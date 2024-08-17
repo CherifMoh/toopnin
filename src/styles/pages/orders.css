@@ -1,0 +1,19 @@
+table {
+    border-collapse:unset;
+    border-right:1px solid rgba(0, 40, 100, 0.12) ;
+}
+
+td, th, tr {
+    border: 1px solid rgba(0, 40, 100, 0.12);
+    padding: 12px;
+    font-weight: 500;
+}
+
+th{
+    padding: 0;
+    font-weight: 600;
+}
+
+th div{
+    white-space: nowrap;
+}

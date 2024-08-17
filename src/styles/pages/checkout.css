@@ -1,0 +1,165 @@
+body {
+    margin: 0;
+}
+
+header {
+    border-bottom: 1px solid rgb(221, 221, 221);
+    text-align: center;
+    height: 82px;
+}
+
+.logo {
+    height: 82px;
+}
+
+main {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    height: 0;
+}
+
+.form-section {
+    height: 100%;
+    border-right: 1px solid rgb(221, 221, 221);
+    display: flex;
+    justify-content: end;
+}
+
+.form-container {
+    width: 610px;
+    padding: 20px;
+    text-align: center;
+}
+
+.form-container h1 {
+    text-align: start;
+}
+
+input,
+select {
+    font-size: 13.5px;
+    padding: 13.5px 11px;
+    border-radius: 4px;
+    width: 100%;
+    margin-bottom: 15px;
+    border: 1px solid rgb(138, 138, 138);
+    letter-spacing: normal;
+}
+
+.name-forms-container,
+.wilaya-forms-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 15px;
+}
+
+.submit-button {
+    width: 100%;
+    padding: 14px;
+    border: none;
+    border-radius: 4px;
+    background-color: #1773B0;
+    color: white;
+    font-size: 14px;
+    letter-spacing: 1.2px;
+    font-weight: 600;
+}
+
+
+.order-details-section {
+    background-color: #f5f5f5;
+}
+
+.order-details-container {
+    width: 414px;
+}
+
+.product-image-container {
+    position: relative;
+}
+
+.product-quntity {
+    position: absolute;
+    right: -4px;
+    top: -7px;
+    text-align: center;
+    font-size: 12px;
+    padding-top: 3px;
+    padding-left: 3px;
+    border-radius: 50px;
+    height: 21px;
+    width: 21px;
+    color: #f5f5f5;
+    background-color: #666666;
+}
+
+.product {
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+    margin-bottom: 10px;
+}
+
+.product-image {
+    height: 64px;
+    object-fit: contain;
+    border-radius: 4px;
+}
+
+.product-title {
+    letter-spacing: normal;
+    padding-left: 14px;
+    width: 215px;
+}
+
+.product-price,
+.products-price {
+    letter-spacing: normal;
+    text-align: end;
+    padding-left: 14px;
+    width: 215px;
+}
+
+.order-price-cintainer {
+    margin-top: 50px;
+
+}
+
+.prcie-c {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.nospasing {
+    letter-spacing: normal;
+}
+
+.total-price,
+.total-text {
+    letter-spacing: normal;
+    font-size: 17px;
+    color: #000000;
+    font-weight: 500;
+}
+
+.order-summary-title {
+    padding: 10px;
+    text-align: start;
+}
+
+@media(max-width: 1100px) {
+    main {
+        grid-template-columns: 1fr;
+    }
+
+    .form-section,
+    .order-details-section {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        background-color: transparent;
+    }
+}

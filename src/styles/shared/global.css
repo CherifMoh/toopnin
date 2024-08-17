@@ -1,0 +1,87 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap');
+
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+
+@font-face {
+    font-family: futura;
+    src: url(../../../public/fonts/futura\ medium\ bt.ttf);
+}
+
+* {
+    /* font-family: futura; */
+    font-family: "Poppins", sans-serif;
+    letter-spacing: normal;
+    box-sizing: border-box;
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(50px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0px);
+        opacity: 1;
+    }
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    background-color: #DCCCB3;
+    font-family: 'Roboto', sans-serif;
+    padding: 0;
+    margin: 0;
+}
+
+.no-focus-outline:focus {
+    outline: none;
+}
+
+td,
+th,
+tr {
+    border: 2px solid black;
+    padding: 12px;
+    font-weight: 500;
+}
+
+.no-spin::-webkit-outer-spin-button,
+.no-spin::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.line-before::before {
+    content: '';
+    position: absolute;
+    right:-16px;
+    top: 50%;
+    width: 16px;
+    height: 3px;
+    transform: translateY(-50%);
+    background-color: currentColor;
+}
+
+
+.line-top::before {
+    content: '';
+    position: absolute;
+    right: 50%;;
+    top: -25px;
+    width: 3px;
+    height: 25px;
+    transform: translateX(-50%);
+    background-color: currentColor;
+}
+
+.no-spin {
+    -moz-appearance: textfield;
+}
