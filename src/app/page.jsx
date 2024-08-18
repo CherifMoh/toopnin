@@ -1,4 +1,3 @@
-'use client'
 // import '../styles/pages/index.css'
 
 // import Header from '../components/home/Header'
@@ -10,12 +9,12 @@
 // import Image from 'next/image'
 // import brownSide from '../../public/assets/brownSide.png'
 // import blueSide from '../../public/assets/blueSide.png'
-import { useRouter } from 'next/navigation'
+// import { useRouter } from 'next/navigation'
 
 
 function Home() {
-  const router = useRouter()
-  router.push('/store')
+  // const router = useRouter()
+  // router.push('/store')
 
   return (
     <></>

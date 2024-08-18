@@ -22,6 +22,10 @@ export default async function middleware(request) {
     if (accessCookie) decodedToken = decodeJwt(accessCookie.value);
 
 
+    if (fullPath === '/') {
+        return NextResponse.redirect(new URL('/store', request.url));
+    }
+
     if (parts.length === 2) {
         return NextResponse.redirect(new URL('/admin/dashboard', request.url))
     }
@@ -45,5 +49,5 @@ export default async function middleware(request) {
 
 
 export const config = {
-    matcher: '/admin(.*)'
+    matcher: '/'
 }
