@@ -118,7 +118,7 @@ function Admin() {
             const formData = new FormData();
             formData.append('image', file);
 
-            fetch('https://drawlys.com:8444/upload', {
+            fetch('https://toopnin.com:8444/upload', {
                 method: 'POST',
                 body: formData
             })
@@ -148,7 +148,7 @@ function Admin() {
             const formData = new FormData();
             formData.append('image', file);
 
-            fetch('https://drawlys.com:8444/upload', {
+            fetch('https://toopnin.com:8444/upload', {
                 method: 'POST',
                 body: formData
             })
@@ -192,7 +192,7 @@ function Admin() {
         const formData = new FormData();
         formData.append('image', file);
 
-        fetch('https://drawlys.com:8444/upload', {
+        fetch('https://toopnin.com:8444/upload', {
             method: 'POST',
             body: formData
         })
@@ -250,7 +250,7 @@ function Admin() {
         const formData = new FormData();
         formData.append('image', file);
 
-        fetch('https://drawlys.com:8444/upload', {
+        fetch('https://toopnin.com:8444/upload', {
             method: 'POST',
             body: formData
         })
@@ -927,7 +927,7 @@ function Admin() {
         const formData = new FormData();
         formData.append('image', file);
 
-        fetch('https://drawlys.com:8444/upload', {
+        fetch('https://toopnin.com:8444/upload', {
             method: 'POST',
             body: formData
         })

@@ -2,7 +2,7 @@
 const { BetaAnalyticsDataClient } = require('@google-analytics/data');
 
 // Replace with your Google Analytics 4 property ID
-const propertyId = '440811286';
+const propertyId = '454869603';
 
 // Initialize the Analytics Data API client
 const analyticsDataClient = new BetaAnalyticsDataClient();

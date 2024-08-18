@@ -15,6 +15,7 @@ export default async function middleware(request) {
     const parts = fullPath.split("/")
     const path = parts[1]
 
+
     const accessCookie = request.cookies.get('access-token')
 
     let decodedToken
@@ -49,5 +50,5 @@ export default async function middleware(request) {
 
 
 export const config = {
-    matcher: '/'
+    matcher: ['/admin/:path*', '/'],
 }

@@ -51,6 +51,10 @@ const productSchem = new mongoose.Schema({
         type: Array,
         required: true
     },
+    qnts: {
+        type: Array,
+        required: false
+    },
     active: {
         type: Boolean,
         required: false,

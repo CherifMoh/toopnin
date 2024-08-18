@@ -1,14 +1,11 @@
 import mongoose from "mongoose"; 
+import { generateUniqueString } from "../lib/utils";
 
 const OrderSchem = new mongoose.Schema({
-    reference: {
-        type: String,
-        required: true
-    },
-    TslTracking: {
+    DLVTracking: {
         type: String,
         required: false,
-        default: ''
+        default: ()=> generateUniqueString(9)
     },
     name: {
         type: String,

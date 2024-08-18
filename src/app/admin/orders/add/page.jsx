@@ -26,28 +26,16 @@ async function fetchProducts() {
     return res.data;
 }
 async function fetchWilayt() {
-    const res = await axios.get('https://tsl.ecotrack.dz/api/v1/get/wilayas', {
-        headers: {
-            Authorization: `Bearer ${process.env.NEXT_PUBLIC_TSL_API_KEY}`
-        }
-    });
-    return res.data;
+    const res = await axios.get('/api/wilayas/wilayasCodes');
+    return res.data.wilayas;
 }
 async function fetchFees() {
-    const res = await axios.get('https://tsl.ecotrack.dz/api/v1/get/fees', {
-        headers: {
-            Authorization: `Bearer ${process.env.NEXT_PUBLIC_TSL_API_KEY}`
-        }
-    });
-    return res.data;
+    const res = await axios.get('/api/wilayas/fees');
+    return res.data.fees;
 }
 async function fetchCommunes() {
-    const res = await axios.get('https://tsl.ecotrack.dz/api/v1/get/communes', {
-        headers: {
-            Authorization: `Bearer ${process.env.NEXT_PUBLIC_TSL_API_KEY}`
-        }
-    });
-    return res.data;
+    const res = await axios.get('/api/wilayas/communes');
+    return res.data.communes;
 }
 
 
@@ -112,18 +100,7 @@ function Page() {
        
     },[accessibilities])
 
-    useEffect(() => {
-        if (typeof localStorage !== 'undefined') {
-            setOrders(
-                JSON.parse(localStorage.getItem('adminOrder')) || []
-            )
-        }
 
-        setFormData(pre => ({
-            ...pre,
-            reference: generateUniqueString()
-        }))
-    }, [])
 
     useEffect(() => {
         setFormData(pre => ({
@@ -218,7 +195,7 @@ function Page() {
             token: 'fU5aHsSOa_x1DkazrQ-SJl:APA91bEUlOLvWu9Jhz7GFNAEPfSyTuPYl12Z3X_buCYKeCTUeEcaEsStO0i7bxbOB94MHrNOa5-lfa7_wXT1ein-ERWrgaGyQAAqFlsA9IKWOHSyf1movvva35B0jPGh4fCLgVPu3k4v',
             title: "New Order",
             message: "A new order has been created",
-            link: "https://drawlys.com/admin/orders",
+            link: "https://toopnin.com/admin/orders",
           }, {
             headers: {
               "Content-Type": "application/json",
@@ -359,7 +336,7 @@ function Page() {
         const formData = new FormData();
         formData.append('image', file);
 
-        fetch('https://drawlys.com:8444/upload', {
+        fetch('https://toopnin.com:8444/upload', {
             method: 'POST',
             body: formData
         })
@@ -388,7 +365,7 @@ function Page() {
         formData.append('image', file);
        
 
-        fetch('https://drawlys.com:8444/upload', {
+        fetch('https://toopnin.com:8444/upload', {
             method: 'POST',
             body: formData
         })
@@ -524,13 +501,6 @@ function Page() {
                     className="name"
                     placeholder="Name"
                     name="name"
-                    type="text"
-                />
-                <input
-                    onChange={handleChange}
-                    className="name"
-                    placeholder="instagram UserName"
-                    name="instaUserName"
                     type="text"
                 />
 

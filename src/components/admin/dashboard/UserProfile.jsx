@@ -122,11 +122,11 @@ function UserProfile({userEmail}) {
           icon:faUsers,
           href: '/admin/users' 
         },
-        { 
-          name: 'storage', 
-          icon:faWarehouse,
-          href: '/admin/storage' 
-        },
+        // { 
+        //   name: 'storage', 
+        //   icon:faWarehouse,
+        //   href: '/admin/storage' 
+        // },
         // { name: 'Category', href: '/admin/categoreis' },
     ]
     
@@ -189,7 +189,7 @@ function UserProfile({userEmail}) {
         const formData = new FormData();
         formData.append('image', file);
 
-        fetch('https://drawlys.com:8444/upload', {
+        fetch('https://toopnin.com:8444/upload', {
             method: 'POST',
             body: formData
         })

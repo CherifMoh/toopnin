@@ -229,14 +229,14 @@ function Orders() {
 
         const fetchAndUpdateOrders = async () => {
             try {
-                const allPages = await fetchAllPages();
+                // const allPages = await fetchAllPages();
                 await Promise.all(
                     Orders.map(async (order) => {
                         const currentDate = format(new Date(), 'yyyy-MM-dd');
     
                         if (order.tracking === 'livred' || order.tracking === 'returned') return;
                         
-                        let newTracking = await getOrderStatus(order,allPages) 
+                        let newTracking = await getOrderStatus(order) 
                    
                         // counter++;
                         if (newTracking === order.tracking) return;
@@ -262,8 +262,9 @@ function Orders() {
                 console.log(err); 
             }
         };
+        getOrderStatus()
 
-        fetchAndUpdateOrders();
+        // fetchAndUpdateOrders();
 
         return () => {
             // Cleanup function
@@ -294,121 +295,64 @@ function Orders() {
     
     async function fetchOrderStatus(tracking) {
         try{
-            const res = await axios.get('https://tsl.ecotrack.dz/api/v1/get/tracking/info', {
-                headers: {
-                    Authorization: `Bearer ${process.env.NEXT_PUBLIC_TSL_API_KEY}`
-                },
-                params:{
-                    tracking: tracking
+            const res = await axios.post('https://procolis.com/api_v1/token', 
+                {
+                    Colis: [
+                        { "Tracking": "ZRFPH358A" }
+                    ]
+                }, 
+                {
+                    headers: {
+                        key: process.env.NEXT_PUBLIC_ZR_API_KEY,
+                        token: process.env.NEXT_PUBLIC_ZR_API_TOKEN
+                    }
                 }
-            });
+            );
             return res.data
         }catch(err){
-            console.log(err)
+            console.log(err.message)
             return null
         }
     }
 
-    async function fetchAllPages() {
-        const baseUrl = 'https://tsl.ecotrack.dz/api/v1/get/orders';
-        let page = 1;
-        let allData = [];
-        let lastPage = false;
-      
-        while (!lastPage) {
-          try {
-            const response = await axios.get(`${baseUrl}?page=${page}`, {
-                headers: {
-                    Authorization: `Bearer ${process.env.NEXT_PUBLIC_TSL_API_KEY}`
-                }
-            });
-            const { data, last_page } = response.data;
-      
-            allData = allData.concat(data);
-      
-            if (page >= last_page) {
-              lastPage = true;
-            } else {
-              page++;
-            }
-          } catch (error) {
-            console.error(`Error fetching page ${page}:`, error);
-            break;
-          }
-        }
-      
-        return allData;
-    }
     
-    async function getOrderStatus(order,allPages) {            
-        const tslOrdersIndex = allPages.findIndex(p => p.phone=== order.phoneNumber);
-        if(tslOrdersIndex === -1)  return
-        const tslOrder = allPages[tslOrdersIndex]
-        
-        let newTracking = ''
-        // console.log(tslOrder?.status)
-        if(!tslOrder.status){
-            const res = await fetchOrderStatus(order.TslTracking)
-            const lastIndex = res.activity.length - 1;
-            const TslStatus = res.activity[lastIndex].status;
-            newTracking = newTrackingFromActivity(order, TslStatus);            
-        }else{
-            newTracking = newTrackingFromStatus(order, tslOrder.status)
-
-        }
-        return newTracking
+    async function getOrderStatus(order) {            
+       
+        const res = await fetchOrderStatus('ZRFPH358A')
+        console.log(res)
+        // const ZrStatus = res.activity[lastIndex].status;
+        // const newTracking = newTrackingFromActivity(order, ZrStatus);            
+       
+        // return newTracking
 
     }
 
-    function newTrackingFromActivity(order, TslStatus) {
+    function newTrackingFromActivity(order, ZrStatus) {
         let newTracking = ''
         if (!order.inDelivery && order.state !== 'مؤكدة') {
             newTracking = '';
         } else if (!order.inDelivery) {
             newTracking = 'Prêt à expédier';
-        } else if (TslStatus === 'accepted_by_carrier') {
+        } else if (ZrStatus === 'accepted_by_carrier') {
             newTracking = 'Vers Wilaya';
-        } else if (TslStatus === 'order_information_received_by_carrier') {
+        } else if (ZrStatus === 'order_information_received_by_carrier') {
             newTracking = 'Vers Station';
-        } else if (TslStatus === 'attempt_delivery' || TslStatus === 'dispatched_to_driver') {
+        } else if (ZrStatus === 'attempt_delivery' || ZrStatus === 'dispatched_to_driver') {
             newTracking = 'En livraison';
-        } else if (TslStatus === 'livred') {
-            newTracking = TslStatus;
-        // } else if (TslStatus === 'notification_on_order') {
+        } else if (ZrStatus === 'livred') {
+            newTracking = ZrStatus;
+        // } else if (ZrStatus === 'notification_on_order') {
         //     newTracking = 'En preparation';
-        } else if (TslStatus === 'notification_on_order') {
+        } else if (ZrStatus === 'notification_on_order') {
             newTracking = 'Suspendus';
-        } else if (TslStatus === 'returned') {
+        } else if (ZrStatus === 'returned') {
             newTracking = 'returned';
         }
         return newTracking
     }
     
-    function newTrackingFromStatus(order, TslStatus) {
-        let newTracking = ''
-        if (!order.inDelivery && order.state !== 'مؤكدة') {
-            newTracking = '';
-        } else if (!order.inDelivery ||TslStatus === 'prete_a_expedier' ) {
-            newTracking = 'Prêt à expédier';
-        } else if (TslStatus === 'en_ramassage') {
-            newTracking = 'En ramassage';
-        } else if (TslStatus === 'vers_wilaya') {
-            newTracking = 'Vers Wilaya';
-        } else if (TslStatus === 'vers_hub' ||TslStatus === 'en_hub' ) {
-            newTracking = 'Vers Station';
-        } else if (TslStatus === 'en_preparation' || TslStatus === 'en_preparation_stock') {
-            newTracking = 'En preparation';
-        } else if (TslStatus === 'en_livraison') {
-            newTracking = 'En livraison';
-        } else if (TslStatus === 'suspendu') {
-            newTracking = 'Suspendus';
-        } else if (TslStatus === 'livré_non_encaissé' || TslStatus === 'encaissé_non_payé' || TslStatus === 'paiements_prêts' || TslStatus === 'payé_et_archive') {
-            newTracking = 'livred';
-        } else if (TslStatus === 'retour_chez_livreur' || TslStatus === 'retour_transit_entrepot' || TslStatus === 'retour_en_traitement' || TslStatus === 'retour_recu' || TslStatus === 'retour_archive' || TslStatus === 'annule') {
-            newTracking = 'returned';
-        }
-        return newTracking
-    }
+    
+
     
     function orderIdToggel(id) {
         if (editedOrderId === id) {
@@ -534,7 +478,7 @@ function Orders() {
 
     async function addToTsl(order) {
 
-        if(!order.reference ||!order.name||!order.phoneNumber||!order.adresse||!order.commune){
+        if(!order.name||!order.phoneNumber||!order.adresse||!order.commune){
             return setErrorNotifiction("couldn't set the order in TSL")
         }
         
@@ -568,7 +512,6 @@ function Orders() {
 
 
         const TslOrder ={
-            reference:order.reference,
             nom_client:order.name,
             telephone:order.phoneNumber,
             adresse:order.adresse,
@@ -656,7 +599,7 @@ function Orders() {
 
 
         const TslOrder ={
-            tracking: order.TslTracking,
+            tracking: order.DLVTracking,
             nom_client:order.name,
             telephone:order.phoneNumber,
             adresse:order.adresse,
@@ -692,7 +635,7 @@ function Orders() {
         orders.forEach(async(order) => {
             
         
-            let res = await validateToTsl(order.TslTracking,ask_collection)
+            let res = await validateToTsl(order.DLVTracking,ask_collection)
          
             
             
@@ -725,15 +668,15 @@ function Orders() {
         
         const newOrder = {
             ...editedOrder,
-            ...(tracking && { TslTracking: tracking })
+            ...(tracking && { DLVTracking: tracking })
         };
         
-        if(editedOrder.state  === 'مؤكدة' && editedOrder.TslTracking){
+        if(editedOrder.state  === 'مؤكدة' && editedOrder.DLVTracking){
             let res= await updateToTsl(editedOrder)
         }
 
         if(oldOrder.inDelivery !== true && editedOrder.inDelivery  === true && editedOrder.state  === 'مؤكدة'){
-            let res= await validateToTsl(editedOrder.TslTracking,0)
+            let res= await validateToTsl(editedOrder.DLVTracking,0)
         }
 
         const res = await axios.put(`/api/orders/${editedOrderId}`, newOrder, { headers: { 'Content-Type': 'application/json' } });
@@ -760,7 +703,7 @@ function Orders() {
             const newOrder = {
                 ...order,
                 state: 'مؤكدة',
-                ...(tracking && { TslTracking: tracking })
+                ...(tracking && { DLVTracking: tracking })
 
             };
             const response = await axios.put(`/api/orders/${order._id}`, newOrder, { headers: { 'Content-Type': 'application/json' } });
@@ -828,8 +771,7 @@ function Orders() {
             order.name.toLowerCase().includes(searchLower) ||
             order.wilaya.toLowerCase().includes(searchLower) ||
             order.phoneNumber.includes(searchLower) ||
-            order.TslTracking?.toLowerCase().includes(searchLower) ||
-            order.reference?.toLowerCase().includes(searchLower) ||
+            order.DLVTracking?.toLowerCase().includes(searchLower) ||
             order.adresse.toLowerCase().includes(searchLower)
         );
 
@@ -913,7 +855,7 @@ function Orders() {
         const formData = new FormData();
         formData.append('image', file);
 
-        fetch('https://drawlys.com:8444/upload', {
+        fetch('https://toopnin.com:8444/upload', {
             method: 'POST',
             body: formData
         })
@@ -1377,19 +1319,9 @@ function Orders() {
                                         <path fill="currentColor" d="M0 448V64h18v384H0zm26.857-.273V64h36v383.727H26.857zM73.143 448V64h8.857v384h-8.857zM108 448V64h8.857v384H108zm44.857-27.143V64h18v356.857h-18zm36 27.143V64h8.857v384h-8.857zm35.715 0V64h18v384h-18zm44.857-26.857V64h8.857v357.143h-8.857zm35.715 26.857V64h8.857v384h-8.857zm35.714-17.714V64h8.857v366.286h-8.857zm17.714-366.286v356.571h-18V64h18zm44.857 356.571V64h18v384h-18zm44.857-8.857V64h18v375.143h-18zm35.715-8.857V64h18v366.286h-18zm26.857 8.857V64h36v383.727h-36zm45.143-.273V64h18v384h-18zm27.143 0V64h18v384h-18z"></path>
                                     </svg>
     
-                                    {order.TslTracking}
+                                    {order.DLVTracking}
                                 </div>
-                                <div className="flex items-center">
-                                    
-                                    {/* <svg className='size-3 mr-1 text-blue-600' aria-hidden="true" focusable="false" data-prefix="fa" data-icon="hashtag" role="img" xmlns="http://www.w3.or g/2000/svg" viewBox="0 0 448 512" data-fa-i2svg> == $0
-                                        ::before
-                                        <path fill="currentColor" d="M440.667 182.10917.143-40c1.313-7.355-4.342-14.109-11.813-14.109h-74.81114.623-81.891C377.123 38.754 371.468 32 363.997 32h-40.632a12 12 000-11.813 9.891L296.175 128H197.54114.623-81.891C213.477 38.754 207.822 32 200.35 32h-40.632a12 12 0 0 0-11.813 9.891L132.528 128H53.432a12 12 0 0 0-11.813 9.8911- 7.143 40C33.163 185.246 38.818 192 46.289 192h74.81L98.242 320H19.146a12 12 0 0 0-11.813 9.8911-7.143 40C-1.123 377.246 4.532 384 12.003 384h74.81L72.19 465.891C70.87 7 473.246 76.532 480 84.003 480h40.632a12 12 0 0 0 11.813-9.891L151.826 384h98.6341-14.623 81.891C234.523 473.246 240.178 480 247.65 480h40.632a12 12 0 0 0 11.813-9.8 91L315.472 384h79.096a12 12 ◊ ◊ ◊ 11.813-9.89117.143-40c1.313-7.355-4.342-14.109-11.813-14.109h-74.81122.857-128h79.096a12 12 0 0 0 11.813-9.891zM261.889 320h-98.6341 22.857-128h98.6341-22.857 128z"></path>
-                                    </svg> */}
-                                    <div className='mr-1 text-blue-600'>#</div>
-    
-    
-                                    {order.reference}
-                                </div>
+                            
                                 
                             </td>
                             <td className="bg-blue-100">
@@ -1713,7 +1645,7 @@ function Orders() {
                                         <Spinner size={'w-8 h-8'} color={'border-green-500'} containerStyle={'ml-6 -mt-3'} />
                                         :
                                         <div className=" whitespace-nowrap flex items-center justify-center">
-                                            {(isCrafting || isSending ||(isLabels && order?.TslTracking)||isOrderAction) &&
+                                            {(isCrafting || isSending ||(isLabels && order?.DLVTracking)||isOrderAction) &&
                                                 <div className="p-2 flex items-center">
                                                     <input 
                                                         type="checkbox" 
@@ -1760,19 +1692,9 @@ function Orders() {
                                         <path fill="currentColor" d="M0 448V64h18v384H0zm26.857-.273V64h36v383.727H26.857zM73.143 448V64h8.857v384h-8.857zM108 448V64h8.857v384H108zm44.857-27.143V64h18v356.857h-18zm36 27.143V64h8.857v384h-8.857zm35.715 0V64h18v384h-18zm44.857-26.857V64h8.857v357.143h-8.857zm35.715 26.857V64h8.857v384h-8.857zm35.714-17.714V64h8.857v366.286h-8.857zm17.714-366.286v356.571h-18V64h18zm44.857 356.571V64h18v384h-18zm44.857-8.857V64h18v375.143h-18zm35.715-8.857V64h18v366.286h-18zm26.857 8.857V64h36v383.727h-36zm45.143-.273V64h18v384h-18zm27.143 0V64h18v384h-18z"></path>
                                     </svg>
     
-                                    {order.TslTracking}
+                                    {order.DLVTracking}
                                 </div>
-                                <div className="flex items-center">
-                                    
-                                    {/* <svg className='size-3 mr-1 text-blue-600' aria-hidden="true" focusable="false" data-prefix="fa" data-icon="hashtag" role="img" xmlns="http://www.w3.or g/2000/svg" viewBox="0 0 448 512" data-fa-i2svg> == $0
-                                        ::before
-                                        <path fill="currentColor" d="M440.667 182.10917.143-40c1.313-7.355-4.342-14.109-11.813-14.109h-74.81114.623-81.891C377.123 38.754 371.468 32 363.997 32h-40.632a12 12 000-11.813 9.891L296.175 128H197.54114.623-81.891C213.477 38.754 207.822 32 200.35 32h-40.632a12 12 0 0 0-11.813 9.891L132.528 128H53.432a12 12 0 0 0-11.813 9.8911- 7.143 40C33.163 185.246 38.818 192 46.289 192h74.81L98.242 320H19.146a12 12 0 0 0-11.813 9.8911-7.143 40C-1.123 377.246 4.532 384 12.003 384h74.81L72.19 465.891C70.87 7 473.246 76.532 480 84.003 480h40.632a12 12 0 0 0 11.813-9.891L151.826 384h98.6341-14.623 81.891C234.523 473.246 240.178 480 247.65 480h40.632a12 12 0 0 0 11.813-9.8 91L315.472 384h79.096a12 12 ◊ ◊ ◊ 11.813-9.89117.143-40c1.313-7.355-4.342-14.109-11.813-14.109h-74.81122.857-128h79.096a12 12 0 0 0 11.813-9.891zM261.889 320h-98.6341 22.857-128h98.6341-22.857 128z"></path>
-                                    </svg> */}
-                                    <div className='mr-1 text-blue-600'>#</div>
-    
-    
-                                    {order.reference}
-                                </div>
+                                
                                 
                             </td>
                             <td className="bg-blue-100">
@@ -1953,7 +1875,7 @@ function Orders() {
                     Authorization: `Bearer ${process.env.NEXT_PUBLIC_TSL_API_KEY}`
                 },
                 params: {
-                    tracking: order.TslTracking
+                    tracking: order.DLVTracking
                 },
                 responseType: 'arraybuffer'  // Handle binary data correctly
             });
@@ -2379,15 +2301,14 @@ function Orders() {
                         className="w-1/4 px-3 text-sm rounded py-1 bg-white border border-[rgba(0, 40, 100, 0.12)]"
                     >
                         <option value="phoneNumber">Phone Number</option>
-                        <option value="TslTracking">Tracking</option>
-                        <option value="reference">Reference</option>
+                        <option value="DLVTracking">Tracking</option>
                     </select>
 
                     <input 
                         type="text"
                         value={serachingValue}
                         onChange={e => setSerachingValue(e.target.value)}
-                        placeholder="Phone Number, Tracking,  Reference  " 
+                        placeholder="Phone Number, Tracking  " 
                         className="w-1/3 px-3 text-sm rounded py-1 bg-white border border-[rgba(0, 40, 100, 0.12)]"
                     />
 
