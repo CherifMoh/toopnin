@@ -3,13 +3,13 @@ import { getMessaging, getToken, isSupported } from "firebase/messaging";
 
 // Replace the following with your app's Firebase project configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyBFQIMDiuZrt4eAZzd1yqO5vVemb1HbiCA",
-  authDomain: "drawlys-notifications.firebaseapp.com",
-  projectId: "drawlys-notifications",
-  storageBucket: "drawlys-notifications.appspot.com",
-  messagingSenderId: "421597835625",
-  appId: "1:421597835625:web:32b670de64a88e8876cdf8",
-  measurementId: "G-ZJWHJGD2YW"
+  apiKey: "AIzaSyDyFIybEpZrroHDpHnyiLb3X7DusBuTfL0",
+  authDomain: "toopnin.firebaseapp.com",
+  projectId: "toopnin",
+  storageBucket: "toopnin.appspot.com",
+  messagingSenderId: "68238425120",
+  appId: "1:68238425120:web:4e929ef233de9ce0b11045",
+  measurementId: "G-S05NM7G6PH"
 };
 
 const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();

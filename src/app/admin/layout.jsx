@@ -1,5 +1,10 @@
 import Dashboard from "../../components/admin/dashboard/Dashboard"
 
+export const metadata = {
+  title: 'Admin Dashboard',
+
+}
+
 
 export default function Layout({ children }) {
   return (

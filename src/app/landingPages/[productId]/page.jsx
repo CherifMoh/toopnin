@@ -16,28 +16,16 @@ import { faLocationCrosshairs, faLocationDot, faMinus, faPaperPlane, faPhone, fa
 
 
 async function fetchWilayt() {
-  const res = await axios.get('https://tsl.ecotrack.dz/api/v1/get/wilayas', {
-      headers: {
-          Authorization: `Bearer ${process.env.NEXT_PUBLIC_TSL_API_KEY}`
-      }
-  });
-  return res.data;
+    const res = await axios.get('/api/wilayas/wilayasCodes');
+    return res.data.wilayas;
 }
 async function fetchFees() {
-  const res = await axios.get('https://tsl.ecotrack.dz/api/v1/get/fees', {
-      headers: {
-          Authorization: `Bearer ${process.env.NEXT_PUBLIC_TSL_API_KEY}`
-      }
-  });
-  return res.data;
+    const res = await axios.get('/api/wilayas/fees');
+    return res.data.fees;
 }
 async function fetchCommunes() {
-  const res = await axios.get('https://tsl.ecotrack.dz/api/v1/get/communes', {
-      headers: {
-          Authorization: `Bearer ${process.env.NEXT_PUBLIC_TSL_API_KEY}`
-      }
-  });
-  return res.data;
+    const res = await axios.get('/api/wilayas/communes');
+    return res.data.communes;
 }
 
 

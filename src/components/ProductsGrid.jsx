@@ -111,10 +111,7 @@ function ProductsGrid() {
                 <Link 
                  key={product._id} 
                  className="product-card" 
-                 href={product.title==='Led Painting'
-                  ?`/led-painting`
-                  :`/${product._id}`
-                 }
+                 href={`/landingPages/${product._id}`}
                 >
                     <div className="product-img-container">
                         <img alt="" src={`${product.imageOn}`} width={20} height={20} className="product-img product-img-on" />

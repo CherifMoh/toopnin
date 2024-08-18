@@ -33,7 +33,7 @@ export async function POST(req){
 
                 cookies().set("user-email", user.email, {
                     path: "/",
-                    domain: "drawlys.com",
+                    domain: "toopnin.com",
                     maxAge: thirtyDaysFromNow,
                     httpOnly: true,
                     secure: true,
@@ -42,7 +42,7 @@ export async function POST(req){
 
                 cookies().set("access-token", token, {
                     path: "/",
-                    domain: "drawlys.com",
+                    domain: "toopnin.com",
                     maxAge: thirtyDaysFromNow,
                     httpOnly: true,
                     secure: true,

@@ -10,6 +10,7 @@ import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import logo from '../../../public/assets/noBgLogo.png'
 import { useRouter } from 'next/navigation';
+// import { updateWilayas } from '../actions/wilayas';
 import { v4 as uuidv4 } from 'uuid';
 import Spinner from '../../components/loadings/Spinner';
 import ChechoutSkeleton from '../../components/loadings/ChechoutSkeleton';
@@ -29,28 +30,16 @@ async function fetchProducts(idArray) {
 }
 
 async function fetchWilayt() {
-    const res = await axios.get('https://tsl.ecotrack.dz/api/v1/get/wilayas', {
-        headers: {
-            Authorization: `Bearer ${process.env.NEXT_PUBLIC_TSL_API_KEY}`
-        }
-    });
-    return res.data;
+    const res = await axios.get('/api/wilayas/wilayasCodes');
+    return res.data.wilayas;
 }
 async function fetchFees() {
-    const res = await axios.get('https://tsl.ecotrack.dz/api/v1/get/fees', {
-        headers: {
-            Authorization: `Bearer ${process.env.NEXT_PUBLIC_TSL_API_KEY}`
-        }
-    });
-    return res.data;
+    const res = await axios.get('/api/wilayas/fees');
+    return res.data.fees;
 }
 async function fetchCommunes() {
-    const res = await axios.get('https://tsl.ecotrack.dz/api/v1/get/communes', {
-        headers: {
-            Authorization: `Bearer ${process.env.NEXT_PUBLIC_TSL_API_KEY}`
-        }
-    });
-    return res.data;
+    const res = await axios.get('/api/wilayas/communes');
+    return res.data.communes;
 }
 
 function Checkout() {
@@ -68,6 +57,10 @@ function Checkout() {
     const [slectedCommunes, setSlectedCommunes] = useState([]);
 
     const [isSubmiting, setIsSubmitting] = useState(false)
+
+    const [shippingPrice, setShippingPrice] = useState(null)
+
+    const [totalPrice, setTotalPrice] = useState(null)
 
     // Form Change Functions
     const handleChange = (e) => {
@@ -105,7 +98,7 @@ function Checkout() {
     });
 
    
-    let shippingPrice = ''
+
     
 
     useEffect(() => {
@@ -127,7 +120,7 @@ function Checkout() {
                         shippingMethod: 'مكتب',
                         shippingPrice: stopdesk
                     }))
-                    shippingPrice = stopdesk
+                    setShippingPrice(stopdesk)
                 } else {
                     setIsBeruAvailable(true)
                 }
@@ -141,7 +134,7 @@ function Checkout() {
                         // }))
                         formData.shippingMethod === 'بيت'
                             ? setFormData(pre => {
-                                shippingPrice = adomicile
+                                setShippingPrice(adomicile)
                                 return {
                                     ...pre,
                                     shippingMethod: 'بيت',
@@ -150,7 +143,7 @@ function Checkout() {
                             })
                             
                             : setFormData(pre => {
-                                shippingPrice = stopdesk
+                                setShippingPrice(stopdesk)
                                 return {
                                     ...pre,
                                     shippingMethod: 'مكتب',
@@ -164,7 +157,11 @@ function Checkout() {
         })
     }, [formData.wilaya,formData.shippingMethod])
 
-    const totalPrice = subTotalPriceState + shippingPrice
+   
+    useEffect(() => {
+        if(!subTotalPriceState || !shippingPrice) return
+        setTotalPrice(Number(subTotalPriceState) + Number(shippingPrice))
+    },[subTotalPriceState, shippingPrice])
 
 
     useEffect(() => {
@@ -253,6 +250,8 @@ function Checkout() {
         )
     })
 
+
+    console.log(totalPrice)
 
     const phonePattern = /^0\d{9}$/;
 
@@ -453,7 +452,7 @@ function Checkout() {
                             <div className="nospasing total prcie-c">
                                 <div className="nospasing total-text">Total</div>
                                 <div style={shippingStyle} className="nospasing total-price">
-                                    {shippingPrice ? (shippingPrice + subTotalPriceState) + ' DA' :
+                                    {shippingPrice ? totalPrice + ' DA' :
                                         ' ادخل الولاية و طريقة التوصيل لتحديد السعر'
                                     }
                                 </div>

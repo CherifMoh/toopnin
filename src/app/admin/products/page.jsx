@@ -75,10 +75,10 @@ function Page() {
     async function handelSelectTimeActiveUsers(time){
         const allpages = await ActiveUsersReport(time)
         const landingPages = allpages
-            .filter(item => item.pagePath.startsWith('/landingPges/'))
+            .filter(item => item.pagePath.startsWith('/landingPages/'))
             .map(item => ({
             ...item,
-            pagePath: item.pagePath.replace('/landingPges/', '')
+            pagePath: item.pagePath.replace('/landingPages/', '')
             }));        
         setAllActiveUsers(landingPages)
     }
@@ -158,7 +158,7 @@ function Page() {
                                 </Link>
                             }
                             {product.landingPageImages.length > 0 &&
-                                <Link href={`/landingPges/${product._id}`} className=' p-2 rounded-md'>
+                                <Link href={`/landingPages/${product._id}`} className=' p-2 rounded-md'>
                                     <Image  
                                         src={landingPageIcon} alt=''
                                         width={32} height={32}
@@ -185,7 +185,7 @@ function Page() {
                                 </Link>
                             }
                             {product.landingPageImages.length > 0 &&
-                                <Link href={`/landingPges/${product._id}`} className=' p-2 rounded-md'>
+                                <Link href={`/landingPages/${product._id}`} className=' p-2 rounded-md'>
                                     <Image  
                                         src={landingPageIcon} alt=''
                                         width={20} height={20}

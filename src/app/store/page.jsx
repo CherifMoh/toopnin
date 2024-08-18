@@ -1,6 +1,6 @@
 
 import '../../styles/pages/index.css'
-import  ProductsGrid  from "../../components/led painting/LedGrid"
+import  ProductsGrid  from "../../components/ProductsGrid"
 import  ProductGSkeleton  from "../../components/loadings/ProductGSkeleton"
 import { Suspense } from 'react'
 

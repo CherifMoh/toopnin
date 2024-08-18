@@ -6,7 +6,7 @@ import { GoogleAnalytics } from '@next/third-parties/google'
 
 
 export const metadata = {
-  title: 'Drawlys',
+  title: 'Toopnin',
   description: 'the best choice',
 }
 
@@ -14,7 +14,7 @@ export default async function RootLayout({ children }) {
   return (
     <html>
       <head>
-        <Script
+        {/* <Script
           id='faceboockPixel'
           strategy='afterInteractive'
           dangerouslySetInnerHTML={{
@@ -31,7 +31,7 @@ export default async function RootLayout({ children }) {
               fbq('track', 'PageView');
             `
           }}
-        ></Script>
+        ></Script> */}
       </head>
       <body>
         <ReduxProvider>
@@ -40,7 +40,7 @@ export default async function RootLayout({ children }) {
           </QueryProvider>
         </ReduxProvider>
       </body>
-      <GoogleAnalytics gaId="G-4HR9W978KD" />
+      <GoogleAnalytics gaId="G-TXR8620253" />
     </html>
   )
 }

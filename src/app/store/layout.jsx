@@ -10,7 +10,7 @@ const Cart = dynamic(() => import('../../components/shared/Cart'), {
 
 
 export const metadata = {
-  title: 'Led Painting',
+  title: 'Toopnin Store',
 }
 
 export default function Layout({ children }) {
