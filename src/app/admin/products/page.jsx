@@ -318,66 +318,33 @@ function Page() {
                 <td>{realTimeUsers.length !== 0 ? realTimeUsers[0].activeUsers : 0}</td>
                 <td>{selectedTimeUsers.length !== 0 ? selectedTimeUsers[0].activeUsers : 0}</td>
                 <td>
-                    {
-                        product.title === 'Led Painting' 
-                        ?
-                        <div className='flex items-center gap-3'>
-                            <Link href={`/admin/products/led-designs`} className='p-2 rounded-md'>
-                                <FontAwesomeIcon  icon={faCircleInfo} />
-                            </Link>
-                            {isUpdateAccess &&
-                                <Link href={`/admin/products/${product._id}`} className=' p-2 rounded-md'>
-                                    <FontAwesomeIcon  icon={faPen} />
-                                </Link>
-                            }
-                            {product.landingPageImages.length > 0 &&
-                                <Link href={`/landingPages/${product._id}`} className=' p-2 rounded-md'>
-                                    <Image  
-                                        src={landingPageIcon} alt=''
-                                        width={32} height={32}
-                                    />
-                                </Link>
-                            }
-                            {isDeleteAccess && deleting.some(item => item.id === product._id && item.state) &&
-                                <Spinner size={'h-8 w-8'} color={'border-red-500'} />
-                            }  
-                            {isDeleteAccess && !deleting.some(item => item.id === product._id && item.state) &&
-                                <button
-                                    className=' p-2 rounded-md'
-                                    onClick={() => handleDelete(product._id)}
-                                >
-                                    <FontAwesomeIcon icon={faTrashCan} />
-                                </button>                            
-                            }  
-                            
-                        </div>
-                        :<div className='flex items-center gap-3'>
+                    <div className='flex items-center gap-3'>
                         {isUpdateAccess &&
-                                <Link href={`/admin/products/${product._id}`} className=' p-2 rounded-md'>
-                                    <FontAwesomeIcon  icon={faPen} />
-                                </Link>
-                            }
-                            {product.landingPageImages.length > 0 &&
-                                <Link href={`/landingPages/${product._id}`} className=' p-2 rounded-md'>
-                                    <Image  
-                                        src={landingPageIcon} alt=''
-                                        width={20} height={20}
-                                    />
-                                </Link>
-                            }
-                            {isDeleteAccess && deleting.some(item => item.id === product._id && item.state) &&
-                                <Spinner size={'h-8 w-8'} color={'border-red-500'} />
-                            }  
-                            {isDeleteAccess && !deleting.some(item => item.id === product._id && item.state) &&
-                                <button
-                                    className=' p-2 rounded-md'
-                                    onClick={() => handleDelete(product._id)}
-                                >
-                                    <FontAwesomeIcon icon={faTrashCan} />
-                                </button>                            
-                            }  
-                        </div>
-                    }
+                            <Link href={`/admin/products/${product._id}`} className='cursor-pointer p-2 rounded-md'>
+                                <FontAwesomeIcon  icon={faPen} />
+                            </Link>
+                        }
+                        {product.landingPageImages.length > 0 &&
+                            <Link href={`/landingPages/${product._id}`} className='cursor-pointer p-2 rounded-md'>
+                                <Image  
+                                    src={landingPageIcon} alt=''
+                                    width={20} height={20}
+                                />
+                            </Link>
+                        }
+                        {isDeleteAccess && deleting.some(item => item.id === product._id && item.state) &&
+                            <Spinner size={'h-8 w-8'} color={'border-red-500'} />
+                        }  
+                        {isDeleteAccess && !deleting.some(item => item.id === product._id && item.state) &&
+                            <button
+                                className=' p-2 rounded-md cursor-pointer'
+                                onClick={() => handleDelete(product._id)}
+                            >
+                                <FontAwesomeIcon icon={faTrashCan} />
+                            </button>                            
+                        }  
+                    </div>
+                
                 </td>
             </tr>
         )
@@ -402,7 +369,7 @@ function Page() {
 
   return (
     <div className='py-4 relative pl-4 pr-48 flex flex-col gap-5 h-screen overflow-x-auto w-full min-w-max'  >
-        <div className='flex items-center w-full justify-around p-14'>
+        <div className='flex z-50 items-center w-full justify-around p-14'>
             <div className='flex justify-center relative '>
                 <FontAwesomeIcon
                     icon={faMagnifyingGlass}
@@ -448,7 +415,7 @@ function Page() {
            
 
         </div>
-        <div className='flex items-center justify-center w-full'>
+        <div className='flex z-50 items-center justify-center w-full'>
             <table className='font-normal h-1 w-full flex-shrink-0 bg-stone-100' style={{ borderSpacing: '0' }}>
                 <thead>
                     <tr>
