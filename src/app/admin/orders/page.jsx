@@ -226,6 +226,7 @@ function Orders() {
                     Orders.map(async (order) => {
                         const currentDate = format(new Date(), 'yyyy-MM-dd');
     
+                        if(order.state !== 'مؤكدة') return
                         // if (order.tracking === 'Livrée' || order.tracking === 'returned') return;
                         let newTracking = await getOrderStatus(order) 
                    
