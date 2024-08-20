@@ -69,7 +69,7 @@ function UserProfile({userEmail}) {
 
     useEffect(() => {
       if(!User1 || !token) return
-      if(User1.fcmTokens.includes(token)) return
+      if(User1.fcmTokens?.includes(token)) return
 
       const newFcmTokens = [...User1.fcmTokens, token]
       const newUser = {...User1, fcmTokens: newFcmTokens}

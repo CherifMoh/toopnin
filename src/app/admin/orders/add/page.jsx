@@ -398,6 +398,7 @@ function Page() {
                 gallery: selectedProduct.gallery,
                 qnt: selectqnt,
                 title: selectedProduct.title,
+                productID: selectedProduct._id,
                 options: selectedProduct.options,
                 _id: uuidv4()
             }

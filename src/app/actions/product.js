@@ -2,6 +2,7 @@
 
 import Product from "../models/products"
 import { dbConnect } from "../lib/dbConnect"
+import axios from "axios"
 
 
 export async function addProduct(newProduct){ 
@@ -40,3 +41,4 @@ export async function getOneProduct(id){
   }
     
 }
+

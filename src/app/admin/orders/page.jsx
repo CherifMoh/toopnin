@@ -9,9 +9,9 @@ import 'react-datepicker/dist/react-datepicker.css';
 import { format } from 'date-fns'
 import Link from "next/link";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faMagnifyingGlass, faPen, faPlus, faX, faCheck, faPaperPlane } from '@fortawesome/free-solid-svg-icons'
+import { faMagnifyingGlass, faPen, faPlus, faX, faCheck, faPaperPlane, faArrowDown, faAngleDown } from '@fortawesome/free-solid-svg-icons'
 import { faTrashCan } from '@fortawesome/free-regular-svg-icons'
-import { deleteOrder, getOrder } from '../../actions/order'
+import { addOrderSchedule, addOrderToZR, deleteOrder, expedieOrderToZR, getOrder } from '../../actions/order'
 import { editMinusProduct } from '../../actions/storage'
 import { useRouter } from "next/navigation";
 import { v4 as uuidv4 } from 'uuid'
@@ -36,7 +36,7 @@ import 'jspdf-autotable';
 
 import Spinner from '../../../components/loadings/Spinner'
 import { useSelector } from "react-redux";
-// import { sandMessage } from "../../actions/instagram";
+import { fetchOrderStatus } from "../../actions/order";
 
 
 async function fetchOrders(date) {
@@ -47,10 +47,7 @@ async function fetchOrders(date) {
     return res.data;
 }
 
-async function fetchDesigns() {
-    const res = await axios.get('/api/products/ledDesigns/images');
-    return res.data;
-}
+
 async function fetchProducts() {
     const res = await axios.get('/api/products');
     return res.data;
@@ -62,7 +59,7 @@ function Orders() {
 
     const [deleting, setDeleting] = useState([])
 
-    const [dateFilter, setDateFilter] = useState('today')
+    const [dateFilter, setDateFilter] = useState('Maximum')
 
     const { data: Orders, isLoading, isError, error } = useQuery({
         queryKey: ['orders',dateFilter],
@@ -70,11 +67,6 @@ function Orders() {
         // enabled: !!dateFilter,
     });
 
-
-    const { data: Designs, isLoading: designsLoding, isError: designsIsError, error: designErr } = useQuery({
-        queryKey: ['AdminledDesigne'],
-        queryFn: fetchDesigns
-    });
 
     const { data: Products, isLoading: ProductsLoding, isError: ProductsIsError, error: ProductsErr } = useQuery({
         queryKey: ['Admin All Products'],
@@ -94,7 +86,6 @@ function Orders() {
     const [orderAction, setOrderAction] = useState('')
     const [isOrderAction, setIsOrderAction] = useState(false)
 
-    const [isdesigns, setIsdesigns] = useState({ _id: '', state: false })
     const [isproducts, setIsproducts] = useState({ _id: '', state: false })
 
     const [isProductDeleted, setIsProductDeleted] = useState([])
@@ -106,7 +97,6 @@ function Orders() {
     const [isAddingProduct, setIsAddingProduct] = useState([])
     const [addedOrder, setAddedOrder] = useState({})
     const [isAddedProducts, setIsAddedProducts] = useState([])
-    const [isAddedDesigns, setIsAddedDesigns] = useState([])
     const [selectqnt, setSelectqnt] = useState(1)
     
     const [isGallery, setIsGallery] = useState([])
@@ -139,6 +129,8 @@ function Orders() {
     const [searchingMethode, setSearchingMethode] = useState('phoneNumber')
     const [serachingValue, setSerachingValue] = useState()
     const [reaserchedOrders, setReaserchedOrders] = useState([])
+
+    const [isTrakingFilterDrop, setIsTrakingFilterDrop] = useState('')
 
     const router = useRouter()
 
@@ -234,8 +226,7 @@ function Orders() {
                     Orders.map(async (order) => {
                         const currentDate = format(new Date(), 'yyyy-MM-dd');
     
-                        if (order.tracking === 'livred' || order.tracking === 'returned') return;
-                        
+                        // if (order.tracking === 'Livrée' || order.tracking === 'returned') return;
                         let newTracking = await getOrderStatus(order) 
                    
                         // counter++;
@@ -262,9 +253,8 @@ function Orders() {
                 console.log(err); 
             }
         };
-        getOrderStatus()
 
-        // fetchAndUpdateOrders();
+        fetchAndUpdateOrders();
 
         return () => {
             // Cleanup function
@@ -287,67 +277,43 @@ function Orders() {
     if (isLoading) return <div>Loading...</div>;
     if (isError) return <div>Error fetching Orders: {error.message}</div>;
 
-    if (designsLoding) return <div>Loading...</div>;
-    if (designsIsError) return <div>Error fetching Designs: {designErr.message}</div>;
-
     if (ProductsLoding) return <div>Loading...</div>;
     if (ProductsIsError) return <div>Error fetching Products: {ProductsErr.message}</div>;
     
-    async function fetchOrderStatus(tracking) {
-        try{
-            const res = await axios.post('https://procolis.com/api_v1/token', 
-                {
-                    Colis: [
-                        { "Tracking": "ZRFPH358A" }
-                    ]
-                }, 
-                {
-                    headers: {
-                        key: process.env.NEXT_PUBLIC_ZR_API_KEY,
-                        token: process.env.NEXT_PUBLIC_ZR_API_TOKEN
-                    }
-                }
-            );
-            return res.data
-        }catch(err){
-            console.log(err.message)
-            return null
-        }
-    }
+   
 
     
     async function getOrderStatus(order) {            
        
-        const res = await fetchOrderStatus('ZRFPH358A')
-        console.log(res)
-        // const ZrStatus = res.activity[lastIndex].status;
-        // const newTracking = newTrackingFromActivity(order, ZrStatus);            
-       
-        // return newTracking
+        const res = await fetchOrderStatus(order.DLVTracking)
+
+        
+        const ZrStatus = res.Colis[0].Situation;
+        if (ZrStatus === 'Reporté') {
+            const updated = await addOrderSchedule(order,res.Colis[0].Commentaire)
+        }
+        const newTracking = newTrackingFromActivity(order, ZrStatus);            
+        
+        return newTracking
 
     }
 
     function newTrackingFromActivity(order, ZrStatus) {
-        let newTracking = ''
+        let newTracking = ZrStatus
         if (!order.inDelivery && order.state !== 'مؤكدة') {
             newTracking = '';
-        } else if (!order.inDelivery) {
-            newTracking = 'Prêt à expédier';
-        } else if (ZrStatus === 'accepted_by_carrier') {
-            newTracking = 'Vers Wilaya';
-        } else if (ZrStatus === 'order_information_received_by_carrier') {
-            newTracking = 'Vers Station';
-        } else if (ZrStatus === 'attempt_delivery' || ZrStatus === 'dispatched_to_driver') {
-            newTracking = 'En livraison';
-        } else if (ZrStatus === 'livred') {
-            newTracking = ZrStatus;
-        // } else if (ZrStatus === 'notification_on_order') {
-        //     newTracking = 'En preparation';
-        } else if (ZrStatus === 'notification_on_order') {
-            newTracking = 'Suspendus';
-        } else if (ZrStatus === 'returned') {
-            newTracking = 'returned';
+        } else if (!order.inDelivery && order.state === 'مؤكدة' || ZrStatus === 'En Preparation') {
+            newTracking = 'En preparation';
+        } else if (ZrStatus === 'En Traitement - Prêt à Expédie') {
+            newTracking = 'Prêt à expédier'; 
+        } else if (ZrStatus === 'SD - Appel sans Réponse 3') {
+            newTracking = 'SD - Appel sans Réponse 2'; 
+        } else if (ZrStatus === 'SD - En Attente du Client') {
+            newTracking = 'En Attente du Client'; 
+        } else if (ZrStatus === 'Reporté') {
+            newTracking = 'Scheduled'; 
         }
+        console.log(ZrStatus)
         return newTracking
     }
     
@@ -410,6 +376,7 @@ function Orders() {
         });
     }
 
+
     function handleOptChange(e, i) {
         const input = e.target
         const name = input.name;
@@ -455,7 +422,7 @@ function Orders() {
         await deleteOrder(id)
         router.refresh()
         router.push('/admin/orders')
-        queryClient.invalidateQueries('AdminledDesigne');
+        queryClient.invalidateQueries(`orders,${dateFilter}`);
     }
 
     let longesOrder = []
@@ -476,31 +443,18 @@ function Orders() {
         }
     })
 
-    async function addToTsl(order) {
+    async function addToZR(order) {
 
         if(!order.name||!order.phoneNumber||!order.adresse||!order.commune){
-            return setErrorNotifiction("couldn't set the order in TSL")
+            return setErrorNotifiction("couldn't set the order in ZR")
         }
         
-        const wilayatresponse = await axios.get('https://tsl.ecotrack.dz/api/v1/get/wilayas', {
-            headers: {
-                Authorization: `Bearer ${process.env.NEXT_PUBLIC_TSL_API_KEY}`
-            }
-        });
-        const wilayat = wilayatresponse.data; // Get the data from the response
+        const wilayatresponse = await axios.get('/api/wilayas/wilayasCodes');
+        const wilayat = wilayatresponse.data.wilayas; // Get the data from the response
 
         const wilayaCode =wilayat.find(wilaya=>wilaya.wilaya_name === order.wilaya).wilaya_id
-
-        const communesresponse = await axios.get('https://tsl.ecotrack.dz/api/v1/get/communes', {
-            headers: {
-                Authorization: `Bearer ${process.env.NEXT_PUBLIC_TSL_API_KEY}`
-            }
-        });
-        const communes = communesresponse.data; // Get the data from the response
-        
-        const communesArray = Object.values(communes);
-        const filteredCommunes = communesArray.filter(commune => commune.wilaya_id === wilayaCode);
-       
+        console.log(wilayaCode)
+               
         let products =[]
 
         order.orders.forEach(order=>{
@@ -511,37 +465,30 @@ function Orders() {
         })
 
 
-        const TslOrder ={
-            nom_client:order.name,
-            telephone:order.phoneNumber,
-            adresse:order.adresse,
-            commune:order.commune,
-            produit:products[0],
-            code_wilaya: wilayaCode,
-            fragile:1,
-            remarque:order.deliveryNote,
-            montant:order.totalPrice,
-            stop_desk:order.shippingMethod === 'مكتب' ? 1 : 0,
-            type:1,
+        const ZROrder ={
+            Tracking:order.DLVTracking,
+            TypeLivraison:order.shippingMethod === 'مكتب' ? 1 : 0,
+            TypeColis:0,
+            Confrimee:'',
+            Client:order.name,
+            MobileA:order.phoneNumber,
+            MobileB:'',
+            Adresse:order.adresse,
+            IDWilaya:wilayaCode,
+            Commune:order.commune,
+            Total:order.totalPrice,
+            Note:order.deliveryNote,
+            TProduit:products.join(),
+            id_Externe:order._id,
+            Source:''
         }
 
      
 
         try {
-            const res = await axios.post('https://tsl.ecotrack.dz/api/v1/create/order', TslOrder, {
-                headers: {
-                    Authorization: `Bearer ${process.env.NEXT_PUBLIC_TSL_API_KEY}`,
-                    'Content-Type': 'application/json', // Ensure correct content type
-                }
-            });
-
-            if(res.data.success){
-                setSuccessNotifiction("the order is set in TSL")
-                return {tracking:res.data.tracking}
-                
-            }
+            await addOrderToZR(ZROrder)
         } catch (error) {
-            setErrorNotifiction("couldn't set the order in TSL")
+            setErrorNotifiction("couldn't set the order in ZR")
             setEditedOrder(pre=>{
                 return {...pre, state: 'غير مؤكدة'}
             })
@@ -549,93 +496,29 @@ function Orders() {
         }
     }
 
-    async function validateToTsl(tracking,ask_collection) {
+    async function validateToZR(order) {
        
         try {
-            const res = await axios.post(
-                'https://tsl.ecotrack.dz/api/v1/valid/order',
-                {
-                    tracking: tracking,
-                    ask_collection: ask_collection
-                },
-                {
-                    headers: {
-                        Authorization: `Bearer ${process.env.NEXT_PUBLIC_TSL_API_KEY}`,
-                        'Content-Type': 'application/json'
-                    }
-                }
-            );
-            if(res.data.success){
-                setSuccessNotifiction(res.data.message);
-                return {tracking:res.data.tracking};
-            }
+            expedieOrderToZR(order.DLVTracking)
+            const newOrder = {
+                ...order,
+                inDelivery: true,
+            };
+            const response = await axios.put(`/api/orders/${order._id}`, newOrder, { headers: { 'Content-Type': 'application/json' } });
+            queryClient.invalidateQueries(`orders,${dateFilter}`);
         } catch (error) {
-            setErrorNotifiction("couldn't validate the order in TSL");
+            setErrorNotifiction("couldn't validate the order in ZR");
             console.error('Error:', error.response?.data || error.message);
         }
         
     }
     
-    async function updateToTsl(order) {
 
-        const wilayatresponse = await axios.get('https://tsl.ecotrack.dz/api/v1/get/wilayas', {
-            headers: {
-                Authorization: `Bearer ${process.env.NEXT_PUBLIC_TSL_API_KEY}`
-            }
-        });
-        const wilayat = wilayatresponse.data; // Get the data from the response
-
-        const wilayaCode =wilayat.find(wilaya=>wilaya.wilaya_name === order.wilaya).wilaya_id
-
-
-        let products =[]
-
-        order.orders.forEach(order=>{
-            const i =products.findIndex(product=>product === order.title)
-            if(i === -1){
-                products.push(order.title)
-            }
-        })
-
-
-        const TslOrder ={
-            tracking: order.DLVTracking,
-            nom_client:order.name,
-            telephone:order.phoneNumber,
-            adresse:order.adresse,
-            produit:products[0],
-            remarque:order.deliveryNote,
-            montant:order.totalPrice,
-        }
-
-   
-        try {
-            const res = await axios.post(
-                'https://tsl.ecotrack.dz/api/v1/update/order',TslOrder,
-                {
-                    headers: {
-                        Authorization: `Bearer ${process.env.NEXT_PUBLIC_TSL_API_KEY}`,
-                        'Content-Type': 'application/json'
-                    }
-                }
-            );
-            if(res.data.success){
-                setSuccessNotifiction(res.data.message);
-                return {tracking:res.data.tracking};
-            }
-        } catch (error) {
-            setErrorNotifiction("couldn't update the order in TSL");
-            console.log(error)
-            console.error('Error:', error.response?.data || error.message);
-        }
-        
-    }
-
-    async function validateMultibelToTSL(orders,ask_collection){
+    async function validateMultibelToZR(orders){
         orders.forEach(async(order) => {
             
         
-            let res = await validateToTsl(order.DLVTracking,ask_collection)
+            let res = await validateToZR(order.DLVTracking)
          
             
             
@@ -646,6 +529,28 @@ function Orders() {
             const response = await axios.put(`/api/orders/${order._id}`, newOrder, { headers: { 'Content-Type': 'application/json' } });
             queryClient.invalidateQueries(`orders,${dateFilter}`);
         })
+    }
+
+    async function handelConfirmOrder(order) {
+        let success = true;
+    
+        for (const item of order.orders) {
+            if (!success) break;
+    
+            const res = await editMinusProduct(item.productID, item.qnt, 'confirmed order');
+    
+            if (res.success) {
+                item.qnts = res.removedItems;
+            } else {
+                success = false;
+            }
+        }
+    
+        if (success) {
+            return { success: true, order: order };
+        }
+        
+        return { success: false };
     }
 
     async function handleUpdatingOrder(id) {
@@ -659,28 +564,39 @@ function Orders() {
             })
         }
 
-        let tracking =''
 
+        let newOrder = editedOrder
         if(oldOrder.state !== 'مؤكدة' && editedOrder.state  === 'مؤكدة'){
-            let res = await addToTsl(editedOrder)
-            tracking = res?.tracking
+            const res = await handelConfirmOrder(editedOrder)
+            if(res.success){
+                await addToZR(editedOrder)
+                newOrder = {
+                    ...res.order,
+                    tracking : 'En preparation'
+                }
+
+            }
+            if(!res.success){
+                setIsProductDeleted([])
+                setSelectedDate(null)
+                setSaving(pre => {
+                    const nweSaving = pre.filter(SId => SId !== id)
+                    return nweSaving
+                })
+                return setErrorNotifiction("Not enough items in stock")
+            }
         }
         
-        const newOrder = {
-            ...editedOrder,
-            ...(tracking && { DLVTracking: tracking })
-        };
         
-        if(editedOrder.state  === 'مؤكدة' && editedOrder.DLVTracking){
-            let res= await updateToTsl(editedOrder)
-        }
+       
 
         if(oldOrder.inDelivery !== true && editedOrder.inDelivery  === true && editedOrder.state  === 'مؤكدة'){
-            let res= await validateToTsl(editedOrder.DLVTracking,0)
+            let res= await validateToZR(editedOrder)
         }
 
         const res = await axios.put(`/api/orders/${editedOrderId}`, newOrder, { headers: { 'Content-Type': 'application/json' } });
         // console.log(res.data)
+        setSuccessNotifiction('تم تعديل الطلب بنجاح');
         queryClient.invalidateQueries(`orders,${dateFilter}`);
         setIsProductDeleted([])
         setSelectedDate(null)
@@ -696,13 +612,14 @@ function Orders() {
             
             let tracking =''
         
-            let res = await addToTsl(order)
+            let res = await addToZR(order)
             tracking = res?.tracking
             
             
             const newOrder = {
                 ...order,
                 state: 'مؤكدة',
+                tracking : 'En preparation',
                 ...(tracking && { DLVTracking: tracking })
 
             };
@@ -778,10 +695,11 @@ function Orders() {
         let isMatchingTraking
         
 
-        if(trackingFilter ==='Scheduled'){
-            isMatchingTraking = order.schedule === currentDate;
+        // if(trackingFilter ==='Scheduled'){
+        //     isMatchingTraking = order.schedule === currentDate;
 
-        }else if(trackingFilter ==='unconfirmed'){
+        // }else 
+        if(trackingFilter ==='unconfirmed'){
             isMatchingTraking = order.state !== 'مؤكدة'
         }else{
             isMatchingTraking = order.tracking===trackingFilter
@@ -869,31 +787,7 @@ function Orders() {
         });
     }
 
-    const designOptionsElent = Designs.map(design => {
-        if (design.title.toLowerCase().includes(search.toLocaleLowerCase()) || search === '') {
-            return (
-                <div
-                    key={design._id}
-                    className='border-gray-500 z-50 border-b-2 p-4 bg-white'
-                >
-                    <img
-                        src={design.imageOn}
-                        alt=''
-                        // width={128} height={128}
-                        onClick={() => {
-                            setSelectedImage({
-                                _id: product._id,
-                                image: design.imageOn
-                            })
-                            setIsproducts({ _id: '', state: false })
-                            setIsdesigns({ _id: '', state: false })
-                        }}
-                    />
-                </div>
-            )
-        }
-
-    })
+    
 
     const productsOptionsElent = Products.map(products => {
         if (products.title.toLowerCase().includes(search.toLocaleLowerCase()) || search === '') {
@@ -903,20 +797,12 @@ function Orders() {
                     className='flex p-4 z-50 border-gray-500 border-b-2 w-full items-center justify-between bg-white'
                     onClick={(e) => {
                         handleProductChange(products, product._id)
-                        if (products.title === 'Led Painting') {
-                            setIsdesigns({
-                                _id: product._id,
-                                state: true
-                            })
-                        } else {
-                            setSelectedImage({
+                        setSelectedImage({
                                 _id: product._id,
                                 image: products.imageOn
                             })
                             setIsproducts({ _id: '', state: false })
-                            setIsdesigns({ _id: '', state: false })
-                        }
-                    }}
+                        }}
                 >
                     <img
                         src={products.imageOn}
@@ -932,35 +818,7 @@ function Orders() {
 
     })
 
-    function addDesignOptionsElent(id) {
-        return Designs.map(design => {
-            if (design.title.toLowerCase().includes(search.toLocaleLowerCase()) || search === '') {
-                return (
-                    <div
-                        key={design._id}
-                        className='border-gray-500 z-50 border-b-2 p-4 bg-white'
-                    >
-                        <img
-                            src={design.imageOn}
-                            alt=''
-                            // width={128} height={128}
-                            className='size-32'
-                            onClick={() => {
-                                // setSelectedImage({
-                                //     _id: product._id,
-                                //     image: design.imageOn
-                                // })
-                                setAddedOrder(pre => ({ ...pre, image: design.imageOn }))
-                                setIsAddedDesigns(pre => pre.filter(item => item !== id))
-                                setIsAddedProducts(pre => pre.filter(item => item !== id))
-                            }}
-                        />
-                    </div>
-                )
-            }
-
-        })
-    }
+   
 
     function addProductsOptionsElent(id) {
         return Products.map(product => {
@@ -971,19 +829,8 @@ function Orders() {
                         className='flex p-4 z-50 border-gray-500 border-b-2 w-full items-center justify-between bg-white'
                         onClick={(e) => {
                             setAddedOrder(pre => {
-                                return product.title === 'Led Painting'
-                                    ? { ...product, }
-                                    : { ...product, image: product.imageOn }
-                            })
-                            setIsAddedDesigns(pre => {
-                                if (product.title === 'Led Painting') pre = [...pre, id]
-                                return pre
-                            })
-                            if (product.title !== 'Led Painting') {
-                                setIsAddedProducts(pre => {
-                                    return pre.filter(item => item !== id)
-                                })
-                            }
+                                return { ...product, image: product.imageOn }
+                            })                          
                         }}
                     >
                         <img
@@ -1178,18 +1025,11 @@ function Orders() {
                                 onChange={(e) => setSearch(e.target.value)}
                             />
                         </div>
-                        {isdesigns.state && isdesigns._id === product._id
-                            ? <div
-                                className='grid grid-cols-2 max-h-[484px] z-50 overflow-y-auto'
-                            >
-                                {designOptionsElent}
-                            </div>
-                            : <div
-                                className='max-h-[484px] w-80 z-50 overflow-y-auto'
-                            >
-                                {productsOptionsElent}
-                            </div>
-                        }
+                        <div
+                            className='max-h-[484px] w-80 z-50 overflow-y-auto'
+                        >
+                            {productsOptionsElent}
+                        </div>
                     </div>
                 }
 
@@ -1204,7 +1044,7 @@ function Orders() {
                         className='min-w-10 mt-2 border border-[rgba(0, 40, 100, 0.12)] rounded-md pl-1 dynamic-width'
                     />
                     : <span
-                        className="bg-red-500 absolute left-4 bottom-8 rounded-lg px-1 text-[10px] text-white text-center"
+                        className="bg-red-500 absolute right-1 top-1 rounded-lg px-1 text-[10px] text-white text-center"
                     >
                         {product.qnt}
                     </span>
@@ -1214,28 +1054,28 @@ function Orders() {
     }
 
     function trackingBg(track){
-        if(track === 'returned'){
+        if(track === 'Retour de Dispatche' || track === 'Retour Navette' || track === 'Retour Livreur'){
             return redBg
         }
-        if(track === 'En livraison'){
+        if(track === 'En livraison' || track === 'En Attente du Client'){
             return lightGreenBg
         }
-        if(track === 'Suspendus'){
+        if(track === 'Appel sans Réponse 3' || track === 'Appel sans Réponse 2' || track === 'Appel sans Réponse 1' || track === 'SD - Appel sans Réponse 2' || track === 'SD - Appel sans Réponse 1' || track === 'SD - Annuler par le Client' || track === 'Annuler par le Client'){
             return yellowBg
         }
-        if(track === 'En preparation'){
+        if(track === 'En preparation' || track === 'Dispatcher'){
             return darkBlueBg
         }
-        if(track === 'livred'){
+        if(track === 'Livrée' || track === 'Livrée [ Encaisser ]'){
             return greenBg
         }
-        if(track === 'Prêt à expédier'){
+        if(track === 'Prêt à expédier' || track === 'Scheduled'){
             return orangeBg
         }
-        if(track === 'Vers Station'){
+        if(track === 'Au Bureau'){
             return lightBlueBg
         }
-        if(track === 'Vers Wilaya'){
+        if(track === 'A Relancé'){
             return darkBlueBg
         }
         return transparent
@@ -1291,7 +1131,7 @@ function Orders() {
                         <tr key={order._id} className={`h-5`}>
                             <td>
     
-                                {/* {isDeleteAccess && deleting.some(item => item.id === order._id && item.state) &&
+                                {isDeleteAccess && deleting.some(item => item.id === order._id && item.state) &&
                                     <Spinner size={'h-8 w-8'} color={'border-red-500'} containerStyle={'ml-6 -mt-3'} />
                                 }  
                                 {isDeleteAccess && !deleting.some(item => item.id === order._id && item.state) &&
@@ -1301,7 +1141,7 @@ function Orders() {
                                     >
                                         <FontAwesomeIcon icon={faTrashCan} className="text-red-700" />
                                     </button>                            
-                                }   */}
+                                }  
     
                                 <button
                                     onClick={() => {
@@ -1328,22 +1168,28 @@ function Orders() {
                                 {order.createdAt}
                             </td>
                             <td className="bg-blue-100">
-                                <input
+                              {editedOrder.state  === 'مؤكدة'
+                                ?<div>{editedOrder.name}</div>
+                                :<input
                                     type="text"
                                     onChange={handleChange}
                                     name="name"
                                     defaultValue={editedOrder.name}
                                     className='border bg-transparent border-[rgba(0, 40, 100, 0.12)] rounded-md pl-1 dynamic-width'
                                 />
+                              }
                             </td>
                             <td className="bg-blue-100">
-                                <input
+                             {editedOrder.state  === 'مؤكدة'
+                                ?<div>{editedOrder.phoneNumber}</div>
+                                :<input
                                     type='text'
                                     onChange={handleChange}
                                     name="phoneNumber"
                                     defaultValue={editedOrder.phoneNumber}
                                     className='border bg-transparent border-[rgba(0, 40, 100, 0.12)] rounded-md pl-1 dynamic-width '
                                 />
+                             }
                             </td>
                             <td className="bg-blue-100">
                                {editedOrder.state  === 'مؤكدة'
@@ -1369,13 +1215,16 @@ function Orders() {
                                }
                             </td>
                             <td className="bg-blue-100">
-                                <input
+                              {editedOrder.state  === 'مؤكدة'
+                                ?<div>{editedOrder.adresse}</div>
+                                :<input
                                     type="text"
                                     onChange={handleChange}
                                     name="adresse"
                                     defaultValue={editedOrder.adresse}
                                     className='border bg-transparent border-[rgba(0, 40, 100, 0.12)] rounded-md pl-1 dynamic-width'
                                 />
+                              }
                             </td>
                             <td className="bg-gray-200">
                                 {editedOrder.state  === 'مؤكدة'
@@ -1392,22 +1241,28 @@ function Orders() {
                                 }
                             </td>
                             <td className="bg-gray-200">
-                                <input
+                              {editedOrder.state  === 'مؤكدة'
+                                ?<div>{editedOrder.shippingPrice}</div>
+                                :<input
                                     type="text"
                                     onChange={handleChange}
                                     name="shippingPrice"
                                     defaultValue={editedOrder.shippingPrice}
                                     className='border bg-transparent border-[rgba(0, 40, 100, 0.12)] rounded-md pl-1 dynamic-width'
                                 />
+                              }
                             </td>
                             <td className="bg-gray-200">
-                                <input
+                              {editedOrder.state  === 'مؤكدة'
+                                ?<div>{editedOrder.totalPrice}</div>
+                                :<input
                                     type="text"
                                     onChange={handleChange}
                                     name="totalPrice"
                                     defaultValue={editedOrder.totalPrice}
                                     className='border bg-transparent border-[rgba(0, 40, 100, 0.12)] rounded-md pl-1 dynamic-width'
                                 />
+                              }
                             </td>
                             <td className="bg-gray-200">
                                 <input
@@ -1417,6 +1272,7 @@ function Orders() {
                                     defaultValue={editedOrder.note}
                                     className='border bg-transparent border-[rgba(0, 40, 100, 0.12)] rounded-md pl-1 dynamic-width'
                                 />
+                              
                             </td>
                             <td className="bg-gray-200">
                                {editedOrder.state  === 'مؤكدة'
@@ -1455,21 +1311,27 @@ function Orders() {
                             }
                             </td>
                             <td>
-                                <DatePicker
+                              {editedOrder.state  === 'مؤكدة'
+                                ?<div>{editedOrder.schedule}</div>
+                                :<DatePicker
                                     selected={selectedDate}
                                     onChange={handleDateChange}
                                     className='border bg-transparent border-[rgba(0, 40, 100, 0.12)] rounded-md pl-1 dynamic-width'
                                     dateFormat="yyyy-MM-dd"
                                 />
+                              }
                             </td>
                             <td>
-                                <input
+                              {editedOrder.state  === 'مؤكدة'
+                                ?<div>{editedOrder.deliveryNote}</div>
+                                :<input
                                     type="text"
                                     onChange={handleChange}
                                     name="deliveryNote"
                                     defaultValue={editedOrder.deliveryNote}
                                     className='border bg-transparent border-[rgba(0, 40, 100, 0.12)] rounded-md pl-1 dynamic-width'
                                 />
+                              }
                             </td>
                             <td className="text-center">
                                 {(editedOrder.state === 'مؤكدة' && !editedOrder.inDelivery) 
@@ -1488,7 +1350,9 @@ function Orders() {
                                 }
                             </td>
                             <td>
-                                <select
+                              {editedOrder.state  === 'مؤكدة'
+                                ?<div>{editedOrder.tracking}</div>
+                                :<select
                                     value={editedOrder.tracking}
                                     onChange={handleChange}
                                     className="border bg-transparent border-[rgba(0, 40, 100, 0.12)] rounded-md pl-1 max-w-32"
@@ -1499,14 +1363,17 @@ function Orders() {
                                     <option value="scheduled">scheduled</option>
                                     <option value="returned">returned</option>
                                 </select>
+                              }
                             </td>
                             {cartItemsElemnt}
                             <td>
-                                <FontAwesomeIcon
+                            {editedOrder.state  === 'مؤكدة' &&
+                               <FontAwesomeIcon
                                     icon={faPlus}
                                     className='cursor-pointer'
                                     onClick={() => toggleIsAding(order._id)}
                                 />
+                            }
                                 {isAddingProduct.includes(order._id) &&
                                     <div className='flex items-center justify-center gap-8'>
                                         {addedOrder.image
@@ -1538,7 +1405,6 @@ function Orders() {
                                                                 pre = [...pre, order._id]
                                                                 return pre
                                                             })
-                                                            setIsAddedDesigns(pre => pre.filter(item => item !== order._id))
                                                         }}
                                                         className='border border-gray-500 w-40 h-14 flex items-center p-2 cursor-pointer'
                                                     >
@@ -1562,36 +1428,11 @@ function Orders() {
                                                                     onChange={(e) => setSearch(e.target.value)}
                                                                 />
                                                             </div>
-                                                            {isAddedDesigns?.includes(order._id)
-                                                                ? <div
-                                                                    className='grid grid-cols-2 max-h-[484px] z-50 overflow-y-auto'
-                                                                >
-                                                                    <div className='border-gray-500 z-50 border-b-2 p-4 bg-white flex items-center '>
-                                                                        <div className='border border-dashed border-slate-800 relative size-32 text-center flex justify-center items-center '>
-                                                                            <span
-                                                                                className='absolute top-1/3'
-                                                                            >
-                                                                                Add a custom
-                                                                            </span>
-                                                                            <input
-                                                                                type='file'
-                                                                                onChange={(e) => {
-                                                                                    handleFileUpload(e)
-                                                                                    setIsAddedDesigns(pre => pre.filter(item => item !== order._id))
-                                                                                    setIsAddedProducts(pre => pre.filter(item => item !== order._id))
-                                                                                }}
-                                                                                className='size-full opacity-0 m-0'
-                                                                            />
-                                                                        </div>
-                                                                    </div>
-                                                                    {addDesignOptionsElent(order._id)}
-                                                                </div>
-                                                                : <div
-                                                                    className='max-h-[484px] w-80 z-50 overflow-y-auto'
-                                                                >
-                                                                    {addProductsOptionsElent(order._id)}
-                                                                </div>
-                                                            }
+                                                            <div
+                                                                className='max-h-[484px] w-80 z-50 overflow-y-auto'
+                                                            >
+                                                                {addProductsOptionsElent(order._id)}
+                                                            </div>
                                                         </div>
                                                     }
                                                 </div>
@@ -1655,7 +1496,7 @@ function Orders() {
                                                     />
                                                 </div>
                                             }
-                                            {/* {isDeleteAccess && deleting.some(item => item.id === order._id && item.state) &&
+                                            {isDeleteAccess && deleting.some(item => item.id === order._id && item.state) &&
                                                 <Spinner size={'h-8 w-8'} color={'border-red-500'} containerStyle={'ml-6 -mt-3'} />
                                             }  
                                             {isDeleteAccess && !deleting.some(item => item.id === order._id && item.state) &&
@@ -1665,7 +1506,7 @@ function Orders() {
                                                 >
                                                     <FontAwesomeIcon icon={faTrashCan} className="text-red-700" />
                                                 </button>                            
-                                            }   */}
+                                            }  
                                             {isUpdateAccess &&
                                             <button
                                                 onClick={() => {
@@ -1902,66 +1743,134 @@ function Orders() {
     const trackingFiltersArray=[
         {
             name:'unconfirmed',
-            icon:'not confirmed.png'      
+            icon:'not confirmed.png'            
         },{
             name:'Scheduled',
             icon:'Schedule.png'      
         },{
+            name:'En preparation',
+            icon:'En preparation.png'  
+        },{
             name:'Prêt à expédier',
             icon:'Prêt à expédier.png'      
         },{
-            name:'En ramassage',
-            icon:'En ramassage.png'          
+            name:'Au Bureau',
+            icon:'Au Bureau.png'      
         },{
-            name:'Vers Station',
-            icon:'vers Station.png'          
+            name:'En Attente du Client',
+            icon:'En-Attente-du-Client.png'      
         },{
-            name:'Vers Wilaya',
-            icon:'Vers Wilaya.png'          
+            name:"Didn't respond",
+            icon:'Appel sans Réponse.png',
+            dropDown:[
+                'SD - Appel sans Réponse 1',
+                'SD - Appel sans Réponse 2',
+                'Appel sans Réponse 1',
+                'Appel sans Réponse 2',
+                'Appel sans Réponse 3',
+            ]        
         },{
-            name:'En preparation',
-            icon:'En preparation.png'          
+            name:'Annuler par le Client',
+            icon:'Annuler-par-le-Client.png',
+            dropDown:[
+                'Annuler par le Client',
+                'SD - Annuler par le Client'
+            ]            
         },{
             name:'En livraison',
             icon:'En livraison.png'          
+        // },{
+        //     name:'Suspendus',
+        //     icon:'Suspendus.png'          
         },{
-            name:'Suspendus',
-            icon:'Suspendus.png'          
+            name:'A Relancé',
+            icon:'A Relancé.png'          
         },{
-            name:'livred',
-            icon:'livres.png'          
+            name:'Dispatcher',
+            icon:'Dispatcher.png'          
+        },{
+            name:'Livrée',
+            icon:'livres.png',
+            dropDown:[
+                'Livrée',
+                'Livrée [ Encaisser ]'
+            ]           
         },{
             name:'returned',
-            icon:'returns.png'          
+            icon:'returns.png',
+            dropDown:[
+                'Retour Livreur',
+                'Retour Navette',
+                'Retour de Dispatche'
+            ]         
         }
     ]
 
-    const trackingFiltersEle=trackingFiltersArray.map(({name,icon},i)=>{
-
+    const trackingFiltersEle=trackingFiltersArray.map((filter,i)=>{
+        const {name,icon} = filter
         let ordersNumber = 0
-        if(name ==='Scheduled'){
-            Orders?.forEach(order => {
-                const currentDate = format(new Date(), 'yyyy-MM-dd');
+        // if(name ==='Scheduled'){
+        //     Orders?.forEach(order => {
+        //         const currentDate = format(new Date(), 'yyyy-MM-dd');
     
-                // Check if the saved date is the same as today
-                const isSameAsToday = order.schedule === currentDate;
-                if (isSameAsToday) ordersNumber++
-            })
-        }else if(name ==='unconfirmed'){
+        //         // Check if the saved date is the same as today
+        //         const isSameAsToday = order.schedule === currentDate;
+        //         if (isSameAsToday) ordersNumber++
+        //     })
+        // }else 
+        if(name ==='unconfirmed'){
             ordersNumber = Orders.filter(order=>order.state !== 'مؤكدة').length
         }else{
-            ordersNumber = Orders.filter(order=>order.tracking===name).length
+
+            if(!filter.dropDown) ordersNumber = Orders.filter(order=>order.tracking===name).length
+            filter.dropDown?.forEach(dropDown=>{
+                ordersNumber += Orders.filter(order=>order.tracking===dropDown).length
+            })
         }
 
+        const dropDownEle=filter.dropDown?.map((dropDown,i)=>{
+            let ordersNumber = Orders.filter(order=>order.tracking===dropDown).length
+            return(
+                <div 
+                    key={dropDown}
+                    className={`cursor-pointer flex gap-2 px-4 py-3 ${i !== 0 && ' border-t'} border-gray-400 items-center hover:bg-[#057588] text-black bg-[#fff] hover:text-[#fff]`}
+                    onClick={()=>{
+                        setTrackingFilter(dropDown)
+                        setIsSearching(false)
+                        setReaserchedOrders([])
+                        setIsTrakingFilterDrop('')
+                    }}
+                >
+                    <p className="text-sm whitespace-nowrap ">{dropDown}</p>
+
+                    {ordersNumber>0  &&
+                    <p 
+                        className='bg-[#777] text-xs font-semibold text-[#fff]  px-1 rounded-sm'
+                    >
+                        {ordersNumber}
+                    </p>
+                }
+                </div>
+            )
+        })
 
         return(
             <div 
                 key={name}
-                className={`cursor-pointer flex ${i === 0 ? '' : 'border-l'} px-4 py-3 border-gray-400 items-center ${trackingFilter === name ? 'bg-[#057588] text-[#fff] ' : ' hover:bg-[#057588] bg-[#fff] hover:text-[#fff]'} gap-2`}
+                className={`cursor-pointer relative flex ${i === 0 ? '' : 'border-l'} px-4 py-3 border-gray-400 items-center ${trackingFilter === name ? 'bg-[#057588] text-[#fff] ' : ' hover:bg-[#057588] bg-[#fff] hover:text-[#fff]'} gap-2`}
                 onClick={()=>{
-                    setTrackingFilter(name)
-                    setIsSearching(false)
-                    setReaserchedOrders([])
+                    if(filter.dropDown){
+                        if(isTrakingFilterDrop === name){
+                            setIsTrakingFilterDrop('')
+                        }else{
+                            setIsTrakingFilterDrop(name)
+                        }
+                    }else{
+                        setTrackingFilter(name)
+                        setIsSearching(false)
+                        setReaserchedOrders([])
+
+                    }
                 }}
             >
                 <img 
@@ -1976,10 +1885,21 @@ function Orders() {
                         {ordersNumber}
                     </p>
                 }
+                {filter.dropDown &&
+                    <FontAwesomeIcon
+                        icon={faAngleDown}
+                        className={`text-xs ${isTrakingFilterDrop === name && 'rotate-180'}`}
+                    />
+                }
+                {isTrakingFilterDrop === name &&
+                    <div className="absolute top-11 right-0 z-[9999999999999999999999] border border-gray-400 rounded">
+                        {dropDownEle}
+                    </div>
+                }
             </div>
         )
     })
-    
+
     async function handleSearch() {
         const phonePattern = /^0\d{9}$/;
         if(searchingMethode === 'phoneNumber' && !phonePattern.test(serachingValue)) return setErrorNotifiction('Please enter a valid phone number')
@@ -1989,7 +1909,7 @@ function Orders() {
         setReaserchedOrders(orders)
     }
     return (
-        <div className="py-4 relative pl-4 pr-48 flex flex-col gap-5 h-screen overflow-x-auto w-full min-w-max">
+        <div className="relative pl-4 pr-48 flex flex-col gap-5 h-screen overflow-x-scroll w-full min-w-max">
 
             <div 
                 className={`bg-green-200 transition-all duration-200 flex items-center gap-2 fixed top-16 right-6 z-[9999999999999999999999] border border-gray-400 px-4 py-2 rounded 
@@ -2015,7 +1935,7 @@ function Orders() {
                 {errorNotifiction}
             </div>
 
-            <div className="w-ful h-11 fixed top-0 left-32 md:left-72 sm:left-48 shadow-md flex z-[9999999999999999999]">
+            <div className="w-ful h-11 -ml-4 shadow-md flex">
                 {trackingFiltersEle}
                 <div 
                     className={`cursor-pointer flex px-4 py-3 border-l border-gray-400 items-center ${isSearching ? 'bg-[#057588] text-[#fff] ' : ' hover:bg-[#057588] bg-[#fff] hover:text-[#fff]'} gap-2`}
@@ -2048,42 +1968,6 @@ function Orders() {
                 </div>
 
 
-               {/* {isSending
-                ?<div 
-                    className="relative border-gray-500 border p-2 px-4 rounded-xl"
-                    onKeyDown={e => e.key === 'Enter' && handleSendMessage()}
-                >
-                    <input 
-                        type="text" 
-                        placeholder="Enter your message"
-                        className="no-focus-outline w-40"
-                        value={instaMessage}
-                        onChange={e => setInstaMessage(e.target.value)}
-                    />
-                    <FontAwesomeIcon 
-                        icon={faPaperPlane} 
-                        onClick={() => handleSendMessage()}
-                        className="cursor-pointer text-gray-600"
-                    />
-                    <div 
-                        className="absolute -top-2 -right-2 flex items-center bg-red-500 p-1 rounded-full"
-                        onClick={() => setIsSending(pre => !pre)}
-                    >
-                        <FontAwesomeIcon 
-                            icon={faX} 
-                            className="cursor-pointer size-3 text-white"
-                        />
-                    </div>
-
-
-                </div>
-                :<div 
-                    className="border-gray-500 border p-2 px-4 rounded-xl cursor-pointer"
-                    onClick={() => setIsSending(pre => !pre)}
-                >
-                    Send instagram Message
-                </div>
-               } */}
                 <div className="relative">
                     <div
                         className='relative flex whitespace-nowrap justify-self-end border-gray-500 border p-2 px-4 rounded-xl cursor-pointer'
@@ -2114,20 +1998,11 @@ function Orders() {
                         <div 
                             className="px-2 whitespace-nowrap cursor-pointer p-1 w-full text-start"
                             onClick={() =>{
-                                validateMultibelToTSL(selectedOrders,0)
+                                validateMultibelToZR(selectedOrders,0)
                                 setIsOrderAction(pre=>!pre)
                             }}
                         >
-                            validate To TSL
-                        </div>
-                        <div 
-                            className="px-2 whitespace-nowrap cursor-pointer p-1 border-t-2 border-gray-500 w-full text-start"
-                            onClick={() =>{
-                                validateMultibelToTSL(selectedOrders,1)
-                                setIsOrderAction(pre=>!pre)
-                            }}
-                        >
-                            validate with ramasage
+                            Expedie To ZR
                         </div>
                     </div>}
                 </div>

@@ -93,6 +93,7 @@ function LindingPage({ params }) {
             ...pre,
             orders:[{
                 title: products[0].title,
+                productID: products[0]._id,
                 imageOn: products[0].imageOn,
                 qnt: qnt,
                 _id: uuidv4(),
