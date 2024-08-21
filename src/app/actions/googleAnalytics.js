@@ -35,7 +35,6 @@ export async function realTimeActiveUsersReport() {
     },
   });
 
-
   let data = []
   response.rows.forEach(row => {
     data.push({ pagePath: row.dimensionValues[0].value, activeUsers: row.metricValues[0].value })
@@ -46,7 +45,6 @@ export async function realTimeActiveUsersReport() {
 export async function ActiveUsersReport(time) {
 
   const { startDate, endDate } = getDateRange(time);
-  console.log(startDate, endDate)
 
   // Run the report
   const [response] = await analyticsDataClient.runReport({
@@ -69,7 +67,7 @@ export async function ActiveUsersReport(time) {
     ],
   });
 
-
+  
   let data = []
   response.rows.forEach(row => {
     data.push({ pagePath: row.dimensionValues[0].value, activeUsers: row.metricValues[0].value })

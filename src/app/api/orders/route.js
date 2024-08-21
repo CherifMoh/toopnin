@@ -73,7 +73,11 @@ export async function POST(req) {
   try {
     await dbConnect();
 
+    const ip = req.headers.get('x-forwarded-for')?.split(',')[0].trim();
+
     const order = await req.json();
+
+    order.ip=ip
 
     Order.create(order);
 

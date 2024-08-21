@@ -87,8 +87,10 @@ function Page() {
     if (isLoading) return <div>Loading...</div>;
     if (isError) return <div>Error fetching products</div>;
 
+    
     async function handelSelectTimeActiveUsers(time){
         const allpages = await ActiveUsersReport(time)
+
         const landingPages = allpages
             .filter(item => item.pagePath.startsWith('/landingPages/'))
             .map(item => ({

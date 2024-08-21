@@ -11,6 +11,14 @@ const OrderSchem = new mongoose.Schema({
         type: String,
         required: true
     },
+    ip: {
+        type: String,
+        required: true
+    },
+    blackListed: {
+        type: Boolean,
+        default: false
+    },
     instaUserName: {
         type: String,
         required: false

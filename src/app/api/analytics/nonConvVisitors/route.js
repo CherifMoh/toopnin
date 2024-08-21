@@ -27,7 +27,6 @@ export async function PUT(req) {
     }
     const cookie = request.cookies.get('visitors-middleware')
 
-    console.log('cookie:'+ cookie)
 
     const thirtyDaysFromNow = Math.floor(Date.now() / 1000) + (30 * 24 * 60 * 60);
 

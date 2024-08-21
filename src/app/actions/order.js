@@ -3,6 +3,7 @@
 import Order from "../models/orders"
 import { dbConnect } from "../lib/dbConnect"
 import axios from "axios"
+import BlackList from "../models/blackLists"
 
 export async function addOrder(formData){ 
     await dbConnect()
@@ -109,5 +110,34 @@ export async function expedieOrderToZR(tracking) {
   }catch(err){
       console.log(err.message)
       return null
+  }
+}
+
+export async function addToBlackList(ip,phoneNumber) {
+  try {
+    await dbConnect()
+
+
+    // Find the blacklist entry with name 'IP'
+    const blacklist = await BlackList.findOne({ name: 'IP' });
+
+    if (!blacklist) {
+        // If no blacklist entry exists, create one
+        await BlackList.create({
+            name: 'IP',
+            ip: [{ip: ip,phoneNumber:phoneNumber}]
+        });
+    } else {
+        // If blacklist entry exists, add the IP address if it's not already present
+        if (!blacklist.ip.includes(ip)) {
+            blacklist.ip.push({ip: ip,phoneNumber:phoneNumber});
+            await blacklist.save();
+        }
+    }
+
+    return {sucsess: true, message: "IP added to blacklist"}
+
+  } catch (err) {
+    return {sucsess: false, err:err}
   }
 }

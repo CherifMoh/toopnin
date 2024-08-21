@@ -952,6 +952,7 @@ function Admin() {
     }
 
     function langingPgesElement (){
+        const checkoutHeight = '755'
         const Images = newProduct?.landingPageImages
         if(!Array.isArray(Images) || Images.length === 0){
             return(
@@ -980,7 +981,7 @@ function Admin() {
                         <span
                             className="absolute top-1/2 right-1/2 translate-x-1/2 -translate-y-1/2 whitespace-nowrap text-lg bg-white px-2 rounded-full text-center"
                         >
-                            checkout bg  <br /> 405 px
+                            checkout bg  <br /> {checkoutHeight} px
                         </span> 
                     </div>
                 </div>
@@ -1016,7 +1017,7 @@ function Admin() {
                         <span
                             className="absolute top-1/2 right-1/2 translate-x-1/2 -translate-y-1/2 whitespace-nowrap text-lg bg-white px-2 rounded-full text-center"
                         >
-                            checkout bg  <br /> 405 px
+                            checkout bg  <br /> {checkoutHeight} px
                         </span> 
                     </div>
                 </div>
@@ -1049,7 +1050,7 @@ function Admin() {
                         <span
                             className="absolute top-1/2 right-1/2 translate-x-1/2 -translate-y-1/2 whitespace-nowrap text-lg bg-white px-2 rounded-full text-center"
                         >
-                            checkout bg  <br /> 405 px
+                            checkout bg  <br /> {checkoutHeight} px
                         </span> 
                         <input 
                             type="file" 

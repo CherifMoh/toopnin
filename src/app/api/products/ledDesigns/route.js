@@ -41,7 +41,7 @@ export async function POST(req) {
     await dbConnect()
 
     const design = await req.json()
-    console.log(design.tages)
+
     Design.create(design)
 
     return new NextResponse("Design created " + design.title)

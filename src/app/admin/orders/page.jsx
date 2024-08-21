@@ -9,9 +9,9 @@ import 'react-datepicker/dist/react-datepicker.css';
 import { format } from 'date-fns'
 import Link from "next/link";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faMagnifyingGlass, faPen, faPlus, faX, faCheck, faPaperPlane, faArrowDown, faAngleDown } from '@fortawesome/free-solid-svg-icons'
+import { faMagnifyingGlass, faPen, faPlus, faX, faCheck, faPaperPlane, faArrowDown, faAngleDown, faBan } from '@fortawesome/free-solid-svg-icons'
 import { faTrashCan } from '@fortawesome/free-regular-svg-icons'
-import { addOrderSchedule, addOrderToZR, deleteOrder, expedieOrderToZR, getOrder } from '../../actions/order'
+import { addOrderSchedule, addOrderToZR, addToBlackList, deleteOrder, expedieOrderToZR, getOrder } from '../../actions/order'
 import { editMinusProduct } from '../../actions/storage'
 import { useRouter } from "next/navigation";
 import { v4 as uuidv4 } from 'uuid'
@@ -117,7 +117,7 @@ function Orders() {
     
     const [selectedOrders, setSelectedOrders] = useState([])
     const [isCrafting, setIsCrafting] = useState(false)
-    const [isLabels, setIsLabels] = useState(false)
+    const [isExcel, setisExcel] = useState(false)
 
     const [isCreateAccess, setIsCreateAccess] = useState(false)
     const [isUpdateAccess, setIsUpdateAccess] = useState(false)
@@ -1113,6 +1113,20 @@ function Orders() {
         })
     }
 
+    function handleAddToBlackList(order) {
+        try{
+            addToBlackList(order.ip,order.phoneNumber)
+            const newOrder = { ...order, blackListed: true }
+            const res = axios.put(`/api/orders/${order._id}`, newOrder, { headers: { 'Content-Type': 'application/json' } });
+            setSuccessNotifiction('IP added to blacklist successfully')
+            queryClient.invalidateQueries(`orders,${dateFilter}`);
+        }catch(err){
+            console.log(err.message)
+            setErrorNotifiction('An error occurred. Please try again later.')
+        }
+
+    }
+
     function ordersElement(data){
 
         return data.map((order, index) => {
@@ -1129,8 +1143,19 @@ function Orders() {
                 }
                 if (editedOrderId === order._id) {
                     return (
-                        <tr key={order._id} className={`h-5`}>
+                        <tr key={order._id} className={`h-5 ${order.blackListed && 'bg-red-200'}`}>
                             <td>
+                                {!order.blackListed &&
+                                <button
+                                    className=' p-2 rounded-md'
+                                    onClick={() => handleAddToBlackList(order)}
+                                >
+                                    <FontAwesomeIcon 
+                                        icon={faBan} 
+                                        className="text-red-700" 
+                                    />
+                                </button> 
+                                }
     
                                 {isDeleteAccess && deleting.some(item => item.id === order._id && item.state) &&
                                     <Spinner size={'h-8 w-8'} color={'border-red-500'} containerStyle={'ml-6 -mt-3'} />
@@ -1480,14 +1505,17 @@ function Orders() {
                             key={order._id}
                             className={`h-5 ${saving.includes(order._id) && 'opacity-40'} ${deleting.some(item => item.id === order._id && item.state) && 'opacity-40'}`}
                         >
-                            {(isUpdateAccess || isDeleteAccess || isCrafting || isLabels || isOrderAction) && (
-                                <td>
+                            {(isUpdateAccess || isDeleteAccess || isCrafting || isExcel || isOrderAction) && (
+                                <td className={` ${order.blackListed && 'bg-red-200'}`}>
+                                    
                                     {saving.includes(order._id)
                                         ?
                                         <Spinner size={'w-8 h-8'} color={'border-green-500'} containerStyle={'ml-6 -mt-3'} />
                                         :
                                         <div className=" whitespace-nowrap flex items-center justify-center">
-                                            {(isCrafting || isSending ||(isLabels && order?.DLVTracking)||isOrderAction) &&
+                                            
+                                            
+                                            {(isCrafting || isSending ||(isExcel && order?.DLVTracking)||isOrderAction) &&
                                                 <div className="p-2 flex items-center">
                                                     <input 
                                                         type="checkbox" 
@@ -1496,6 +1524,18 @@ function Orders() {
                                                         onChange={(e) => handleSelecteOrder(order)} 
                                                     />
                                                 </div>
+                                            }
+
+                                            {!order.blackListed &&
+                                            <button
+                                                className=' p-2 rounded-md'
+                                                onClick={() => handleAddToBlackList(order)}
+                                            >
+                                                <FontAwesomeIcon 
+                                                    icon={faBan} 
+                                                    className="text-red-700" 
+                                                />
+                                            </button> 
                                             }
                                             {isDeleteAccess && deleting.some(item => item.id === order._id && item.state) &&
                                                 <Spinner size={'h-8 w-8'} color={'border-red-500'} containerStyle={'ml-6 -mt-3'} />
@@ -1706,39 +1746,8 @@ function Orders() {
         window.open(pdfUrl);
     };
     
-    const generateLabelsPDF = async (data) => {
-        setLablesLoading(true);
-        // Create a new PDF document
-        const combinedPdf = await PDFDocument.create();
-    
-        for (const order of data) {
-            const res = await axios.get(`https://tsl.ecotrack.dz/api/v1/get/order/label`, {
-                headers: {
-                    Authorization: `Bearer ${process.env.NEXT_PUBLIC_TSL_API_KEY}`
-                },
-                params: {
-                    tracking: order.DLVTracking
-                },
-                responseType: 'arraybuffer'  // Handle binary data correctly
-            });
-    
-            // Create a PDF document from the response data
-            const pdfDoc = await PDFDocument.load(res.data);
-            const pages = await combinedPdf.copyPages(pdfDoc, pdfDoc.getPageIndices());
-    
-            pages.forEach(page => combinedPdf.addPage(page));
-        }
-    
-        // Serialize the combined PDF to bytes
-        const pdfBytes = await combinedPdf.save();
-    
-        // Create a Blob from the PDF data
-        const blob = new Blob([pdfBytes], { type: 'application/pdf' });
-        const url = URL.createObjectURL(blob);
-    
-        // Open the combined PDF in a new window
-        window.open(url, '_blank');
-        setLablesLoading(false);
+    const generateOrdersExcel = async (data) => {
+        console.log(data)
     };
     
     const trackingFiltersArray=[
@@ -2024,19 +2033,19 @@ function Orders() {
                 <div
                     className='relative h-11 min-w-28 whitespace-nowrap justify-self-end border-gray-500 border p-2 px-4 rounded-xl cursor-pointer'
                     onClick={() => {
-                        if(isLabels) {
-                            setIsLabels(pre => !pre)
-                            generateLabelsPDF(selectedOrders)
+                        if(isExcel) {
+                            setisExcel(pre => !pre)
+                            generateOrdersExcel(selectedOrders)
                         }else{
-                            setIsLabels(pre => !pre)
+                            setisExcel(pre => !pre)
                         }
                     }}
                 >
                     {lablesLoading && 
                         <Spinner size={'size-6'} containerStyle={'ml-8'} />
                     }
-                    {(isLabels && !lablesLoading) && 'Show PDF' }
-                    {(!isLabels && !lablesLoading) && 'Get labels' }
+                    {(isExcel && !lablesLoading) && 'Show excel' }
+                    {(!isExcel && !lablesLoading) && 'upload to excel' }
                 </div>
 
                 <select
