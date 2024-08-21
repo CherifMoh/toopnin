@@ -13,9 +13,9 @@ export default async function middleware(request) {
 
     const ip = request.headers.get('x-forwarded-for')?.split(',')[0].trim();
 
-   
-    const isBlacklisted = await axios.get(`https://localhost:3000/api/orders/ip?ip=${ip}`)
-    if(isBlacklisted.data) return NextResponse.redirect(new URL('/notAllowed', request.url));
+
+    const isBlacklisted = await axios.get(`https://toopnin.com/api/orders/ip?ip=${ip}`)
+    if (isBlacklisted.data) return NextResponse.redirect(new URL('/notAllowed', request.url));
 
     const fullPath = request.nextUrl.pathname
     const parts = fullPath.split("/")
