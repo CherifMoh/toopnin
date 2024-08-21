@@ -58,17 +58,7 @@ export function generateUniqueString(length) {
 
 export async function checkBlackliste(ip) {
   try {
-    let formattedIp = ip;
-
-    // Handle IPv6 addresses like ::ffff:127.0.0.1 or ::1
-    if (formattedIp.startsWith('::ffff:')) {
-        formattedIp = formattedIp.split('::ffff:')[1];
-    } else if (formattedIp === '::1') {
-        formattedIp = '127.0.0.1';
-    }
-
-    
-    const response = await fetch(`https://toopnin.com/api/orders/ip?ip=${formattedIp}`);
+    const response = await fetch(`https://toopnin.com/api/orders/ip?ip=${ip}`);
     if (response.ok) {
       const data = await response.json();
       return data.data;
