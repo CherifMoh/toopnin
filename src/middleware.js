@@ -4,7 +4,7 @@ import { decodeJwt } from 'jose';
 import axios from 'axios'
 import { cookies } from 'next/headers'
 import { CreateUnVisitor } from './app/actions/cookies'
-import { checkBlackliste } from './app/lib/utils';
+import { checkBlackliste } from './app/lib/utils.js';
 
 
 
