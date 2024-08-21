@@ -4,6 +4,7 @@ import { decodeJwt } from 'jose';
 import axios from 'axios'
 import { cookies } from 'next/headers'
 import { CreateUnVisitor } from './app/actions/cookies'
+import { checkBlackliste } from './app/lib/utils';
 
 
 
@@ -14,9 +15,20 @@ export default async function middleware(request) {
     const ip = request.headers.get('x-forwarded-for')?.split(',')[0].trim();
 
 
-    const response = await fetch(`https://toopnin.com/api/orders/ip?ip=${ip}`);
-    const isBlacklisted = await response.json();
-    if (isBlacklisted.data) return NextResponse.redirect(new URL('/notAllowed', request.url));
+    let isBlacklisted = await checkBlackliste(ip);
+    // try {
+    //     const response = await fetch(`https://toopnin.com/api/orders/ip?ip=${ip}`);
+    //     if (response.ok) {
+    //         const data = await response.json();
+    //         isBlacklisted = data.data;
+    //     } else {
+    //         console.error('Failed to fetch IP check:', response.status, response.statusText);
+    //     }
+    // } catch (error) {
+    //     console.error('Fetch failed:', error);
+    // }
+
+    if (isBlacklisted) return NextResponse.redirect(new URL('/notAllowed', request.url));
 
     const fullPath = request.nextUrl.pathname
     const parts = fullPath.split("/")
