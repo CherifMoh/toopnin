@@ -72,12 +72,19 @@ export async function GET(req) {
 export async function POST(req) {
   try {
     await dbConnect();
+    let formattedIp = ip;
 
-    const ip = req.headers.get('x-forwarded-for')?.split(',')[0].trim();
+    // Handle IPv6 addresses like ::ffff:127.0.0.1 or ::1
+    if (formattedIp.startsWith('::ffff:')) {
+        formattedIp = formattedIp.split('::ffff:')[1];
+    } else if (formattedIp === '::1') {
+        formattedIp = '127.0.0.1';
+    }
 
     const order = await req.json();
 
-    order.ip=ip
+    order.ip = formattedIp;
+
 
     Order.create(order);
 
