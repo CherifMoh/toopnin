@@ -14,7 +14,7 @@ export default async function middleware(request) {
     const ip = request.headers.get('x-forwarded-for')?.split(',')[0].trim();
 
 
-    const response = await fetch(`/api/orders/ip?ip=${ip}`);
+    const response = await fetch(`https://toopnin.com/api/orders/ip?ip=${ip}`);
     const isBlacklisted = await response.json();
     if (isBlacklisted.data) return NextResponse.redirect(new URL('/notAllowed', request.url));
 
