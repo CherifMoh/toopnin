@@ -16,6 +16,7 @@ import { editMinusProduct } from '../../actions/storage'
 import { useRouter } from "next/navigation";
 import { v4 as uuidv4 } from 'uuid'
 import {AmiriFont} from '../../data/AmiriFont'
+import * as XLSX from 'xlsx';
 
 import downArrow from '../../../../public/assets/arrow-down.svg';
 import orangeBg from '../../../../public/assets/orange bg.png';
@@ -1747,8 +1748,49 @@ function Orders() {
     };
     
     const generateOrdersExcel = async (data) => {
-        console.log(data)
+        if(!data || data.length === 0 ) return setErrorNotifiction(`select orders to generate excel`)
+    
+        // Map the data to the desired Excel format
+        const formattedData = data.map(order => ({
+            'Reference': order.DLVTracking,
+            'Name': order.name,
+            'Phone Number': order.phoneNumber,
+            'Wilaya': order.wilaya,
+            'Address': order.adresse,
+            'Commune': order.commune,
+            'Shipping Method': order.shippingMethod,
+            'Shipping Price': order.shippingPrice,
+            'Total Price': order.totalPrice,
+            'State': order.state,
+            'Tracking': order.tracking,
+            'In Delivery': order.inDelivery ? 'Yes' : 'No',
+            'Created At': new Date(order.createdAt).toLocaleString(),
+            'Blacklisted': order.blackListed ? 'Yes' : 'No',
+        }));
+    
+        // Create a new workbook and add a worksheet
+        const wb = XLSX.utils.book_new();
+        const ws = XLSX.utils.json_to_sheet(formattedData);
+    
+        // Calculate the max width for each column and set the column widths
+        const getMaxWidth = (arr, key) => Math.max(...arr.map(obj => obj[key]?.toString().length || 0), key.length);
+    
+        const columns = Object.keys(formattedData[0]).map(key => ({
+            wch: getMaxWidth(formattedData, key) + 2 // Add some padding
+        }));
+    
+        ws['!cols'] = columns;
+    
+        // Append the worksheet to the workbook
+        XLSX.utils.book_append_sheet(wb, ws, 'Orders');
+    
+        // Write the workbook to a file
+        const fileName = 'orders.xlsx';
+        XLSX.writeFile(wb, fileName);
+    
+        console.log(`Excel file generated: ${fileName}`);
     };
+    
     
     const trackingFiltersArray=[
         {
@@ -2036,6 +2078,7 @@ function Orders() {
                         if(isExcel) {
                             setisExcel(pre => !pre)
                             generateOrdersExcel(selectedOrders)
+                            setSelectedOrders([])
                         }else{
                             setisExcel(pre => !pre)
                         }
