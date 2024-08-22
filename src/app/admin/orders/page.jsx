@@ -688,10 +688,10 @@ function Orders() {
 
         const isMatchingSearch = (
             order.name?.toLowerCase().includes(searchLower) ||
-            order.wilaya.toLowerCase().includes(searchLower) ||
+            order.wilaya?.toLowerCase().includes(searchLower) ||
             order.phoneNumber.includes(searchLower) ||
             order.DLVTracking?.toLowerCase().includes(searchLower) ||
-            order.adresse.toLowerCase().includes(searchLower)
+            order.adresse?.toLowerCase().includes(searchLower)
         );
 
         let isMatchingTraking
