@@ -8,7 +8,8 @@ export async function GET(req) {
 
   try {
     await dbConnect()
-    const ip = req.nextUrl.searchParams.get('ip')
+    const ip = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip');
+    console.log(ip)
     const blacklist = await BlackList.findOne({ name: 'IP' })
     if (blacklist && blacklist.ip?.some(entry => entry.ip === ip)) {
       return new NextResponse(true);

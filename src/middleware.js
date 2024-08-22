@@ -14,7 +14,7 @@ export default async function middleware(request) {
 
     const ip = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip')
 
-    let isBlacklisted = await checkBlackliste(ip);
+    let isBlacklisted = await checkBlackliste();
     console.log(isBlacklisted)
 
     if (isBlacklisted) return NextResponse.redirect(new URL('/notAllowed', request.url));

@@ -328,7 +328,7 @@ function LindingPage({ params }) {
   }
 
   async function handleBlur(){
-    if (!phonePattern.test(formData.phoneNumber)|| !formData.name) {
+    if (!phonePattern.test(formData.phoneNumber)) {
         return; // Exit the function
     }
 

@@ -1,6 +1,6 @@
-export async function checkBlackliste(ip) {
+export async function checkBlackliste() {
     try {
-      const response = await fetch(`https://toopnin.com/api/orders/ip?ip=${ip}`);
+      const response = await fetch(`https://toopnin.com/api/orders/ip`);
       if (response.ok) {
         const data = await response.json();
         return data;
