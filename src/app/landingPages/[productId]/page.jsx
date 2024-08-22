@@ -11,6 +11,7 @@ import { generateUniqueString } from '../../../app/lib/utils';
 import { useInView } from 'react-intersection-observer';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faLocationCrosshairs, faLocationDot, faMinus, faPaperPlane, faPhone, faPlus, faUser } from "@fortawesome/free-solid-svg-icons";
+import { addAbandonedCheckout } from "../../actions/order";
 
 
 
@@ -207,7 +208,6 @@ function LindingPage({ params }) {
 
     }, [formData.wilaya,communes,wilayat])
 
-    console.log(formData)
 
   const router =useRouter()
 
@@ -327,6 +327,23 @@ function LindingPage({ params }) {
     }))
   }
 
+  async function handleBlur(){
+    if (!phonePattern.test(formData.phoneNumber)|| !formData.name) {
+        return; // Exit the function
+    }
+
+
+    try {
+        // Make API call
+        const res = await addAbandonedCheckout(formData);
+        console.log(res.data)
+    } catch (error) {
+        // Handle error if necessary
+        console.error('Error submitting form:', error);
+    }
+
+  }
+
 
   return (
 
@@ -388,6 +405,7 @@ function LindingPage({ params }) {
                         <FontAwesomeIcon icon={faPhone} className="text-red-500 p-2 pr-5 border-r border-[rgb(0, 40, 100)]" />
                         <input
                             onChange={handleChange}
+                            onBlur={handleBlur}
                             required
                             className="flex-grow pl-2 bg-transparent"
                             placeholder="رقم الهاتف"

@@ -702,7 +702,9 @@ function Orders() {
 
         // }else 
         if(trackingFilter ==='unconfirmed'){
-            isMatchingTraking = order.state !== 'مؤكدة'
+            isMatchingTraking = (order.state !== 'مؤكدة' && order.state !== 'abandoned')
+        }else if(order.state === 'abandoned'){
+            isMatchingTraking = order.state === 'abandoned'
         }else{
             isMatchingTraking = order.tracking===trackingFilter
         }
@@ -1797,6 +1799,9 @@ function Orders() {
             name:'unconfirmed',
             icon:'not confirmed.png'            
         },{
+            name:'Abandoned',
+            icon:'abandoned.svg'      
+        },{
             name:'Scheduled',
             icon:'Schedule.png'      
         },{
@@ -1871,7 +1876,9 @@ function Orders() {
         //     })
         // }else 
         if(name ==='unconfirmed'){
-            ordersNumber = Orders.filter(order=>order.state !== 'مؤكدة').length
+            ordersNumber = Orders.filter(order=>(order.state !== 'مؤكدة' && order.state !== 'abandoned')).length
+        }else if(name ==='Abandoned'){
+            ordersNumber = Orders.filter(order=>order.state === 'abandoned').length
         }else{
 
             if(!filter.dropDown) ordersNumber = Orders.filter(order=>order.tracking===name).length
@@ -1909,7 +1916,7 @@ function Orders() {
         return(
             <div 
                 key={name}
-                className={`cursor-pointer relative flex ${i === 0 ? '' : 'border-l'} px-4 py-3 border-gray-400 items-center ${trackingFilter === name ? 'bg-[#057588] text-[#fff] ' : ' hover:bg-[#057588] bg-[#fff] hover:text-[#fff]'} gap-2`}
+                className={`cursor-pointer relative flex ${i === 0 ? '' : 'border-l'} ${name !== 'Abandoned' ? 'px-4' : 'pl-4 pr-8'} py-3 border-gray-400 items-center ${trackingFilter === name ? 'bg-[#057588] text-[#fff] ' : ' hover:bg-[#057588] bg-[#fff] hover:text-[#fff]'} gap-2`}
                 onClick={()=>{
                     if(filter.dropDown){
                         if(isTrakingFilterDrop === name){
@@ -2266,6 +2273,12 @@ function Orders() {
                                 <th className="bg-blue-100">
                                     <div className=" border-y border-solid border-[rgba(0, 40, 100, 0.12)] p-[13px]">
                                         Ref
+                                    </div>
+                                        
+                                </th>
+                                <th className="bg-blue-100">
+                                    <div className=" border-y border-solid border-[rgba(0, 40, 100, 0.12)] p-[13px]">
+                                        التاريخ
                                     </div>
                                         
                                 </th>

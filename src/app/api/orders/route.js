@@ -73,9 +73,21 @@ export async function POST(req) {
   try {
     await dbConnect();
 
+    
+
     const ip = req.headers.get('x-forwarded-for')?.split(',')[0].trim();
 
     const order = await req.json();
+
+    const AbandonedOrders = await Order.find({ phoneNumber: order.phoneNumber, state:'abandoned' });
+
+    if(AbandonedOrders && AbandonedOrders.length > 0) {
+      
+      for (const oldOrder of AbandonedOrders) {
+        await Order.findByIdAndDelete(oldOrder._id);
+      }
+
+    }
 
     order.ip=ip
 

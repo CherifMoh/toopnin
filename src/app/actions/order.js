@@ -141,3 +141,32 @@ export async function addToBlackList(ip,phoneNumber) {
     return {sucsess: false, err:err}
   }
 }
+
+export async function addAbandonedCheckout(order) {
+  try {
+    await dbConnect();
+
+    const oldOrders = await Order.find({ phoneNumber: order.phoneNumber, state:'abandoned' });
+
+    const newOrder ={
+      ...order,
+      state:'abandoned',
+    }
+
+    if (!oldOrders || oldOrders.length === 0) {
+      // If no order exists, create one
+      await Order.create(newOrder);
+    } else {
+
+      for (const oldOrder of oldOrders) {
+        await Order.findByIdAndDelete(oldOrder._id);
+      }
+      // Delete the old orders and create a new one
+      await Order.create(newOrder);
+    }
+
+    return 'updated';
+  } catch (err) {
+    return err;
+  }
+}

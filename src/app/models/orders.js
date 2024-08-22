@@ -13,7 +13,7 @@ const OrderSchem = new mongoose.Schema({
     },
     ip: {
         type: String,
-        required: true
+        required: false
     },
     blackListed: {
         type: Boolean,
@@ -29,27 +29,27 @@ const OrderSchem = new mongoose.Schema({
     },
     wilaya: {
         type: String,
-        required: true
+        required: false
     },
     commune: {
         type: String,
-        required: true
+        required: false
     },
     adresse: {
         type: String,
-        required: true
+        required: false
     },
     shippingMethod: {
         type: String,
-        required: true
+        required: false
     },
     shippingPrice: {
         type: Number,
-        required: true
+        required: false
     },
     totalPrice: {
         type: Number,
-        required: true
+        required: false
     },
     orders: {
         type: Array,
