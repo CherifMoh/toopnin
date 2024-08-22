@@ -430,7 +430,7 @@ function Page() {
             </table>
         </div>
         <div
-            className='fixed bottom-0 left-0 right-0 w-screen h-screen'
+            className='fixed bottom-0 left-0 right-0 w-full h-full'
             onClick={()=>{
                 setIsPlus(pre=>{
                     if(pre) return null
