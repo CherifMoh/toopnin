@@ -12,7 +12,7 @@ import { checkBlackliste } from './app/lib/ip/checkIPBlacklist';
 
 export default async function middleware(request) {
 
-    const ip = request.headers.get('x-forwarded-for')?.split(',')[0].trim();
+    const ip = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip')
 
     let isBlacklisted = await checkBlackliste(ip);
     console.log(isBlacklisted)

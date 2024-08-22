@@ -75,7 +75,7 @@ export async function POST(req) {
 
     
 
-    const ip = req.headers.get('x-forwarded-for')?.split(',')[0].trim();
+    const ip = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip');
 
     const order = await req.json();
 
