@@ -56,16 +56,4 @@ export function generateUniqueString(length) {
   return result;
 }
 
-export async function checkBlackliste(ip) {
-  try {
-    const response = await fetch(`https://toopnin.com/api/orders/ip?ip=${ip}`);
-    if (response.ok) {
-      const data = await response.json();
-      return data.data;
-    } else {
-      console.error('Failed to fetch IP check:', response.status, response.statusText);
-    }
-  } catch (error) {
-    console.error('Fetch failed:', error);
-  }
-}
+
