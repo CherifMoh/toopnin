@@ -3,6 +3,7 @@ import '../styles/shared/global.css'
 import QueryProvider from './lib/Providers'
 import ReduxProvider from './redux/provider'
 import { GoogleAnalytics } from '@next/third-parties/google'
+import { checkBlackliste } from './lib/ip/checkIPBlacklist'
 
 
 export const metadata = {
@@ -11,6 +12,7 @@ export const metadata = {
 }
 
 export default async function RootLayout({ children }) {
+  await checkBlackliste()
   return (
     <html>
       <head>
