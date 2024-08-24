@@ -12,7 +12,6 @@ export const metadata = {
 }
 
 export default async function RootLayout({ children }) {
-  await checkBlackliste()
   return (
     <html>
       <head>

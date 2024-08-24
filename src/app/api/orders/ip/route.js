@@ -11,7 +11,7 @@ export async function GET(req) {
     const ip = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip');
     const blacklist = await BlackList.findOne({ name: 'IP' })
     if (blacklist && blacklist.ip?.some(entry => entry.ip === ip)) {
-      return NextResponse.redirect('/notAllowed');
+      return NextResponse.redirect('https://toopnin.com/notAllowed');
     }
     return new NextResponse(false)
   } catch (error) {

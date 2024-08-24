@@ -1,9 +1,12 @@
 export async function checkBlackliste() {
     try {
-      const response = await fetch(`https://toopnin.com/api/orders/ip`);
+      const response = await fetch(`/api/orders/ip`);
       if (response.ok) {
-        const data = await response.json();
-        return data;
+        
+        if(response.redirected){
+          window.location.href = response.url;
+        }
+        
       } else {
         console.error('Failed to fetch IP check:', response.status, response.statusText);
       }

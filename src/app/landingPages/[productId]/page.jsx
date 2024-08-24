@@ -12,6 +12,7 @@ import { useInView } from 'react-intersection-observer';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faLocationCrosshairs, faLocationDot, faMinus, faPaperPlane, faPhone, faPlus, faUser } from "@fortawesome/free-solid-svg-icons";
 import { addAbandonedCheckout } from "../../actions/order";
+import { checkBlackliste } from "../../lib/ip/checkIPBlacklist";
 
 
 
@@ -255,6 +256,10 @@ function LindingPage({ params }) {
         setIsSubmitting(false); // Set isSubmitting to false
         return; // Exit the function
     }
+    const checkBlacklisted = await checkBlackliste()
+    if(checkBlacklisted){
+        return console.log('ip is blacklisted')
+    }
 
     try {
         // Make API call
@@ -362,6 +367,10 @@ function LindingPage({ params }) {
                 src={mproduct?.landingPageImages[2]} alt="" 
                 className="w-full absolute top-0 left-0 -z-10"
             />
+            <div className="w-full sm:w-3/4 md:w-2/3 lg:w-1/3 xl:w-1/4 p-5">
+                <div className="text-3xl w-full text-end">{mproduct?.title}</div>
+                <div className="text-end">{mproduct?.price} DA</div>
+            </div>
 
             <form 
                 onSubmit={handelSubmit} 
@@ -604,7 +613,7 @@ function LindingPage({ params }) {
                     <select
                         value={formData.wilaya}
                         onChange={handleChange}
-                        required className="wilaya"
+                        required
                         style={inputsStyle}
                         name="wilaya"
                     >
@@ -615,8 +624,8 @@ function LindingPage({ params }) {
                     <select
                         value={formData.commune}
                         onChange={handleChange}
+                        required
                         style={inputsStyle}
-                        required className="wilaya"
                         name="commune"
                     >
                         <option hidden >
