@@ -12,14 +12,14 @@ import { checkBlackliste } from './app/lib/ip/checkIPBlacklist';
 
 export default async function middleware(request) {
 
-    const isBlacklisted = request.cookies.get('ipBlocked')
-    // console.oog(isBlacklisted.value)
-    if (isBlacklisted?.value) return NextResponse.redirect(new URL('/notAllowed', request.url));
-
+    
     const fullPath = request.nextUrl.pathname
     const parts = fullPath.split("/")
     const path = parts[1]
-
+    
+    const isBlacklisted = request.cookies.get('ipBlocked')
+    // console.oog(isBlacklisted.value)
+    if (isBlacklisted?.value && path !== 'notAllowed') return NextResponse.redirect(new URL('/notAllowed', request.url));
 
     const accessCookie = request.cookies.get('access-token')
 
