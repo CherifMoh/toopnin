@@ -32,7 +32,7 @@ export default async function middleware(request) {
         return NextResponse.redirect(new URL('/store', request.url));
     }
 
-    if (parts.length === 2) {
+    if (path === 'admin') {
         return NextResponse.redirect(new URL('/admin/dashboard', request.url))
     }
 
@@ -55,5 +55,5 @@ export default async function middleware(request) {
 
 
 export const config = {
-    matcher: ['/admin/:path*', '/'],
+    matcher: ['/admin/:path*', '/:path*'],
 }

@@ -40,12 +40,12 @@ function Header() {
       <div className="utility-bar">
         <div className="utility-bar--container">
           <div className="utility-bar--icons-container">
-            <Link href="https://www.instagram.com/drawlys_deco/">
+            <Link href="https://www.instagram.com/abdou_el_maknine/">
               <Image className="utility-bar--icons" width={76} height={76} src={instaIcon} alt='instagram icon' />
             </Link>
           </div>
           <h5 className='md:text-base text-sm'>
-            الخيار الأفضل  / the best choice
+            Lorem ipsum / أسيا كثيرة اسبوعين
           </h5>
           <span>!</span>
         </div>

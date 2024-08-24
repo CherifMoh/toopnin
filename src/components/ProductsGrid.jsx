@@ -184,7 +184,7 @@ function ProductsGrid() {
     
     return (
         <div>
-            <div className="flex items-center lg:flex-row lg:justify-end text-start relative">
+            <div className="flex items-center mt-14 lg:flex-row lg:justify-end text-start relative">
                 {isRightShown && 
                     <div className="flex absolute bg-[#DCCCB3] z-50 lg:left-[570px] sm:left-[370px] left-[270px]">
                     <div
@@ -245,7 +245,7 @@ function ProductsGrid() {
                     </div>
                 </div> */}
 
-                <div className="hidden lg:block">
+                <div className="hidden lg:block absolute right-0 -top-[94px]">
                     <FontAwesomeIcon 
                      icon={faMagnifyingGlass}
                      className={`pt-2 text-[#dcccb3] pointer-events-none z-10 absolute right-2 ${search?'hidden':'opacity-50'}`}

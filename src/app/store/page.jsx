@@ -11,7 +11,7 @@ function Home() {
     <main className="main">
       <div className="main-container">
         <h1 className="text-4xl text-[#1a2332] font-bold mb-5">
-          Luminous Frames
+          Lorem Ipsum 
         </h1>            
         <ProductsGrid />   
       </div>
