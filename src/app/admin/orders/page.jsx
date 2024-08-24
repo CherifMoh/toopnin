@@ -954,7 +954,7 @@ function Orders() {
                     
                     {(isGallery.includes(product._id) && galleryElement) &&
                         <div 
-                            className="absolute z-[999999999999] -bottom-28 right-0 flex bg-gray-200 shadow-lg rounded-md rounded-tr-none gap-2 p-6 w-max"
+                            className="absolute z-50 -bottom-28 right-0 flex bg-gray-200 shadow-lg rounded-md rounded-tr-none gap-2 p-6 w-max"
                         >   
                             <div className="absolute -top-5 right-0 size-0 border-l-[12px] border-l-transparent border-r-[12px] border-r-transparent border-b-[24px] border-b-gray-200"></div>
                             <div            
@@ -1015,7 +1015,7 @@ function Orders() {
                 />
 
                 {isproducts.state && isproducts._id === product._id &&
-                    <div className='max-w-96 border border-solid border-[rgba(0, 40, 100, 0.12)]  absolute mt-2 bg-white z-[99999999999999]'>
+                    <div className='max-w-96 border border-solid border-[rgba(0, 40, 100, 0.12)]  absolute mt-2 bg-white z-[102]'>
                         <div className='flex justify-center mt-2 border-b border-[rgba(0, 40, 100, 0.12)] z-50'>
                             <FontAwesomeIcon
                                 icon={faMagnifyingGlass}
@@ -1951,7 +1951,7 @@ function Orders() {
                     />
                 }
                 {isTrakingFilterDrop === name &&
-                    <div className="absolute top-11 right-0 z-[9999999999999999999999] border border-gray-400 rounded">
+                    <div className="absolute top-11 right-0 z-[100] border border-gray-400 rounded">
                         {dropDownEle}
                     </div>
                 }
@@ -1971,7 +1971,7 @@ function Orders() {
         <div className="relative pl-4 pr-48 flex flex-col gap-5 h-screen overflow-x-scroll w-full min-w-max">
 
             <div 
-                className={`bg-green-200 transition-all duration-200 flex items-center gap-2 fixed top-16 right-6 z-[9999999999999999999999] border border-gray-400 px-4 py-2 rounded 
+                className={`bg-green-200 transition-all duration-200 flex items-center gap-2 fixed top-16 right-6 z-[101] border border-gray-400 px-4 py-2 rounded 
                             ${successNotifiction ? 'translate-x-0 opacity-100' : 'translate-x-96 opacity-0'}
                           `}
             >
@@ -1983,7 +1983,7 @@ function Orders() {
             </div>
 
             <div 
-                className={`bg-red-200 transition-all duration-200 flex items-center gap-2 fixed top-16 right-6 z-[9999999999999] border border-gray-400 px-4 py-2 rounded 
+                className={`bg-red-200 transition-all duration-200 flex items-center gap-2 fixed top-16 right-6 z-[102] border border-gray-400 px-4 py-2 rounded 
                             ${errorNotifiction ? 'translate-x-0 opacity-100' : 'translate-x-96 opacity-0'}
                           `}
             >
@@ -2043,7 +2043,7 @@ function Orders() {
                     </div>
                     {isOrderAction &&
                      <div
-                        className="absolute rounded-lg top-12 right-1/2 translate-x-1/2 border z-[99999999999999999] border-gray-500 flex flex-col bg-white items-center"
+                        className="absolute rounded-lg top-12 right-1/2 translate-x-1/2 border z-[100] border-gray-500 flex flex-col bg-white items-center"
                     >
                         <div 
                             className="px-2 whitespace-nowrap p-1 cursor-pointer border-b-2 border-gray-500  w-full text-start"
@@ -2121,7 +2121,7 @@ function Orders() {
             {!isSearching?  
             <div className="relative h-[700px] overflow-y-auto w-full">
                 <table border={0} className="font-normal w-full ml-auto" style={{ borderSpacing: '0' }}>
-                    <thead className="sticky top-0 z-[999999999] border border-gray-500 bg-white">
+                    <thead className="sticky top-0 z-[90] border border-gray-500 bg-white">
                             <tr>
                         {(isUpdateAccess || isDeleteAccess || isCrafting) && (
                             <th>
@@ -2261,7 +2261,7 @@ function Orders() {
                 <div className="relative mt-14 h-[700px] overflow-y-auto w-full">
 
                     <table border={0} className="font-normal w-full ml-auto" style={{ borderSpacing: '0' }}>
-                        <thead className="sticky top-0 z-[999999999] border border-[rgba(0, 40, 100, 0.12)] bg-white">
+                        <thead className="sticky top-0 z-[90] border border-[rgba(0, 40, 100, 0.12)] bg-white">
                                 <tr>
                             {(isUpdateAccess || isDeleteAccess || isCrafting) && (
                                 <th>
