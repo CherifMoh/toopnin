@@ -10,7 +10,7 @@ function Home() {
     <>
     <main className="main">
       <div className="main-container">
-        <h1 className="text-4xl text-[#1a2332] font-bold mb-5">
+        <h1 className="text-4xl text-black font-bold mb-5">
           Lorem Ipsum 
         </h1>            
         <ProductsGrid />   

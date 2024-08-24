@@ -248,13 +248,13 @@ function ProductsGrid() {
                 <div className="hidden lg:block absolute right-0 -top-[94px]">
                     <FontAwesomeIcon 
                      icon={faMagnifyingGlass}
-                     className={`pt-2 text-[#dcccb3] pointer-events-none z-10 absolute right-2 ${search?'hidden':'opacity-50'}`}
+                     className={`pt-2 text-black pointer-events-none z-10 absolute right-2 ${search?'hidden':'opacity-50'}`}
                     />
                     <input 
                      id="search"
                      type='search' 
                      placeholder={`Search`}
-                     className='w-64 px-2 py-1 rounded-xl border-2 border-[#4a3623] no-focus-outline text-[#dcccb3] placeholder-[#dcccb3] bg-[#4a3623]' 
+                     className='w-64 px-2 py-1 rounded-xl border-2 border-[#4a3623] no-focus-outline text-black placeholder-black bg-gray-100' 
                      onChange={(e)=>setSearch(e.target.value)}
                     />
                 </div>
