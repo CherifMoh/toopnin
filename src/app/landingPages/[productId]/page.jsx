@@ -13,6 +13,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faLocationCrosshairs, faLocationDot, faMinus, faPaperPlane, faPhone, faPlus, faUser } from "@fortawesome/free-solid-svg-icons";
 import { addAbandonedCheckout } from "../../actions/order";
 import { checkBlackliste } from "../../lib/ip/checkIPBlacklist";
+import { formatNumberWithCommas } from "../../lib/utils";
 
 
 
@@ -524,26 +525,26 @@ function LindingPage({ params }) {
                     </div>
                 </div>
                 <div className="w-full bg-[#a64100] mt-4 text-white">
-                    <div class="text-center font-semibold text-xl pt-4">
+                    <div className="text-center font-semibold text-xl pt-4">
                         ملخص الطلب
                     </div>
                     <div className="flex justify-between px-4">
                         <span>سعر المنتج</span>
                         <div>
                             {price !== mproduct.price*qnt &&
-                                <span class="product-price mr-3 text-gray-300 opacity-80 line-through">
-                                    {mproduct.price*qnt} 
+                                <span className="product-price mr-3 text-gray-300 opacity-80 line-through">
+                                    {formatNumberWithCommas(mproduct.price*qnt)} 
                                 </span>
                             }
-                            <span class="product-price">
-                                {price} DZD
+                            <span >
+                                {formatNumberWithCommas(price)} DZD
                             </span>
                         </div>
                     </div>
                     <div className="flex justify-between px-4 mt-2">
                         <span>سعر التوصيل</span>
                         {shippingPrice 
-                            ?<span class="shipping-price"> {shippingPrice} DZD </span> 
+                            ?<span class="shipping-price"> {formatNumberWithCommas(shippingPrice)} DZD </span> 
                             :<span class="shipping-price">أدخل الولاية&nbsp;</span> 
                         }
                     </div>
@@ -553,7 +554,7 @@ function LindingPage({ params }) {
                         </span>
                         {(shippingPrice && mproduct.price )
                             ?<span class="shipping-price">
-                                {totalPrice} DZD
+                                {formatNumberWithCommas(totalPrice)} DZD
                             </span> 
                             :<span class="shipping-price">أدخل الولاية&nbsp;</span> 
                         }
@@ -571,160 +572,6 @@ function LindingPage({ params }) {
                     }
                 </button>
             </form>
-
-            <form className="w-full hidden sm:w-3/4 md:w-2/3 lg:w-1/3 p-5" onSubmit={handelSubmit}>
-                
-                <div className="flex gap-4">
-                
-                    <input
-                        onChange={handleChange}
-                        required
-                        // className="text-sm rounded w-full mb-4 border border-gray-400 p-3"
-                        style={inputsStyle}
-                        placeholder="الاسم"
-                        name="name"
-                        type="text"
-                    />
-
-                    {!isPhoneCorrect &&
-                        <h1 className='flex justify-end text-red-600 font-semibold mb-1'>
-                            أدخل رقم هاتف صحيح
-                        </h1>
-                    }
-
-                    <input
-                        onChange={handleChange}
-                        required
-                        className="phone"
-                        style={inputsStyle}
-                        placeholder="رقم الهاتف"
-                        name="phoneNumber"
-                        type="text"
-                    />
-                </div>
-                <div className="flex gap-4">
-
-                    {!isWilayaSelected &&
-                        <h1 className='flex justify-end text-red-600 font-semibold mb-1'>
-                            أدخل الولاية
-                        </h1>
-                    }
-
-                    <select
-                        value={formData.wilaya}
-                        onChange={handleChange}
-                        required
-                        style={inputsStyle}
-                        name="wilaya"
-                    >
-                        <option value="الولاية" hidden >الولاية</option>
-                        {wilayatOptionsElement}
-                    </select>
-
-                    <select
-                        value={formData.commune}
-                        onChange={handleChange}
-                        required
-                        style={inputsStyle}
-                        name="commune"
-                    >
-                        <option hidden >
-                            البلدية
-                        </option>
-                        {communesOptionsElement}
-                    </select>
-
-                </div>
-                <div className="flex w-1/2 mx-auto gap-4">
-
-                    {/* <input
-                        onChange={(e) =>{
-                            setQnt(e.target.value)
-                            setFormData(preState => ({
-                                ...preState,
-                                qnt: e.target.value
-                            }))
-                        }}
-                        required
-                        value={qnt}
-                        style={inputsStyle}
-                        placeholder="الكمية"
-                        type="number"
-                    /> */}
-
-                    {!isShippingSelected &&
-                        <h1 className='flex justify-end text-red-600 font-semibold mb-1'>
-                            أدخل طريقة التوصيل
-                        </h1>
-                    }
-
-
-
-                    {isBeruAvailable
-                        ? <select
-                            value={formData.shippingMethod}
-                            onChange={handleChange}
-                            style={inputsStyle}
-                            required
-                            className='shippingmethod'
-                            name="shippingMethod"
-                        >
-                            <option value='طريقة التوصيل' hidden >طريقة التوصيل</option>
-                            <option value="بيت">بيت</option>
-                            <option value="مكتب">مكتب</option>
-                        </select>
-                        : <div className='my-5 w-full text-center text-xl font-semibold'>
-                            التوصيل الى البيت فقط
-                        </div>
-                    }
-                </div>
-                <button 
-                    type="submit" 
-                    className={`w-1/2 mx-auto rounded-full p-3 border-none bg-[#1773B0] text-sm font-semibold tracking-wide text-white ${isSubmiting && 'h-16'} flex justify-center items-start`}
-                >
-                    {isSubmiting
-                        ? <Spinner color={'border-gray-500'} size={'h-10 w-10 '} />
-                        :
-                        ' أطلب الان'
-                    }
-                </button>
-            </form>
-
-            <div class="order-summary-contaainer hidden">
-                <span class="summary-title">ملخص الطلبية</span>&nbsp;
-                <div class="delevry">
-                    <span class="product-price">
-                        {mproduct.price}
-                    </span>
-                    <span class="summary-option">Da : سعر المنتج</span>
-                </div>
-                <img 
-                    src="https://media-public.canva.com/cl77U/MAE9OUcl77U/1/t.png" 
-                    alt="" class="fr-fil fr-dib"
-                />
-                <div class="delevry">
-                    {shippingPrice 
-                        ?shippingPrice
-                        :<span class="shipping-price red">أدخل الولاية&nbsp;</span> 
-                    }
-                    <span class="summary-option">&nbsp;: سعر التوصيل</span>
-                </div>
-                <img 
-                    src="https://media-public.canva.com/cl77U/MAE9OUcl77U/1/t.png" 
-                    alt="" class="fr-fil fr-dib"
-                />
-                <div class="delevry">
-                    {(shippingPrice && mproduct.price )
-                        ?Number(shippingPrice) + Number(mproduct.price)
-                        :<span class="shipping-price red">أدخل الولاية&nbsp;</span> 
-                    }
-                    <span class="summary-option">&nbsp;: سعر الكلي</span>
-                </div>
-                <img 
-                    src="https://media-public.canva.com/cl77U/MAE9OUcl77U/1/t.png" 
-                    alt="" class="fr-fil fr-dib"
-                />
-            </div>
 
         </section>
 
