@@ -257,9 +257,7 @@ function LindingPage({ params }) {
         return; // Exit the function
     }
     const checkBlacklisted = await checkBlackliste()
-    if(checkBlacklisted){
-        return console.log('ip is blacklisted')
-    }
+    if(checkBlacklisted) return 
 
     try {
         // Make API call
@@ -336,6 +334,8 @@ function LindingPage({ params }) {
     if (!phonePattern.test(formData.phoneNumber)) {
         return; // Exit the function
     }
+    const checkBlacklisted = await checkBlackliste()
+    if(checkBlacklisted) return 
 
 
     try {
