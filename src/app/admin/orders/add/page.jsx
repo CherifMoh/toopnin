@@ -221,8 +221,12 @@ function Page() {
 
 
         setIsSubmiting(true)
+        const newOrder = {
+            ...formData,
+            tracking:'غير مؤكدة'
+        }
 
-        const res = await axios.post(`/api/orders`, formData)
+        const res = await axios.post(`/api/orders`, newOrder)
         // handleTestNotification()
 
         console.log(res)

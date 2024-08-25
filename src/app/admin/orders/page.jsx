@@ -12,7 +12,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faMagnifyingGlass, faPen, faPlus, faX, faCheck, faPaperPlane, faArrowDown, faAngleDown, faBan } from '@fortawesome/free-solid-svg-icons'
 import { faTrashCan } from '@fortawesome/free-regular-svg-icons'
 import { addOrderSchedule, addOrderToZR, addToBlackList, deleteOrder, expedieOrderToZR, getOrder } from '../../actions/order'
-import { editMinusProduct } from '../../actions/storage'
+import { editAddProduct, editMinusProduct } from '../../actions/storage'
 import { useRouter } from "next/navigation";
 import { v4 as uuidv4 } from 'uuid'
 import {AmiriFont} from '../../data/AmiriFont'
@@ -315,12 +315,19 @@ function Orders() {
         } else if (ZrStatus === 'Reporté') {
             newTracking = 'Scheduled'; 
         }
-        console.log(ZrStatus)
+        if(newTracking === 'Retour Navette' && order.tracking !== 'Retour Navette') {
+            
+            order.orders.forEach(product => {
+    
+                product.qnts.forEach(qnt => {
+                    editAddProduct(product.productID,qnt)
+                })
+            });
+        }
+        console.log('newTracking',newTracking)
         return newTracking
     }
     
-    
-
     
     function orderIdToggel(id) {
         if (editedOrderId === id) {
