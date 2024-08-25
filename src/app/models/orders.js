@@ -73,7 +73,7 @@ const OrderSchem = new mongoose.Schema({
     },
     tracking:{
         type: String,
-        default: ''
+        // default: ''
     },
     note:{
         type: String,

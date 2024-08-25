@@ -269,9 +269,14 @@ function LindingPage({ params }) {
     const checkBlacklisted = await checkBlackliste()
     if(checkBlacklisted) return 
 
+    const newOrder = {
+        ...formData,
+        tracking:'غير مؤكدة'
+    }
+
     try {
         // Make API call
-        const res = await axios.post(`/api/orders`, formData);
+        const res = await axios.post(`/api/orders`, newOrder);
 
         // Refresh and navigate to thank you page
         router.refresh();

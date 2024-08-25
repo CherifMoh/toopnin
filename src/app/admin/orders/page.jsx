@@ -93,7 +93,7 @@ function Orders() {
 
     const [newOrders, setNewOrders] = useState({})
     
-    const [trackingFilter, setTrackingFilter] = useState('unconfirmed')
+    const [trackingFilter, setTrackingFilter] = useState('غير مؤكدة')
     
     const [isAddingProduct, setIsAddingProduct] = useState([])
     const [addedOrder, setAddedOrder] = useState({})
@@ -337,6 +337,15 @@ function Orders() {
         const name = input.name;
         const value = input.value;
         
+        if(name === 'state' && (editedOrder.tracking === 'غير مؤكدة' || editedOrder.tracking === 'ملغاة' || editedOrder.tracking === 'لم يرد')) {
+            console.log('tracking changed')
+            setEditedOrder(prev => ({
+                ...prev,
+                tracking: value,
+                [name]: value
+            }));
+            return
+        }
 
         if (name !== 'schedule') input.style.width = `${(input.value.length + 2) * 9}px`;
         setEditedOrder(prev => ({
@@ -701,9 +710,7 @@ function Orders() {
         //     isMatchingTraking = order.schedule === currentDate;
 
         // }else 
-        if(trackingFilter ==='unconfirmed'){
-            isMatchingTraking = (order.state !== 'مؤكدة' && order.state !== 'abandoned')
-        }else if(order.state === 'abandoned'){
+        if(trackingFilter === 'Abandoned'){
             isMatchingTraking = order.state === 'abandoned'
         }else{
             isMatchingTraking = order.tracking===trackingFilter
@@ -1108,6 +1115,19 @@ function Orders() {
             return [...pre, order]
         })
     }
+    function handleSelecteAllOrders() {
+        const currentDate = format(new Date(), 'yyyy-MM-dd');
+        Orders.forEach(order => {
+            if(!filterOrders(order, currentDate)) return
+            
+            setSelectedOrders(pre=>{
+                if(pre.some(item => item._id === order._id)){
+                    return pre.filter(item => item._id !== order._id)
+                }
+                return [...pre, order]
+            })
+        })
+    }
 
     async function handleSendMessage() {
         selectedOrders.forEach(async (order) => {
@@ -1379,20 +1399,7 @@ function Orders() {
                                 }
                             </td>
                             <td>
-                              {editedOrder.state  === 'مؤكدة'
-                                ?<div>{editedOrder.tracking}</div>
-                                :<select
-                                    value={editedOrder.tracking}
-                                    onChange={handleChange}
-                                    className="border bg-transparent border-[rgba(0, 40, 100, 0.12)] rounded-md pl-1 max-w-32"
-                                    name="tracking"
-                                >
-                                    <option hidden>Tracking</option>
-                                    <option value="delivered">delivered</option>
-                                    <option value="scheduled">scheduled</option>
-                                    <option value="returned">returned</option>
-                                </select>
-                              }
+                                <div>{editedOrder.tracking}</div>
                             </td>
                             {cartItemsElemnt}
                             <td>
@@ -1796,11 +1803,17 @@ function Orders() {
     
     const trackingFiltersArray=[
         {
-            name:'unconfirmed',
-            icon:'not confirmed.png'            
-        },{
             name:'Abandoned',
-            icon:'abandoned.svg'      
+            icon:'abandoned.svg'
+                      
+        },{
+            name:'unconfirmed',
+            icon:'not confirmed.png' ,
+            dropDown:[
+                'غير مؤكدة',
+                'لم يرد',
+                'ملغاة',,
+            ]  
         },{
             name:'Scheduled',
             icon:'Schedule.png'      
@@ -2125,8 +2138,18 @@ function Orders() {
                             <tr>
                         {(isUpdateAccess || isDeleteAccess || isCrafting) && (
                             <th>
-                                <div className="border-y border-solid border-[rgba(0, 40, 100, 0.12)] p-[13px]">
-                                    تعديل       
+                                <div className="border-y flex items-center justify-evenly  border-solid border-[rgba(0, 40, 100, 0.12)] p-[13px]">
+                                {(isCrafting || isSending ||isExcel||isOrderAction) &&
+                                        <div className="p-2 flex items-center">
+                                            <input 
+                                                type="checkbox" 
+                                                className="size-4 m-0"
+                                                // checked={}
+                                                onChange={(e) => handleSelecteAllOrders()} 
+                                            />
+                                        </div>
+                                }
+                                تعديل       
                                 </div>
                             </th>
                         )}
@@ -2268,6 +2291,7 @@ function Orders() {
                                     <div className="border-y border-solid border-[rgba(0, 40, 100, 0.12)] p-[13px]">
                                         تعديل       
                                     </div>
+                                   
                                 </th>
                             )}
                                 <th className="bg-blue-100">
