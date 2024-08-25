@@ -17,11 +17,15 @@ const productSchem = new mongoose.Schema({
     },
     imageOff: {
         type: String,
-        required: true
+        required: false
     },
     description: {
         type: String,
         required: true
+    },
+    HomeOnly: {
+        type: Boolean,
+        default: true
     },
     options: {
         type: Array,
@@ -31,17 +35,21 @@ const productSchem = new mongoose.Schema({
         type: Number,
         required: true
     },
+    beforePrice: {
+        type: Number,
+        required: true
+    },
     sales: {
         type: Array,
         required: true
     },
     parts: {
         type: Array,
-        required: true
+        required: false
     },
     gallery: {
         type: Array,
-        required: true
+        required: false
     },
     landingPageImages: {
         type: Array,
@@ -49,7 +57,7 @@ const productSchem = new mongoose.Schema({
     },
     dropDowns: {
         type: Array,
-        required: true
+        required: false
     },
     qnts: {
         type: Array,

@@ -26,7 +26,7 @@ function Admin() {
     });
 
 
-    const [newProduct, setNewProduct] = useState({active:true});
+    const [newProduct, setNewProduct] = useState({active:true,HomeOnly:false});
 
     const textareaRef = useRef(null);
     
@@ -80,6 +80,8 @@ function Admin() {
 
 
     async function handleSubmit(e) {
+
+        if(!newProduct.imageOn || !newProduct.title || !newProduct.description || !newProduct.price || newProduct.landingPageImages.length < 3) return 
 
         e.preventDefault();
         setIsSubmitting(true)
@@ -435,7 +437,7 @@ function Admin() {
                 />
                 <input
                     type="Number"
-                    placeholder="Sale %"
+                    placeholder="Price"
                     name="price"
                     onChange={(e) => handelSaleChange(e, i)}
                     className="border-2 border-gray-400 rounded-md p-4 w-full"
@@ -952,7 +954,7 @@ function Admin() {
     }
 
     function langingPgesElement (){
-        const checkoutHeight = '755'
+        const checkoutHeight = '855'
         const Images = newProduct?.landingPageImages
         if(!Array.isArray(Images) || Images.length === 0){
             return(
@@ -1117,25 +1119,28 @@ function Admin() {
                     }`}
                 />
             </div>
-            <form onSubmit={(e) => handleSubmit(e)} className="flex flex-col gap-5 bg-white p-8 rounded-lg shadow-md">
+            <form onSubmit={(e) => handleSubmit(e)} className="flex flex-col gap-5 w-1/2 bg-white p-8 rounded-lg shadow-md">
 
                 <div className="flex items-center justify-between relative w-full">
-                    <input
-                        required
-                        className="imageOn w-96 h-96 bg-white hover:bg-gray-200 hover:text-gray-200 text-white mr-5 rounded-full border-dashed cursor-pointer border-black border-2"
-                        type="file"
-                        label="imageOn"
-                        name="imageOn"
-                        onChange={(e) => handleFileUpload(e, 'On')}
-                    />
+                    <div
+                        className="w-full h-96 bg-white hover:bg-gray-200 hover:text-gray-200 text-white mr-5 rounded-lg border-dashed cursor-pointer border-black border-2"
+                    >
+                         <input
+                            type="file"
+                            className="w-full h-full opacity-0"
+                            label="imageOn"
+                            name="imageOn"
+                            onChange={(e) => handleFileUpload(e, 'On')}
+                        />
+                    </div>
                     {newProduct?.imageOn
-                        ? <img src={newProduct.imageOn} width={96} height={96} alt="" className='absolute rounded-full w-96 h-96 object-cover pointer-events-none' />
-                        : <div className='absolute left-32 font-bold text-xl pointer-events-none'>
-                            <p>Enter imge on</p>
-                            <FontAwesomeIcon icon={faCloudArrowUp} className="ml-12" />
+                       ? <img alt="" src={newProduct.imageOn} width={750} height={400} className='absolute rounded-lg w-full h-full object-cover pointer-events-none' />
+                       : <div className='absolute right-1/2 translate-x-1/2 font-bold text-xl pointer-events-none'>
+                            <p>Enter main image</p>
+                            <FontAwesomeIcon icon={faCloudArrowUp} className="ml-16" />
                         </div>
                     }
-                    <input
+                    {/* <input
                         required
                         className="imageOff w-96 h-96 bg-white hover:bg-gray-200 hover:text-gray-200 text-white ml-5 rounded-full border-dashed cursor-pointer border-black border-2"
                         type="file"
@@ -1149,10 +1154,10 @@ function Admin() {
                             <p>Enter imge off</p>
                             <FontAwesomeIcon icon={faCloudArrowUp} className="ml-12" />
                         </div>
-                    }
+                    } */}
                 </div>
 
-                <div className="text-center">
+                {/* <div className="text-center">
                     <h1 className="font-semibold text-xl"> gallery</h1>
                     <div className="grid grid-cols-4 gap-8 justify-between my-10">
                         {galleryElemnt}
@@ -1165,7 +1170,7 @@ function Admin() {
                             <span>+</span>
                         </div>
                     </div>
-                </div>
+                </div> */}
 
 
                 <input
@@ -1178,16 +1183,29 @@ function Admin() {
                     value={newProduct?.title}
                     onChange={handleChange}
                 />
-                <input
-                    required
-                    placeholder="Price"
-                    type='number'
-                    label="Price"
-                    name="price"
-                    className="border-[1px] border-gray-400 p-2"
-                    value={newProduct?.price}
-                    onChange={handleChange}
-                />
+                <div className="flex gap-5 w-full">
+
+                    <input
+                        required
+                        placeholder="Price"
+                        type='number'
+                        label="Price"
+                        name="price"
+                        className="border-[1px] flex-grow border-gray-400 p-2"
+                        value={newProduct?.price}
+                        onChange={handleChange}
+                    />
+                    <input
+                        required
+                        placeholder="before sale Price"
+                        type='number'
+                        label="Before Price"
+                        name="beforePrice"
+                        className="border-[1px] flex-grow border-gray-400 p-2"
+                        value={newProduct?.beforePrice}
+                        onChange={handleChange}
+                    />
+                </div>
                 <textarea
                     required
                     ref={textareaRef}
@@ -1200,7 +1218,28 @@ function Admin() {
                     onChange={handleChange}
                     onKeyDown={handleKeyDown}
                 />
-                <div className="text-center">
+                <div
+                    className="border-[1px] flex items-center justify-end gap-4 flex-grow relative border-gray-400 p-2"
+                >
+                    <div
+                        className={`flex items-center cursor-pointer w-14 h-8 rounded-full p-1 duration-300 ease-in-out ${
+                            newProduct.HomeOnly ? `bg-green-400` : 'bg-gray-300'
+                        }`}
+                        onClick={()=>{
+                            setNewProduct({...newProduct,HomeOnly: !newProduct.HomeOnly})
+                        }}
+                    >
+                        <div
+                            className={`bg-white w-6 h-6 rounded-full shadow-md transform duration-300 ease-in-out ${
+                            newProduct.HomeOnly ? 'translate-x-6' : ''
+                            }`}
+                        />
+                    </div>
+                    <p className="text-lg font-medium">
+                        التوصيل للبيت فقط
+                    </p>
+                </div>
+                {/* <div className="text-center">
                     <h1 className="font-semibold text-xl"> Options </h1>
                     {optionsElemnt}
                     <div
@@ -1209,7 +1248,7 @@ function Admin() {
                     >
                         Add option
                     </div>
-                </div>
+                </div> */}
                 <div className="text-center">
                     <h1 className="font-semibold text-xl"> Sales </h1>
                     {salesElemnt}
@@ -1220,7 +1259,7 @@ function Admin() {
                         Add sale
                     </div>
                 </div>
-                <div className="text-center relative">
+                {/* <div className="text-center relative">
                     <div
                         className="size-full absolute top-0 right-0"
                         onClick={() => setIsRewMates([])}
@@ -1247,12 +1286,12 @@ function Admin() {
                     >
                         Add a dropDown
                     </div>
-                </div>
+                </div> */}
                 <div className="text-center">
                     <h1 className="font-semibold text-xl mb-4"> Landing Page </h1>
 
-                    {usingLandingPage &&langingPgesElement()}
-                    <div
+                    {langingPgesElement()}
+                    {/* <div
                         className="mt-6 bg-stone-500 px-4 py-3 cursor-pointer text-white rounded-3xl w-max m-auto"
                         onClick={() => {
                             setUsingLandingPage(pre=>!pre)
@@ -1260,7 +1299,7 @@ function Admin() {
                         }}
                     >
                         {usingLandingPage?'Remove Landing Page':'Use Landing Page'}                     
-                    </div>
+                    </div> */}
 
                 </div>
                 <button

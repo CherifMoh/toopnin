@@ -105,10 +105,19 @@ function LindingPage({ params }) {
             reference: generateUniqueString()
         }))
     }, [products,qnt])
-
+    
+    useEffect(() => {
+        if (!mproduct) return
+       
+        setFormData(pre => ({
+            ...pre,
+            reference: generateUniqueString(),
+            ...(mproduct?.HomeOnly && { shippingMethod: 'بيت' })
+        }))
+    }, [mproduct])
 
     useEffect(() => {
-        if (!wilayat || !fees) return
+        if (!wilayat || !fees || !mproduct) return
 
         wilayat.forEach(wilaya => {
             if (wilaya.wilaya_name === formData.wilaya) {
@@ -130,7 +139,7 @@ function LindingPage({ params }) {
                     setIsBeruAvailable(true)
                 }
 
-                if (formData.wilaya && formData.shippingMethod) {
+                if (formData.wilaya && (formData.shippingMethod || mproduct?.HomeOnly)) {
                     if (wilaya.wilaya_name === formData.wilaya) {
                         // setFormData(pre => ({
                         //     ...pre,
@@ -160,7 +169,7 @@ function LindingPage({ params }) {
 
             }
         })
-    }, [formData.wilaya,formData.shippingMethod])
+    }, [formData.wilaya,formData.shippingMethod,mproduct])
 
     useEffect(() => {
         if(!mproduct) return
@@ -369,14 +378,20 @@ function LindingPage({ params }) {
                 className="w-full absolute top-0 left-0 -z-10"
             />
             <div className="w-full sm:w-3/4 md:w-2/3 lg:w-1/3 xl:w-1/4 p-5">
-                <div className="text-3xl w-full text-end">{mproduct?.title}</div>
-                <div className="text-end">{mproduct?.price} DA</div>
+                <div className="text-4xl font-semibold w-full text-center mb-2">{mproduct?.title}</div>
+                <div className="flex items-center justify-center gap-2">
+                    <div className="line-through text-gray-600 opacity-60 font-semibold">{mproduct?.beforePrice}</div>
+                    <div className=" text-green-500 font-semibold text-lg">{formatNumberWithCommas(mproduct?.price)} DA</div>
+                </div>
             </div>
 
             <form 
                 onSubmit={handelSubmit} 
                 className={`${wrongSubmit && 'bg-gradient-radial from-red-300  to-transparent bg-opacity-10'} w-full sm:w-3/4 md:w-2/3 lg:w-1/3 xl:w-1/4 p-5 border-2 border-black rounded-3xl`}
             >
+                <div>
+                    {mproduct?.description}
+                </div>
                 <h1 className="text-2xl font-semibold text-center tracking-wide">
                     استمارة الطلب
                 </h1>
@@ -447,7 +462,7 @@ function LindingPage({ params }) {
                 </div>
                 <div>
                     <p className="mt-2 font-semibold">
-                        الولاية
+                        البلدية
                         <span className="text-red-600 text-lg font-bold ml-1">*</span>
                     </p>
 
@@ -474,7 +489,7 @@ function LindingPage({ params }) {
                         <span className="text-red-600 text-lg font-bold ml-1">*</span>
                     </p>
 
-                    {isBeruAvailable
+                    {(isBeruAvailable && !mproduct?.HomeOnly)
                         ? 
                         <div className="flex w-full rounded-md bg-white border border-[rgba(0, 40, 100, 0.12)]">
 
