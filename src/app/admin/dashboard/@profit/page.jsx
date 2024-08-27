@@ -94,6 +94,7 @@ function Profit() {
   
   const productsSelectElement = [
     <select 
+        key={'productsSelectElement'}
         name="product" 
         value={selectedProduct}
         className=" w-1/4 py-2 px-4 bg-transparent border border-gray-200 rounded-md"
@@ -130,7 +131,7 @@ function Profit() {
   })
   
   const dateSelectElement = [
-    <div className="w-1/4 relative">
+    <div className="w-1/4 relative" key={'dateSelectElement'}>
       <select 
         onChange={handleOptionChange} 
         value={selectedDate}
@@ -171,7 +172,7 @@ function Profit() {
 
 
   const bodyElement =[
-    <div className="flex gap-4 w-full">
+    <div className="flex gap-4 w-full" key={'bodyElement'}>
         {dateSelectElement}
         {productsSelectElement}
         <input 
@@ -195,6 +196,7 @@ function Profit() {
 
   const subtitlelmnt = [
     <span 
+      key={'subtitlelmnt'}
       className="text-green-500 whitespace-nowrap text-lg font-semibold"
     >
       الربح : {profit} دج
