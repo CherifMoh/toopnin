@@ -2,7 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faCloudArrowUp } from '@fortawesome/free-solid-svg-icons'
+import { faCloudArrowUp, faInfoCircle } from '@fortawesome/free-solid-svg-icons'
 import { useRouter } from "next/navigation";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import Image from "next/image";
@@ -1192,6 +1192,30 @@ function ProductUpdate({ params }) {
                         className="border-[1px] flex-grow border-gray-400 p-2"
                         value={newProduct?.beforePrice}
                         onChange={(e) => setNewProduct(pre => ({ ...pre, beforePrice: e.target.value }))}
+                    />
+                </div>
+                <div className="relative flex">
+                    <div className="group">
+                        <FontAwesomeIcon 
+                            icon={faInfoCircle} 
+                            className="absolute top-1 right-2 text-lg text-blue-600 cursor-pointer" 
+                        />
+                        <div className="absolute bottom-full right-0 mb-2 w-56 hidden group-hover:block">
+                            <div className="relative z-10 p-2 text-sm leading-tight text-white whitespace-no-wrap bg-black rounded shadow-lg">
+                                هذا يشمل جميع تكاليف المنتج مثل التعبئة والتغليف
+                            </div>
+                            <div className="absolute right-0 w-3 h-3 -mb-1 transform rotate-45 bg-black"></div>
+                        </div>
+                    </div>
+                    <input
+                        required
+                        placeholder="Cost"
+                        type='text'
+                        label="Cost"
+                        name="cost"
+                        className="border-[1px] flex-grow border-gray-400 p-2"
+                        value={newProduct?.cost}
+                        onChange={(e) => setNewProduct(pre => ({ ...pre, cost: e.target.value }))}       
                     />
                 </div>
                 <textarea

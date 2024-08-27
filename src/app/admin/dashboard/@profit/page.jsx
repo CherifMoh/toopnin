@@ -176,7 +176,7 @@ function Profit() {
         {dateSelectElement}
         {productsSelectElement}
         <input 
-            type="number" 
+            type="text" 
             placeholder="cost"
             value={cost}
             className="no-focus-outline w-1/4 py-2 px-4 bg-transparent border border-gray-200 rounded-md"
@@ -197,20 +197,17 @@ function Profit() {
   const subtitlelmnt = [
     <span 
       key={'subtitlelmnt'}
-      className="text-green-500 whitespace-nowrap text-lg font-semibold"
+      className={`text-${profit > 0 ? 'green' : 'red'}-500 whitespace-nowrap text-lg font-semibold`}
     >
       الربح : {profit} دج
     </span>
   ]
 
-  
- 
-    
 
   return (
     <DashboardCard
       title="Profit calculator" 
-      subtitle={subtitlelmnt}
+      subtitle={profit && subtitlelmnt}
       body={bodyElement}
     />
   )
