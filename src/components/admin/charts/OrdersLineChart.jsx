@@ -66,7 +66,7 @@ const OrdersLineChart = () => {
   const todayMore = todayTotalQnt > yesterdayTotalQnt;
 
   const qntElement =[
-    <div className='text-lg font-bold flex gap-2 items-center'>
+    <div key={'todayTotalQnt'} className='text-lg font-bold flex gap-2 items-center'>
       {todayTotalQnt}
       <FontAwesomeIcon 
         icon={faArrowRightLong} 
