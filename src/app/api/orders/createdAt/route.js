@@ -1,5 +1,5 @@
-import Order from "../../models/orders";
-import { dbConnect } from "../../lib/dbConnect";
+import Order from "../../../models/orders";
+import { dbConnect } from "../../../lib/dbConnect";
 import { NextResponse } from "next/server";
 import { startOfDay, endOfDay, startOfWeek, endOfWeek, subDays } from 'date-fns';
 
@@ -26,7 +26,7 @@ export async function GET(req) {
 
     if (dateFilter === 'today') {
       query = {
-        updatedAt: {
+        createdAt: {
           $gte: startToday,
           $lte: endToday,
         },
@@ -37,7 +37,7 @@ export async function GET(req) {
       const endYesterday = endOfDay(subDays(today, 1));
       endYesterday.setHours(endYesterday.getHours() + 1);
       query = {
-        updatedAt: {
+        createdAt: {
           $gte: startYesterday,
           $lte: endYesterday,
         },
@@ -45,7 +45,7 @@ export async function GET(req) {
     } else if (dateFilter === 'this Week') {
       const startOfWeek = startOfDay(subDays(today, 6));
       query = {
-        updatedAt: {
+        createdAt: {
           $gte: startOfWeek,
           $lte: endToday,
         },
@@ -54,7 +54,7 @@ export async function GET(req) {
       const startOfMonth = startOfDay(new Date(today.getFullYear(), today.getMonth(), 1));
       const endOfMonth = endOfDay(new Date(today.getFullYear(), today.getMonth() + 1, 0));
       query = {
-        updatedAt: {
+        createdAt: {
           $gte: startOfMonth,
           $lte: endOfMonth,
         },
@@ -63,7 +63,7 @@ export async function GET(req) {
       const startCustomDate = new Date(customStartDate);
       const endCustomDate = new Date(customEndDate);
       query = {
-        updatedAt: {
+        createdAt: {
           $gte: startCustomDate,
           $lte: endCustomDate,
         },

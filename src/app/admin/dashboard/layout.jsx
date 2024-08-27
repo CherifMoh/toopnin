@@ -1,11 +1,12 @@
 
-export default function Layout({ children, sales, customers, activeP, ordersChart, ordersPieChart }) {
+export default function Layout({ children, profit, sales, customers, activeP, ordersChart, ordersPieChart }) {
   return (
     <main className='bg-white p-4'>
 
       <section>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {sales}
+          {/* {sales} */}
+          {profit}
           {customers}
           {activeP}
         </div>

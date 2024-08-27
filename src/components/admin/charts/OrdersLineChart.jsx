@@ -2,64 +2,105 @@
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
+import { format, parseISO } from 'date-fns';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faArrowLeft, faArrowLeftLong, faArrowRightLong } from '@fortawesome/free-solid-svg-icons';
 
 
-async function fetchLastWeekOrders() {
-  const res = await axios.get('/api/orders/lastWeek');
+async function fetchTodayOrders() {
+  const res = await axios.get('/api/orders/createdAt?date=today');
   return res.data;
 }
 
+async function fetchYesterdayOrders() {
+  const res = await axios.get('/api/orders/createdAt?date=yesterday');
+  return res.data;
+}
 const OrdersLineChart = () => {
 
-  const { data: Orders, isLoading, isError, error } = useQuery({
-    queryKey: ['orders lastWeek'],
-    queryFn: fetchLastWeekOrders
+  const { data: todayOrders, todayIsLoading, todayIsError, todayError } = useQuery({
+    queryKey: ['orders today'],
+    queryFn: fetchTodayOrders
+  });
+  const { data: yesterdayOrders, isLoading, isError, error } = useQuery({
+    queryKey: ['orders yesterday'],
+    queryFn: fetchYesterdayOrders
   });
 
-  if (isLoading) return <div>Loading Chart ...</div>;
-  if (isError) return <div>Error fetching Orders: {error.message}</div>;
+  if (isLoading || todayIsLoading) return <div>Loading Chart ...</div>;
+  if (isError || todayIsError) return <div>Error fetching Orders: {error?.message || todayError?.message}</div>;
+  
 
-  const ordersByDate = Orders.reduce((acc, order) => {
-    // Extract the date part from the createdAt timestamp
-    const date = new Date(order.createdAt).toLocaleDateString('ar-DZ', { month: 'short', day: 'numeric' });
+ 
+  // Function to aggregate orders by hour
+  const aggregateOrdersByHour = (orders) => {
+    const hourlyData = Array(24).fill(0); // Initialize an array with 24 zeros
 
+    orders.forEach(order => {
+      const hour = parseISO(order.createdAt).getHours();
+      order.orders?.forEach((product) => {
+        
+        hourlyData[hour] += Number(product.qnt);
+      })
+    });
 
-    // Check if the date exists in the accumulator
-    if (acc[date]) {
-      acc[date].push(order);
-    } else {
-      acc[date] = [order];
-    }
+    return hourlyData.map((qnt, hour) => ({
+      hour: `${hour}:00`,
+      qnt,
+    }));
+  };
 
-    return acc;
-  }, {});
+  const todayData = aggregateOrdersByHour(todayOrders);
+  const yesterdayData = aggregateOrdersByHour(yesterdayOrders);
 
-  // Transform the grouped data into the format required for the chart
-  let chartData = Object.entries(ordersByDate).map(([date, orders]) => ({
-    day: date,
-    Orders: orders.length // Count the number of orders for each date
+  // Combine today's and yesterday's data into a single array for the chart
+  const chartData = todayData.map((data, index) => ({
+    hour: data.hour,
+    todayQnt: data.qnt,
+    yesterdayQnt: yesterdayData[index].qnt,
   }));
 
-  chartData = chartData.slice().reverse();
+  const todayTotalQnt = todayData.reduce((acc, data) => acc + data.qnt, 0);
+  const yesterdayTotalQnt = yesterdayData.reduce((acc, data) => acc + data.qnt, 0);
 
-  // const data = [
-  //   { day: 'june 1', Orders: 70 },
-  //   { day: 'june 2', Orders: 75 },
-  //   { day: 'june 3', Orders: 80 },
-  //   { day: 'june 4', Orders: 78 },
-  //   { day: 'june 5', Orders: 85 },
-  //   { day: 'june 6', Orders: 88 },
-  //   { day: 'june 7', Orders: 82 },
-  // ];
+  const todayMore = todayTotalQnt > yesterdayTotalQnt;
+
+  const qntElement =[
+    <div className='text-lg font-bold flex gap-2 items-center'>
+      {todayTotalQnt}
+      <FontAwesomeIcon 
+        icon={faArrowRightLong} 
+        className={todayMore ? 'text-green-500 -rotate-45' : 'text-red-500 rotate-45'}
+      />
+    </div>
+  ]
 
   return (
-    <LineChart width={600} height={300} data={chartData}>
-      <CartesianGrid strokeDasharray="3 3" strokeOpacity={0.3} />
-      <XAxis dataKey="day" />
-      <YAxis />
-      <Tooltip />
-      <Line type="monotone" dataKey="Orders" stroke="#8884d8" dot={false} activeDot={{ r: 8 }} />
-    </LineChart>
+    <div className='flex-col'>
+      {qntElement}
+      <LineChart width={600} height={300} data={chartData}>
+        <CartesianGrid strokeDasharray="3 3" strokeOpacity={0.3} />
+        <XAxis dataKey="hour" />
+        <YAxis />
+        <Tooltip />
+        <Line
+          type="monotone"
+          dataKey="todayQnt"
+          stroke="#8884d8"
+          dot={false}
+          activeDot={{ r: 8 }}
+          name="Today's Orders"
+          />
+        <Line
+          type="monotone"
+          dataKey="yesterdayQnt"
+          stroke="#82ca9d"
+          strokeDasharray="5 5"
+          dot={false}
+          name="Yesterday's Orders"
+          />
+      </LineChart>
+    </div>
   );
 }
 
