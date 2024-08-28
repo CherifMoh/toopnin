@@ -1,7 +1,9 @@
 import Order from "../../../models/orders"
 import { dbConnect } from "../../../lib/dbConnect"
+import { getUserNameByEmail } from "../../../actions/users"
 import { NextResponse } from "next/server"
 import { revalidatePath } from "next/cache";
+import { cookies } from "next/headers";
 
 export async function PUT(req, { params }) {
   try {
@@ -13,6 +15,13 @@ export async function PUT(req, { params }) {
     const newDocument = await Order.findByIdAndUpdate(id, NewOrder, { new: true })
 
     revalidatePath('/admin/orders')
+    const userName = await getUserNameByEmail(cookies().get('user-email').value)
+    
+    AddToArchive({
+      user: userName,
+      tracking: formData.DLVTracking,
+      action: "تم تعديل طلب",
+    }); 
     return new NextResponse(newDocument)
 
   } catch (err) {

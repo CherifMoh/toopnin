@@ -1,18 +1,39 @@
 'use server'
 
 import Order from "../models/orders"
+import OrdersArchive from "../models/ordersArchive"
 import { dbConnect } from "../lib/dbConnect"
 import axios from "axios"
 import BlackList from "../models/blackLists"
+import { getUserNameByEmail } from "./users"
+import { cookies } from "next/headers"
 
 export async function addOrder(formData){ 
+  try{
+
     await dbConnect()
-    Order.create(formData)   
+    Order.create(formData)      
+    
+  }catch(err){
+    console.log(err)
+  }
 }
 
 export async function deleteOrder(id){
+  try{
+
     await dbConnect()
-    const res = await Order.findByIdAndDelete(id)        
+    const res = await Order.findByIdAndDelete(id)       
+    const userName = await getUserNameByEmail(cookies().get('user-email').value)
+    
+    AddToArchive({
+      user: userName,
+      tracking: res.DLVTracking,
+      action: "حذف",
+    }); 
+  }catch(err){
+    console.log(err)
+  }
 }
 
 export async function getOrder(methode, value){
@@ -40,6 +61,14 @@ export async function addOrderSchedule(order,schedule) {
       }
 
       await Order.findByIdAndUpdate(order._id,newOrder,{new:true});
+
+      const userName = await getUserNameByEmail(cookies().get('user-email').value)
+
+      AddToArchive({
+        user: userName,
+        tracking: formData.DLVTracking,
+        action: "تم اضافة طلب",
+      }); 
 
       return 'updated';
   } catch (error) {
@@ -84,6 +113,13 @@ export async function addOrderToZR(order) {
           }
       }
     );
+    const userName = await getUserNameByEmail(cookies().get('user-email').value)
+   
+    AddToArchive({
+        user: userName,
+        tracking: phoneNumber,
+        action: "أُضيف إلى شركة التوصيل",
+    });
     return response.data
   }catch(err){
       console.log(err.message)
@@ -106,6 +142,13 @@ export async function expedieOrderToZR(tracking) {
           }
       }
     );
+    const userName = await getUserNameByEmail(cookies().get('user-email').value)
+   
+    AddToArchive({
+        user: userName,
+        tracking: phoneNumber,
+        action: "شحن إلى شركة التوصيل",
+    });
     return response.data
   }catch(err){
       console.log(err.message)
@@ -134,6 +177,14 @@ export async function addToBlackList(ip,phoneNumber) {
             await blacklist.save();
         }
     }
+
+    const userName = await getUserNameByEmail(cookies().get('user-email').value)
+   
+    AddToArchive({
+        user: userName,
+        tracking: phoneNumber,
+        action: "أُضيف إلى القائمة السوداء",
+    });
 
     return {sucsess: true, message: "IP added to blacklist"}
 
@@ -169,4 +220,11 @@ export async function addAbandonedCheckout(order) {
   } catch (err) {
     return err;
   }
+}
+
+export async function AddToArchive(newData){
+  await dbConnect()
+  
+  OrdersArchive.create(newData)
+  
 }

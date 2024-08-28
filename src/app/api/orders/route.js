@@ -2,6 +2,8 @@ import Order from "../../models/orders";
 import { dbConnect } from "../../lib/dbConnect";
 import { NextResponse } from "next/server";
 import { startOfDay, endOfDay, startOfWeek, endOfWeek, subDays } from 'date-fns';
+import { getUserNameByEmail } from "../../actions/users";
+import { cookies } from "next/headers";
 
 export async function GET(req) {
   try {
@@ -104,6 +106,14 @@ export async function POST(req) {
     order.ip=ip
 
     Order.create(order);
+
+    const userName = await getUserNameByEmail(cookies().get('user-email').value)
+    
+    AddToArchive({
+      user: userName,
+      tracking: formData.DLVTracking,
+      action: "تم اضافة طلب",
+    }); 
 
     return new NextResponse("Order created");
   } catch (err) {

@@ -41,4 +41,16 @@ export async function getOneProduct(id){
   }
     
 }
+export async function getProductCost(id){
+  try{
+    await dbConnect()
+
+    const res = await Product.findById(id).select('cost')
+    console.log(res)
+    return res
+  }catch(err){  
+    throw Error(err)
+  }
+    
+}
 

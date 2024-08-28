@@ -17,6 +17,13 @@ export async function deleteUser(id) {
     const res = await User.findByIdAndDelete(id)
 }
 
+export async function getUserNameByEmail(email) {
+    await dbConnect()
+    const res = await User.findOne({ email: email }).select('name')
+
+    return res.name
+}
+
 export async function editeUserPfp(email, pfp) {
     await dbConnect();
 

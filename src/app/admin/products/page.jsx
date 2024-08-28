@@ -222,7 +222,7 @@ function Page() {
     function minusTabelElement(product,minusMax){
         return [
             <div className="shadow-lg p-1 absolute top-0 right-0 bg-white z-20"  key={product._id}>
-                <table className='m-auto'>
+                <table className=' w-48'>
                     <thead>
                         <tr>
                         <th>كمية</th>
@@ -236,7 +236,7 @@ function Page() {
                         <td>
                             <input 
                                 type="number" 
-                                className="no-focus-outline bg-transparent w-full h-full"
+                                className="no-focus-outline min-w-28 bg-transparent w-full h-full"
                                 placeholder="كمية"
                                 value={minusQnt}
                                 max={minusMax}
@@ -247,7 +247,7 @@ function Page() {
                         <td>
                             <input 
                                 type="text" 
-                                className="no-focus-outline bg-transparent w-full h-full"
+                                className="no-focus-outline min-w-36 bg-transparent w-full h-full"
                                 placeholder="ملاحظة"
                                 onChange={(e)=>setNote(e.target.value)}
                             />
@@ -414,6 +414,13 @@ function Page() {
                     <span className="ml-2 whitespace-nowrap">Add a new product</span>
                 </Link>
             }
+
+            <Link
+                className='justify-self-end  whitespace-nowrap rounded-xl border border-[rgba(0, 40, 100, 0.12)] no-focus-outline text-black bg-transparent p-2 px-4 cursor-pointer'
+                href={'/admin/products/archive'}
+            >
+                <span className="ml-2 whitespace-nowrap">Archive</span>
+            </Link>
            
 
         </div>

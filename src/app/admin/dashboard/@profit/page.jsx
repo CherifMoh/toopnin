@@ -5,6 +5,7 @@ import { DashboardCard, formatNumberWithCommas } from "../../../lib/utils";
 import axios from "axios";
 import Spinner from '../../../../components/loadings/Spinner'
 import { useState } from "react";
+import { getProductCost } from "../../../actions/product";
 
 async function fetchProducts() {
   const res = await axios.get('/api/products');
@@ -65,27 +66,35 @@ function Profit() {
   />;
 
 
-  function calculateProfit() {
-    const livredOrders = Orders.filter(order => order.tracking === 'Livrée [ Encaisser ]' || order.tracking === 'Livrée');
-    const returnedOrders = Orders.filter(order => order.tracking === 'Retour Livreur' || order.tracking === 'Retour de Dispatche' || order.tracking === 'Retour Navette');
+  async function calculateProfit() {
+    const livredOrders = Orders.filter(order => 
+        order.tracking === 'Livrée [ Encaisser ]' || order.tracking === 'Livrée'
+    );
+    const returnedOrders = Orders.filter(order => 
+        order.tracking === 'Retour Livreur' || 
+        order.tracking === 'Retour de Dispatche' || 
+        order.tracking === 'Retour Navette'
+    );
     
-    let ordersProfit =0
+    let ordersProfit = 0;
   
-    livredOrders.forEach(order => {
-      let orderProfit = Number(order.totalPrice) - Number(order.shippingPrice)
-      order.orders.forEach(product => {
-          
-          if(product.productID === selectedProduct){
-            product.qnts.forEach(qnt => {
-              orderProfit -=Number(qnt.qnt) * Number(qnt.price)
-            })
-          }
-      })
-      ordersProfit += Number(orderProfit)
-    });
-  
-    stProfit( ordersProfit - Number(cost) - Number(returnedOrders.length * 150))
-  }
+    for (const order of livredOrders) {
+        let orderProfit = Number(order.totalPrice) - Number(order.shippingPrice);
+
+        for (const product of order.orders) {
+            if (product.productID === selectedProduct) {
+                for (const qnt of product.qnts) {
+                    const productCost = await getProductCost(product.productID);
+                    orderProfit -= Number(qnt.qnt) *( Number(qnt.price) + Number(productCost.cost));
+                }
+            }
+        }
+
+        ordersProfit += orderProfit;
+    }
+
+    stProfit(ordersProfit - Number(cost) - Number(returnedOrders.length * 150));
+}
 
 
   const productsOptionsElement = Products.map(product => {

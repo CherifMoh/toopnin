@@ -1,11 +1,11 @@
 import mongoose,{Schema} from "mongoose";
 
-const ArchiveSchema = new Schema({
+const OrdersArchiveSchema = new Schema({
     user: {
         type: String,
         required: true
     },
-    name: {
+    tracking: {
         type: String,
         required: true
     },
@@ -18,17 +18,8 @@ const ArchiveSchema = new Schema({
         type: String,
         required: true
     },
-    price: {
-        type: Number,
-        required: false,
-        default: null
-    },
-    qnt: {
-        type: Number,
-        required: true
-    },
 },{timestamps:true})
 
-const Archive = mongoose.models.Archive || mongoose.model('Archive', ArchiveSchema)
+const OrdersArchive = mongoose.models.OrdersArchive || mongoose.model('OrdersArchive', OrdersArchiveSchema)
 
-export default Archive
+export default OrdersArchive

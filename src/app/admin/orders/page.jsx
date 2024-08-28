@@ -1004,7 +1004,7 @@ function Orders() {
                     </div>
                 }
 
-                {order._id === editedOrderId &&
+                {(order._id === editedOrderId && order.state  !== 'مؤكدة') &&
                     <div
                         className='absolute top-0 right-0 px-1 rounded-full bg-gray-200 cursor-pointer'
                         onClick={() => deleteOrderProduct(product._id)}
@@ -1224,7 +1224,7 @@ function Orders() {
                                 {order.createdAt}
                             </td>
                             <td className="bg-blue-100">
-                              {editedOrder.state  === 'مؤكدة'
+                              {order.state  === 'مؤكدة'
                                 ?<div>{editedOrder.name}</div>
                                 :<input
                                     type="text"
@@ -1236,7 +1236,7 @@ function Orders() {
                               }
                             </td>
                             <td className="bg-blue-100">
-                             {editedOrder.state  === 'مؤكدة'
+                             {order.state  === 'مؤكدة'
                                 ?<div>{editedOrder.phoneNumber}</div>
                                 :<input
                                     type='text'
@@ -1248,7 +1248,7 @@ function Orders() {
                              }
                             </td>
                             <td className="bg-blue-100">
-                               {editedOrder.state  === 'مؤكدة'
+                               {order.state  === 'مؤكدة'
                                 ?<div>{editedOrder.wilaya}</div>
                                 :<input
                                     type="text"
@@ -1259,7 +1259,7 @@ function Orders() {
                                 />}
                             </td>
                             <td className="bg-blue-100">
-                               {editedOrder.state  === 'مؤكدة'
+                               {order.state  === 'مؤكدة'
                                 ?<div>{editedOrder.commune}</div>
                                 :<input
                                     type="text"
@@ -1271,7 +1271,7 @@ function Orders() {
                                }
                             </td>
                             <td className="bg-blue-100">
-                              {editedOrder.state  === 'مؤكدة'
+                              {order.state  === 'مؤكدة'
                                 ?<div>{editedOrder.adresse}</div>
                                 :<input
                                     type="text"
@@ -1283,7 +1283,7 @@ function Orders() {
                               }
                             </td>
                             <td className="bg-gray-200">
-                                {editedOrder.state  === 'مؤكدة'
+                                {order.state  === 'مؤكدة'
                                 ?<div>{editedOrder.shippingMethod}</div>
                                 :<select
                                     value={editedOrder.shippingMethod}
@@ -1297,7 +1297,7 @@ function Orders() {
                                 }
                             </td>
                             <td className="bg-gray-200">
-                              {editedOrder.state  === 'مؤكدة'
+                              {order.state  === 'مؤكدة'
                                 ?<div>{editedOrder.shippingPrice}</div>
                                 :<input
                                     type="text"
@@ -1309,7 +1309,7 @@ function Orders() {
                               }
                             </td>
                             <td className="bg-gray-200">
-                              {editedOrder.state  === 'مؤكدة'
+                              {order.state  === 'مؤكدة'
                                 ?<div>{editedOrder.totalPrice}</div>
                                 :<input
                                     type="text"
@@ -1331,7 +1331,7 @@ function Orders() {
                               
                             </td>
                             <td className="bg-gray-200">
-                               {editedOrder.state  === 'مؤكدة'
+                               {order.state  === 'مؤكدة'
                                 ?<div>{editedOrder.state}</div>
                                 :<select
                                     onChange={handleChange}
@@ -1367,7 +1367,7 @@ function Orders() {
                             }
                             </td>
                             <td>
-                              {editedOrder.state  === 'مؤكدة'
+                              {order.state  === 'مؤكدة'
                                 ?<div>{editedOrder.schedule}</div>
                                 :<DatePicker
                                     selected={selectedDate}
@@ -1378,7 +1378,7 @@ function Orders() {
                               }
                             </td>
                             <td>
-                              {editedOrder.state  === 'مؤكدة'
+                              {order.state  === 'مؤكدة'
                                 ?<div>{editedOrder.deliveryNote}</div>
                                 :<input
                                     type="text"
@@ -1390,7 +1390,7 @@ function Orders() {
                               }
                             </td>
                             <td className="text-center">
-                                {(editedOrder.state === 'مؤكدة' && !editedOrder.inDelivery) 
+                                {(order.state === 'مؤكدة' && !editedOrder.inDelivery) 
                                 ?<input type='checkbox'
                                     name="inDelivery"
                                     onChange={() => setEditedOrder(pre => ({
@@ -1410,7 +1410,7 @@ function Orders() {
                             </td>
                             {cartItemsElemnt}
                             <td>
-                            {editedOrder.state  === 'مؤكدة' &&
+                            {order.state  !== 'مؤكدة' &&
                                <FontAwesomeIcon
                                     icon={faPlus}
                                     className='cursor-pointer'
@@ -2135,6 +2135,13 @@ function Orders() {
                         <span className="ml-2 whitespace-nowrap">Add a new order</span>
                     </Link>
                 }
+
+            <Link
+                className='justify-self-end  whitespace-nowrap border-gray-500 border p-2 px-4 rounded-xl cursor-pointer'
+                href={'/admin/orders/archive'}
+            >
+                <span className="ml-2 whitespace-nowrap">Archive</span>
+            </Link>
             </div>
             }
 

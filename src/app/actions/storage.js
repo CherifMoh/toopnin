@@ -3,8 +3,10 @@
 
 import Product from "../models/products"
 import Archive from "../models/archive"
+import { getUserNameByEmail } from "../actions/users"
 
 import { dbConnect } from "../lib/dbConnect"
+import { cookies } from "next/headers"
 
 
 
@@ -13,22 +15,17 @@ export async function editAddProduct(id,newQnts){
     
     let result = await Product.findOne({_id:id})
 
-    // if(!result){
-    //     ProductsStorage.create({
-    //         name,
-    //         qnts: newQnts
-    //     })   
-    //     return
-    // }
 
     result.qnts =[...result.qnts, newQnts]
     const newDocument = await Product.findOneAndUpdate({_id:id}, result, { new: true })
+    const userName = await getUserNameByEmail(cookies().get('user-email').value)
+   
     AddToArchive({
+        user: userName,
         name: result.title,
         qnt: newQnts.qnt,
         price: newQnts.price,
         action:'ادخال',
-        type:'منتح نهائي',
     })
     return newDocument       
 }
@@ -91,12 +88,14 @@ export async function editMinusProduct(id, newQnt, note, option) {
 
     const newDocument = await Product.findOneAndUpdate({ _id: id }, result, { new: true });
 
+    const userName = await getUserNameByEmail(cookies().get('user-email').value)
+   
     AddToArchive({
+        user: userName,
         name: result.title,
         qnt: firstQnt,
         note,
         action: 'اخراج',
-        type: 'منتح نهائي',
     });
 
     return { success: true, removedItems: removedItems };
