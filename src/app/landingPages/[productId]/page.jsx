@@ -10,7 +10,7 @@ import { v4 as uuidv4 } from 'uuid'
 import { generateUniqueString } from '../../../app/lib/utils';
 import { useInView } from 'react-intersection-observer';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faLocationCrosshairs, faLocationDot, faMinus, faPaperPlane, faPhone, faPlus, faUser } from "@fortawesome/free-solid-svg-icons";
+import { faChevronDown, faLocationCrosshairs, faLocationDot, faMinus, faPaperPlane, faPhone, faPlus, faUser } from "@fortawesome/free-solid-svg-icons";
 import { addAbandonedCheckout } from "../../actions/order";
 import { checkBlackliste } from "../../lib/ip/checkIPBlacklist";
 import { formatNumberWithCommas } from "../../lib/utils";
@@ -86,7 +86,14 @@ function LindingPage({ params }) {
   const [wrongSubmit, setWrongSubmit] = useState(false)
   
   const [isSubmiting, setIsSubmitting] = useState(false)
-    
+
+  const [wilayaSearch, setWilayaSearch] = useState('')
+  const [isWilayaDropdown, setIsWilayaDropdown] = useState(false);
+  const [selectedWilaya, setSelectedWilaya] = useState("الولاية");
+  
+  const [communeSearch, setCommuneSearch] = useState('')
+  const [isCommuneDropdown, setIsCommuneDropdown] = useState(false);
+  const [selectedCommune, setSelectedCommune] = useState("البلدية");
     
 
     useEffect(() => {
@@ -306,17 +313,41 @@ function LindingPage({ params }) {
     }
   }
 
-  const wilayatOptionsElement = wilayat.map(wilaya => (
-    <option key={wilaya.wilaya_id} value={wilaya.wilaya_name}>
-        {wilaya.wilaya_id} {wilaya.wilaya_name}
-    </option>
-  ))
+  
+  const wilayasOptionsElement = wilayat.map(wilaya => {
+    console.log(wilaya.wilaya_name.includes(wilayaSearch))
+    if(!wilaya.wilaya_name.toLowerCase().includes(wilayaSearch.toLowerCase()) && wilayaSearch !== '') return
+    return(
+        <div
+        key={wilaya.wilaya_name}
+        className="p-2 hover:bg-gray-200 cursor-pointer"
+        onClick={() => {
+            setSelectedWilaya(wilaya.wilaya_name);
+            setIsWilayaDropdown(false);
+            setWilayaSearch(""); // Reset search after selection
+        }}
+    >
+        {wilaya.wilaya_name}
+    </div>
+    )
+  })
 
-  const communesOptionsElement = slectedCommunes.map(commune => (
-      <option key={commune.nom} value={commune.nom}>
-          {commune.nom}
-      </option>
-  ))
+  const communesOptionsElement = slectedCommunes.map(commune => {
+    if(!commune.nom.toLowerCase().includes(communeSearch.toLowerCase()) && communeSearch !== '') return
+    return(
+        <div
+        key={commune.nom}
+        className="p-2 hover:bg-gray-200 cursor-pointer"
+        onClick={() => {
+            setSelectedCommune(commune.nom);
+            setIsCommuneDropdown(false);
+            setCommuneSearch(""); // Reset search after selection
+        }}
+    >
+        {commune.nom}
+    </div>
+    )
+  })
 
   const inputsStyle = {
     fontSize: '13.5px',
@@ -450,42 +481,78 @@ function LindingPage({ params }) {
                         <span className="text-red-600 text-lg font-bold ml-1">*</span>
                     </p>
 
-                    <div className="flex w-full rounded-md bg-white border border-[rgba(0, 40, 100, 0.12)]">
-
-                        <FontAwesomeIcon icon={faPaperPlane} className="text-red-500 p-2 pr-5 border-r border-[rgb(0, 40, 100)]" />
-                        <select
-                            value={formData.wilaya}
-                            onChange={handleChange}
-                            required 
-                            className="flex-grow pl-2 bg-transparent"
-                            name="wilaya"
+                    <div className="flex w-full relative rounded-md bg-white border border-[rgba(0, 40, 100, 0.12)]">
+                        <div
+                            className="w-full items-center flex bg-transparent rounded cursor-pointer"
+                            onClick={() => setIsWilayaDropdown(pre=>!pre)}
                         >
-                            <option value="الولاية" hidden >الولاية</option>
-                            {wilayatOptionsElement}
-                        </select>
+                            <FontAwesomeIcon icon={faPaperPlane} className="text-red-500 p-2 pr-5 border-r border-[rgb(0, 40, 100)]" />
+                            <div className="px-2 flex items-center justify-between w-full">
+                                {selectedWilaya}
+                                <FontAwesomeIcon icon={faChevronDown} className={`text-sm`} />
+                            </div>
+                        </div>
+                        {isWilayaDropdown&& (
+                            <div className="absolute w-full bg-white border border-[rgba(0, 40, 100, 0.12)] rounded shadow-lg z-10">
+                                <div className="flex items-center pr-2 w-full bg-white border border-[rgba(0, 40, 100, 0.12)]">
+                                    <input
+                                        type="text"
+                                        value={wilayaSearch}
+                                        onChange={(e) => setWilayaSearch(e.target.value)}
+                                        placeholder="ابحث عن الولاية"
+                                        className="flex-grow no-focus-outline p-2"
+                                    />
+                                    <FontAwesomeIcon 
+                                        icon={faChevronDown} 
+                                        className={`text-sm rotate-180 cursor-pointer`} 
+                                        onClick={()=>setIsWilayaDropdown(false)}
+                                    />
+                                </div>
+                                <div className="max-h-48 overflow-y-auto">
+                                    {wilayasOptionsElement}
+                                </div>
+                            </div>
+                        )}
                     </div>
                 </div>
                 <div>
                     <p className="mt-2 font-semibold">
-                        البلدية
+                        البلدية 
                         <span className="text-red-600 text-lg font-bold ml-1">*</span>
                     </p>
 
-                    <div className="flex w-full rounded-md bg-white border border-[rgba(0, 40, 100, 0.12)]">
-
-                        <FontAwesomeIcon icon={faLocationDot} className="text-red-500 p-2 pr-5 border-r border-[rgb(0, 40, 100)]" />
-                        <select
-                            value={formData.commune}
-                            onChange={handleChange}
-                            className="flex-grow pl-2 bg-transparent"
-                            required 
-                            name="commune"
+                    <div className="flex w-full relative rounded-md bg-white border border-[rgba(0, 40, 100, 0.12)]">
+                        <div
+                            className="w-full items-center flex bg-transparent rounded cursor-pointer"
+                            onClick={() => setIsCommuneDropdown(pre=>!pre)}
                         >
-                            <option hidden >
-                                البلدية
-                            </option>
-                            {communesOptionsElement}
-                        </select>
+                            <FontAwesomeIcon icon={faLocationDot} className="text-red-500 p-2 pr-5 border-r border-[rgb(0, 40, 100)]" />
+                            <div className="px-2 flex items-center justify-between w-full">
+                                {selectedCommune}
+                                <FontAwesomeIcon icon={faChevronDown} className={`text-sm`} />
+                            </div>
+                        </div>
+                        {(isCommuneDropdown && selectedWilaya !== 'الولاية')&& (
+                            <div className="absolute w-full bg-white border border-[rgba(0, 40, 100, 0.12)] rounded shadow-lg z-10">
+                                <div className="flex items-center pr-2 w-full bg-white border border-[rgba(0, 40, 100, 0.12)]">
+                                    <input
+                                        type="text"
+                                        value={communeSearch}
+                                        onChange={(e) => setCommuneSearch(e.target.value)}
+                                        placeholder="ابحث في الولاية"
+                                        className="flex-grow no-focus-outline p-2"
+                                    />
+                                    <FontAwesomeIcon 
+                                        icon={faChevronDown} 
+                                        className={`text-sm rotate-180 cursor-pointer`} 
+                                        onClick={()=>setIsCommuneDropdown(false)}
+                                    />
+                                </div>
+                                <div className="max-h-48 overflow-y-auto">
+                                    {communesOptionsElement}
+                                </div>
+                            </div>
+                        )}
                     </div>
                 </div>
                 <div>

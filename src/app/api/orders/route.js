@@ -111,7 +111,7 @@ export async function POST(req) {
     
     AddToArchive({
       user: userName,
-      tracking: formData.DLVTracking,
+      tracking: order.DLVTracking,
       action: "تم اضافة طلب",
     }); 
 

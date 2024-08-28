@@ -19,7 +19,7 @@ export async function PUT(req, { params }) {
     
     AddToArchive({
       user: userName,
-      tracking: formData.DLVTracking,
+      tracking: NewOrder.DLVTracking,
       action: "تم تعديل طلب",
     }); 
     return new NextResponse(newDocument)

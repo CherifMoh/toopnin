@@ -1987,6 +1987,33 @@ function Orders() {
 
         setReaserchedOrders(orders)
     }
+    const thArray = [
+        { className: "bg-blue-100", content: "Ref" },
+        { className: "bg-blue-100", content: "التاريخ" },
+        { className: "bg-blue-100", content: "الأسم" },
+        { className: "bg-blue-100", content: "الرقم" },
+        { className: "bg-blue-100", content: "الولاية" },
+        { className: "bg-blue-100", content: "البلدية" },
+        { className: "bg-blue-100", content: "عنوان" },
+        { className: "bg-gray-200", content: "نوع التوصيل" },
+        { className: "bg-gray-200", content: "سعر التوصيل" },
+        { className: "bg-gray-200", content: "سعر كلي" },
+        { className: "bg-gray-200", content: "ملاحضة" },
+        { className: "bg-gray-200", content: "الحالة" },
+        { className: "", content: "التأجيل" },
+        { className: "", content: "ملاحظة التوصيل" },
+        { className: "", content: "في التوصيل" },
+        { className: "", content: "التتبع" },
+    ];
+    
+    const thElement = thArray.map((th, i) => (
+        <th key={i} className={th.className}>
+            <div className="border-y border-solid border-[rgba(0, 40, 100, 0.12)] p-[13px]">
+                {th.content}
+            </div>
+        </th>
+    ));
+    
     return (
         <div className="relative pl-4 pr-48 flex flex-col gap-5 h-screen overflow-x-scroll w-full min-w-max">
 
@@ -2167,89 +2194,7 @@ function Orders() {
                                 </div>
                             </th>
                         )}
-                            <th className="bg-blue-100">
-                                <div className=" border-y border-solid border-[rgba(0, 40, 100, 0.12)] p-[13px]">
-                                    Ref
-                                </div>
-                                    
-                            </th>
-                            <th className="bg-blue-100">
-                                <div className=" border-y border-solid border-[rgba(0, 40, 100, 0.12)] p-[13px]">
-                                    التاريخ
-                                </div>
-                                    
-                            </th>
-                            <th className="bg-blue-100">
-                                <div className=" border-y border-solid border-[rgba(0, 40, 100, 0.12)] p-[13px]">
-                                    الأسم
-                                </div>
-                                    
-                            </th>
-                            <th className="bg-blue-100">
-                                <div className=" border-y border-solid border-[rgba(0, 40, 100, 0.12)] p-[13px]">
-                                    الرقم
-                                </div>
-                            </th>
-                            <th className="bg-blue-100">
-                                <div className=" border-y border-solid border-[rgba(0, 40, 100, 0.12)] p-[13px]">
-                                    الولاية
-                                </div>
-                            </th>
-                            <th className="bg-blue-100">
-                                <div className=" border-y border-solid border-[rgba(0, 40, 100, 0.12)] p-[13px]">
-                                    البلدية 
-                                </div>
-                            </th>
-                            <th className="bg-blue-100">
-                                <div className=" border-y border-solid border-[rgba(0, 40, 100, 0.12)] p-[13px]">
-                                    عنوان    
-                                </div>
-                            </th>
-                            <th className="bg-gray-200">
-                                <div className=" border-y border-solid border-[rgba(0, 40, 100, 0.12)] p-[13px]">
-                                    نوع التوصيل 
-                                </div>
-                            </th>
-                            <th className="bg-gray-200">
-                                <div className=" border-y border-solid border-[rgba(0, 40, 100, 0.12)] p-[13px]">
-                                    سعر التوصيل 
-                                </div>
-                            </th>
-                            <th className="bg-gray-200">
-                                <div className=" border-y border-solid border-[rgba(0, 40, 100, 0.12)] p-[13px]">
-                                    سعر كلي 
-                                </div>
-                            </th>
-                            <th className="bg-gray-200">
-                                <div className=" border-y border-solid border-[rgba(0, 40, 100, 0.12)] p-[13px]">
-                                    ملاحضة   
-                                </div>
-                            </th>
-                            <th className="bg-gray-200">
-                                <div className=" border-y border-solid border-[rgba(0, 40, 100, 0.12)] p-[13px]">
-                                    الحالة   
-                                </div>
-                            </th>
-                            <th>
-                                <div className=" border-y border-solid border-[rgba(0, 40, 100, 0.12)] p-[13px]">
-                                    التأجيل    
-                                </div>
-                            </th>
-                            <th>
-                                <div className=" border-y border-solid border-[rgba(0, 40, 100, 0.12)] p-[13px]">
-                                    ملاحظة التوصيل 
-                                </div>
-                            </th>
-                            <th>
-                                <div className=" border-y border-solid border-[rgba(0, 40, 100, 0.12)] p-[13px]">
-                                    في التوصيل 
-                                </div>
-                            </th>
-                            <th>
-                                <div className=" border-y border-solid border-[rgba(0, 40, 100, 0.12)] p-[13px]">
-                                    التتبع      
-                                </div>
-                            </th>
+                            {thElement}
                             <th colSpan={longesOrder.length}>
                                 <div className=" border-y border-solid border-[rgba(0, 40, 100, 0.12)] p-[13px]">
                                 الطلبيات      
@@ -2308,89 +2253,7 @@ function Orders() {
                                    
                                 </th>
                             )}
-                                <th className="bg-blue-100">
-                                    <div className=" border-y border-solid border-[rgba(0, 40, 100, 0.12)] p-[13px]">
-                                        Ref
-                                    </div>
-                                        
-                                </th>
-                                <th className="bg-blue-100">
-                                    <div className=" border-y border-solid border-[rgba(0, 40, 100, 0.12)] p-[13px]">
-                                        التاريخ
-                                    </div>
-                                        
-                                </th>
-                                <th className="bg-blue-100">
-                                    <div className=" border-y border-solid border-[rgba(0, 40, 100, 0.12)] p-[13px]">
-                                        الأسم
-                                    </div>
-                                        
-                                </th>
-                                <th className="bg-blue-100">
-                                    <div className=" border-y border-solid border-[rgba(0, 40, 100, 0.12)] p-[13px]">
-                                        الرقم
-                                    </div>
-                                </th>
-                                <th className="bg-blue-100">
-                                    <div className=" border-y border-solid border-[rgba(0, 40, 100, 0.12)] p-[13px]">
-                                        الولاية
-                                    </div>
-                                </th>
-                                <th className="bg-blue-100">
-                                    <div className=" border-y border-solid border-[rgba(0, 40, 100, 0.12)] p-[13px]">
-                                        البلدية 
-                                    </div>
-                                </th>
-                                <th className="bg-blue-100">
-                                    <div className=" border-y border-solid border-[rgba(0, 40, 100, 0.12)] p-[13px]">
-                                        عنوان    
-                                    </div>
-                                </th>
-                                <th className="bg-gray-200">
-                                    <div className=" border-y border-solid border-[rgba(0, 40, 100, 0.12)] p-[13px]">
-                                        نوع التوصيل 
-                                    </div>
-                                </th>
-                                <th className="bg-gray-200">
-                                    <div className=" border-y border-solid border-[rgba(0, 40, 100, 0.12)] p-[13px]">
-                                        سعر التوصيل 
-                                    </div>
-                                </th>
-                                <th className="bg-gray-200">
-                                    <div className=" border-y border-solid border-[rgba(0, 40, 100, 0.12)] p-[13px]">
-                                        سعر كلي 
-                                    </div>
-                                </th>
-                                <th className="bg-gray-200">
-                                    <div className=" border-y border-solid border-[rgba(0, 40, 100, 0.12)] p-[13px]">
-                                        ملاحضة   
-                                    </div>
-                                </th>
-                                <th className="bg-gray-200">
-                                    <div className=" border-y border-solid border-[rgba(0, 40, 100, 0.12)] p-[13px]">
-                                        الحالة   
-                                    </div>
-                                </th>
-                                <th>
-                                    <div className=" border-y border-solid border-[rgba(0, 40, 100, 0.12)] p-[13px]">
-                                        التأجيل    
-                                    </div>
-                                </th>
-                                <th>
-                                    <div className=" border-y border-solid border-[rgba(0, 40, 100, 0.12)] p-[13px]">
-                                        ملاحظة التوصيل 
-                                    </div>
-                                </th>
-                                <th>
-                                    <div className=" border-y border-solid border-[rgba(0, 40, 100, 0.12)] p-[13px]">
-                                        في التوصيل 
-                                    </div>
-                                </th>
-                                <th>
-                                    <div className=" border-y border-solid border-[rgba(0, 40, 100, 0.12)] p-[13px]">
-                                        التتبع      
-                                    </div>
-                                </th>
+                                {thElement}
                                 <th colSpan={longesOrder.length}>
                                     <div className=" border-y border-solid border-[rgba(0, 40, 100, 0.12)] p-[13px]">
                                     الطلبيات      

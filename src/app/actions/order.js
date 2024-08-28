@@ -66,7 +66,7 @@ export async function addOrderSchedule(order,schedule) {
 
       AddToArchive({
         user: userName,
-        tracking: formData.DLVTracking,
+        tracking: order.DLVTracking,
         action: "تم اضافة طلب",
       }); 
 
@@ -117,7 +117,7 @@ export async function addOrderToZR(order) {
    
     AddToArchive({
         user: userName,
-        tracking: phoneNumber,
+        tracking: order.DLVTracking,
         action: "أُضيف إلى شركة التوصيل",
     });
     return response.data
@@ -146,7 +146,7 @@ export async function expedieOrderToZR(tracking) {
    
     AddToArchive({
         user: userName,
-        tracking: phoneNumber,
+        tracking: tracking,
         action: "شحن إلى شركة التوصيل",
     });
     return response.data
