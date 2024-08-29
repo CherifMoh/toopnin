@@ -11,6 +11,10 @@ const OrderSchem = new mongoose.Schema({
         type: String,
         required: false
     },
+    adminEmail: {
+        type: String,
+        required: false
+    },
     ip: {
         type: String,
         required: false

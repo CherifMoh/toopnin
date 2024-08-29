@@ -14,6 +14,10 @@ export async function GET(req) {
     const customEndDate = req.nextUrl.searchParams.get('endDate');
     let query = {};
 
+    const email = cookies().get('user-email')?.value
+
+   
+
     const oneHourBefore = new Date();
     const today = new Date(oneHourBefore);
     // today.setHours(oneHourBefore.getHours() + 1);
@@ -74,6 +78,16 @@ export async function GET(req) {
       // No additional filtering needed for 'maximum'
     }
 
+    if (email) {
+      query = {
+        $or: [
+          { adminEmail: email },  // Match the specified email
+          { adminEmail: { $exists: false } },  // No email field
+          { adminEmail: null }  // Email field is null
+        ]
+      };
+    }
+
     const result = await Order.find(query).sort({ _id: -1 });
 
 
@@ -105,9 +119,11 @@ export async function POST(req) {
 
     order.ip=ip
 
+    order.adminEmail = cookies().get('user-email')?.value
+
     Order.create(order);
 
-    const userName = await getUserNameByEmail(cookies().get('user-email').value)
+    const userName = await getUserNameByEmail(cookies().get('user-email')?.value)
     
     AddToArchive({
       user: userName,

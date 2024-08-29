@@ -12,6 +12,8 @@ export async function PUT(req, { params }) {
     const NewOrder = await req.json()
     const id = params.orderId
 
+    NewOrder.adminEmail = cookies().get('user-email')?.value
+
     const newDocument = await Order.findByIdAndUpdate(id, NewOrder, { new: true })
 
     revalidatePath('/admin/orders')

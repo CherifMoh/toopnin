@@ -11,7 +11,7 @@ import Link from "next/link";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faMagnifyingGlass, faPen, faPlus, faX, faCheck, faPaperPlane, faArrowDown, faAngleDown, faBan } from '@fortawesome/free-solid-svg-icons'
 import { faTrashCan } from '@fortawesome/free-regular-svg-icons'
-import { addOrderSchedule, addOrderToZR, addToBlackList, deleteOrder, expedieOrderToZR, getOrder } from '../../actions/order'
+import { addOrderSchedule, addOrderToZR, addToBlackList, checkEmailAllowance, deleteOrder, expedieOrderToZR, getOrder } from '../../actions/order'
 import { editAddProduct, editMinusProduct } from '../../actions/storage'
 import { useRouter } from "next/navigation";
 import { v4 as uuidv4 } from 'uuid'
@@ -264,13 +264,6 @@ function Orders() {
         };
     }, [Orders, ordersUpdted, dateFilter, queryClient]);
     
-    // useEffect(() => {
-    //     if(!Orders) return
-    //     fetchAllOrders(Orders)
-    // }, [Orders]);
-    
-    
-
 
 
 
@@ -432,6 +425,15 @@ function Orders() {
     }
 
     async function handleDelete(id) {
+
+        const order = Orders.find(order => order._id === id)
+        if(!checkEmailAllowance(order.adminEmail)){
+            setErrorNotifiction('You are not allowed to edit this order')
+            setEditedOrder({})
+            queryClient.invalidateQueries(`orders,${dateFilter}`);
+            return
+        }
+
         setDeleting(pre => ([...pre, {
             id: id,
             state: true
@@ -462,6 +464,13 @@ function Orders() {
     })
 
     async function addToZR(order) {
+
+        if(!checkEmailAllowance(order.adminEmail)){
+            setErrorNotifiction('You are not allowed to edit this order')
+            setEditedOrder({})
+            queryClient.invalidateQueries(`orders,${dateFilter}`);
+            return
+        }
 
         if(!order.name||!order.phoneNumber||!order.adresse||!order.commune){
             return setErrorNotifiction("couldn't set the order in ZR")
@@ -515,6 +524,13 @@ function Orders() {
     }
 
     async function validateToZR(order) {
+
+        if(!checkEmailAllowance(order.adminEmail)){
+            setErrorNotifiction('You are not allowed to edit this order')
+            setEditedOrder({})
+            queryClient.invalidateQueries(`orders,${dateFilter}`);
+            return
+        }
        
         try {
             expedieOrderToZR(order.DLVTracking)
@@ -551,6 +567,13 @@ function Orders() {
 
     async function handelConfirmOrder(order) {
         let success = true;
+
+        if(!checkEmailAllowance(order.adminEmail)){
+            setErrorNotifiction('You are not allowed to edit this order')
+            setEditedOrder({})
+            queryClient.invalidateQueries(`orders,${dateFilter}`);
+            return
+        }
     
         for (const item of order.orders) {
             if (!success) break;
@@ -610,6 +633,13 @@ function Orders() {
 
         if(oldOrder.inDelivery !== true && editedOrder.inDelivery  === true && editedOrder.state  === 'مؤكدة'){
             let res= await validateToZR(editedOrder)
+        }
+
+        if(!checkEmailAllowance(oldOrder.email)){
+            setErrorNotifiction('You are not allowed to edit this order')
+            setEditedOrder({})
+            queryClient.invalidateQueries(`orders,${dateFilter}`);
+            return
         }
 
         const res = await axios.put(`/api/orders/${editedOrderId}`, newOrder, { headers: { 'Content-Type': 'application/json' } });
@@ -1144,6 +1174,14 @@ function Orders() {
     }
 
     function handleAddToBlackList(order) {
+
+        if(!checkEmailAllowance(order.adminEmail)){
+            setErrorNotifiction('You are not allowed to edit this order')
+            setEditedOrder({})
+            queryClient.invalidateQueries(`orders,${dateFilter}`);
+            return
+        }
+        
         try{
             addToBlackList(order.ip,order.phoneNumber)
             const newOrder = { ...order, blackListed: true }
@@ -2013,6 +2051,7 @@ function Orders() {
             </div>
         </th>
     ));
+    console.log(Orders)
     
     return (
         <div className="relative pl-4 pr-48 flex flex-col gap-5 h-screen overflow-x-scroll w-full min-w-max">

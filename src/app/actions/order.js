@@ -228,3 +228,13 @@ export async function AddToArchive(newData){
   OrdersArchive.create(newData)
   
 }
+
+export async function checkEmailAllowance(orderEmail){
+  if(!orderEmail) return true
+
+  const email = cookies().get('user-email').value
+
+  if(email === orderEmail) return true
+  return false
+  
+}

@@ -315,13 +315,13 @@ function LindingPage({ params }) {
 
   
   const wilayasOptionsElement = wilayat.map(wilaya => {
-    console.log(wilaya.wilaya_name.includes(wilayaSearch))
     if(!wilaya.wilaya_name.toLowerCase().includes(wilayaSearch.toLowerCase()) && wilayaSearch !== '') return
     return(
         <div
         key={wilaya.wilaya_name}
         className="p-2 hover:bg-gray-200 cursor-pointer"
         onClick={() => {
+            setFormData(pre=>({...pre,wilaya:wilaya.wilaya_name}));
             setSelectedWilaya(wilaya.wilaya_name);
             setIsWilayaDropdown(false);
             setWilayaSearch(""); // Reset search after selection
@@ -339,6 +339,7 @@ function LindingPage({ params }) {
         key={commune.nom}
         className="p-2 hover:bg-gray-200 cursor-pointer"
         onClick={() => {
+            setFormData(pre=>({...pre,commune:commune.nom}));
             setSelectedCommune(commune.nom);
             setIsCommuneDropdown(false);
             setCommuneSearch(""); // Reset search after selection
@@ -417,7 +418,7 @@ function LindingPage({ params }) {
                 <div className="text-4xl font-semibold w-full text-center mb-2">{mproduct?.title}</div>
                 <div className="flex items-center justify-center gap-2">
                     <div className="line-through text-gray-600 opacity-60 font-semibold">{mproduct?.beforePrice}</div>
-                    <div className=" text-green-500 font-semibold text-lg">{formatNumberWithCommas(mproduct?.price)} DA</div>
+                    <div className=" text-green-500 font-semibold text-xl">{formatNumberWithCommas(mproduct?.price)} DA</div>
                 </div>
             </div>
 
