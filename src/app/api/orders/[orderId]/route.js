@@ -4,6 +4,7 @@ import { getUserNameByEmail } from "../../../actions/users"
 import { NextResponse } from "next/server"
 import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
+import { AddToArchive } from "../../../actions/order";
 
 export async function PUT(req, { params }) {
   try {
@@ -12,7 +13,16 @@ export async function PUT(req, { params }) {
     const NewOrder = await req.json()
     const id = params.orderId
 
-    NewOrder.adminEmail = cookies().get('user-email')?.value
+    if(!NewOrder.adminEmail){
+      NewOrder.adminEmail = cookies().get('user-email')?.value
+    }else{
+      const email = cookies().get('user-email')?.value
+
+      if(NewOrder.adminEmail !== email){
+        return Response.json({success:false,message:"you are not allowed to edit this order"})
+      }
+    }
+
 
     const newDocument = await Order.findByIdAndUpdate(id, NewOrder, { new: true })
 
@@ -24,7 +34,7 @@ export async function PUT(req, { params }) {
       tracking: NewOrder.DLVTracking,
       action: "تم تعديل طلب",
     }); 
-    return new NextResponse(newDocument)
+    return Response.json({success:true,message:"order updated"})
 
   } catch (err) {
     return new NextResponse("Error :" + err)

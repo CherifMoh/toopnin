@@ -427,7 +427,8 @@ function Orders() {
     async function handleDelete(id) {
 
         const order = Orders.find(order => order._id === id)
-        if(!checkEmailAllowance(order.adminEmail)){
+        const emailAllowed = await checkEmailAllowance(order.adminEmail)
+        if(!emailAllowed){
             setErrorNotifiction('You are not allowed to edit this order')
             setEditedOrder({})
             queryClient.invalidateQueries(`orders,${dateFilter}`);
@@ -464,8 +465,9 @@ function Orders() {
     })
 
     async function addToZR(order) {
-
-        if(!checkEmailAllowance(order.adminEmail)){
+        const emailAllowed = await checkEmailAllowance(order.adminEmail)
+        if(!emailAllowed){
+            
             setErrorNotifiction('You are not allowed to edit this order')
             setEditedOrder({})
             queryClient.invalidateQueries(`orders,${dateFilter}`);
@@ -524,8 +526,8 @@ function Orders() {
     }
 
     async function validateToZR(order) {
-
-        if(!checkEmailAllowance(order.adminEmail)){
+        const emailAllowed = await checkEmailAllowance(order.adminEmail)
+        if(!emailAllowed){
             setErrorNotifiction('You are not allowed to edit this order')
             setEditedOrder({})
             queryClient.invalidateQueries(`orders,${dateFilter}`);
@@ -567,8 +569,8 @@ function Orders() {
 
     async function handelConfirmOrder(order) {
         let success = true;
-
-        if(!checkEmailAllowance(order.adminEmail)){
+        const emailAllowed = await checkEmailAllowance(order.adminEmail)
+        if(!emailAllowed){
             setErrorNotifiction('You are not allowed to edit this order')
             setEditedOrder({})
             queryClient.invalidateQueries(`orders,${dateFilter}`);
@@ -635,7 +637,8 @@ function Orders() {
             let res= await validateToZR(editedOrder)
         }
 
-        if(!checkEmailAllowance(oldOrder.email)){
+        const emailAllowed = await checkEmailAllowance(order.adminEmail)
+        if(!emailAllowed){
             setErrorNotifiction('You are not allowed to edit this order')
             setEditedOrder({})
             queryClient.invalidateQueries(`orders,${dateFilter}`);
@@ -643,8 +646,13 @@ function Orders() {
         }
 
         const res = await axios.put(`/api/orders/${editedOrderId}`, newOrder, { headers: { 'Content-Type': 'application/json' } });
-        // console.log(res.data)
-        setSuccessNotifiction('تم تعديل الطلب بنجاح');
+        if(res.data.success){
+            setSuccessNotifiction('تم تعديل الطلب بنجاح');
+        }else{
+            setErrorNotifiction(res.data.message);
+            router.refresh()
+            router.push('/admin/orders')
+        }
         queryClient.invalidateQueries(`orders,${dateFilter}`);
         setIsProductDeleted([])
         setSelectedDate(null)
@@ -835,8 +843,6 @@ function Orders() {
         });
     }
 
-    
-
     const productsOptionsElent = Products.map(products => {
         if (products.title.toLowerCase().includes(search.toLocaleLowerCase()) || search === '') {
             return (
@@ -865,9 +871,7 @@ function Orders() {
         }
 
     })
-
    
-
     function addProductsOptionsElent(id) {
         return Products.map(product => {
             if (product.title.toLowerCase().includes(search.toLocaleLowerCase()) || search === '') {
@@ -1173,9 +1177,9 @@ function Orders() {
         })
     }
 
-    function handleAddToBlackList(order) {
-
-        if(!checkEmailAllowance(order.adminEmail)){
+    async function handleAddToBlackList(order) {
+        const emailAllowed = await checkEmailAllowance(order.adminEmail)
+        if(!emailAllowed){
             setErrorNotifiction('You are not allowed to edit this order')
             setEditedOrder({})
             queryClient.invalidateQueries(`orders,${dateFilter}`);
@@ -2051,7 +2055,6 @@ function Orders() {
             </div>
         </th>
     ));
-    console.log(Orders)
     
     return (
         <div className="relative pl-4 pr-48 flex flex-col gap-5 h-screen overflow-x-scroll w-full min-w-max">
