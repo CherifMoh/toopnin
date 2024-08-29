@@ -637,7 +637,7 @@ function Orders() {
             let res= await validateToZR(editedOrder)
         }
 
-        const emailAllowed = await checkEmailAllowance(order.adminEmail)
+        const emailAllowed = await checkEmailAllowance(oldOrder.adminEmail)
         if(!emailAllowed){
             setErrorNotifiction('You are not allowed to edit this order')
             setEditedOrder({})
