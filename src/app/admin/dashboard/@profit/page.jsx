@@ -106,7 +106,7 @@ function Profit() {
         key={'productsSelectElement'}
         name="product" 
         value={selectedProduct}
-        className=" w-1/4 py-2 px-4 bg-transparent border border-gray-200 rounded-md"
+        className="min-w-20 w-1/4 py-2 px-4 bg-transparent border border-gray-200 rounded-md"
         onChange={e => setSelectedProduct(e.target.value)}
     >
         <option hidden>اختر المنتج</option>
@@ -140,7 +140,7 @@ function Profit() {
   })
   
   const dateSelectElement = [
-    <div className="w-1/4 relative" key={'dateSelectElement'}>
+    <div className="min-w-20 w-1/4 relative" key={'dateSelectElement'}>
       <select 
         onChange={handleOptionChange} 
         value={selectedDate}
@@ -188,7 +188,7 @@ function Profit() {
             type="text" 
             placeholder="cost"
             value={cost}
-            className="no-focus-outline w-1/4 py-2 px-4 bg-transparent border border-gray-200 rounded-md"
+            className="no-focus-outline min-w-20 w-1/4 py-2 px-4 bg-transparent border border-gray-200 rounded-md"
             onChange={e => setCost(e.target.value)}
         />
         <button 

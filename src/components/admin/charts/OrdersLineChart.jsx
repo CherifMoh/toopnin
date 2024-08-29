@@ -1,7 +1,7 @@
 'use client'
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { format, parseISO } from 'date-fns';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft, faArrowLeftLong, faArrowRightLong } from '@fortawesome/free-solid-svg-icons';
@@ -78,28 +78,32 @@ const OrdersLineChart = () => {
   return (
     <div className='flex-col'>
       {qntElement}
-      <LineChart width={600} height={300} data={chartData}>
-        <CartesianGrid strokeDasharray="3 3" strokeOpacity={0.3} />
-        <XAxis dataKey="hour" />
-        <YAxis />
-        <Tooltip />
-        <Line
-          type="monotone"
-          dataKey="todayQnt"
-          stroke="#8884d8"
-          dot={false}
-          activeDot={{ r: 8 }}
-          name="Today's Orders"
-          />
-        <Line
-          type="monotone"
-          dataKey="yesterdayQnt"
-          stroke="#82ca9d"
-          strokeDasharray="5 5"
-          dot={false}
-          name="Yesterday's Orders"
-          />
-      </LineChart>
+      <div className='w-full h-[272px]'>
+        <ResponsiveContainer>
+          <LineChart data={chartData}>
+            <CartesianGrid strokeDasharray="3 3" strokeOpacity={0.3} />
+            <XAxis dataKey="hour" />
+            <YAxis />
+            <Tooltip />
+            <Line
+              type="monotone"
+              dataKey="todayQnt"
+              stroke="#8884d8"
+              dot={false}
+              activeDot={{ r: 8 }}
+              name="Today's Orders"
+              />
+            <Line
+              type="monotone"
+              dataKey="yesterdayQnt"
+              stroke="#82ca9d"
+              strokeDasharray="5 5"
+              dot={false}
+              name="Yesterday's Orders"
+              />
+          </LineChart>
+        </ResponsiveContainer>
+      </div>
     </div>
   );
 }

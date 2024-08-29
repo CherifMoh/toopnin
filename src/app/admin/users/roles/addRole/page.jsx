@@ -77,42 +77,63 @@ function Page() {
         setIsSaving(false)
     }
 
-    const actions = [
-        'create', 'read', 'update', 'delete'
-    ]
-    const actionsElements = actions.map((action, idx) => {
-        const isChecked = newRole.accessibilities.find(item => item.name === accessGategory)?.accessibilities.includes(action) || false
-        return (
-            <div key={idx} className="flex gap-2 items-center">
-                <input
-                    type="checkbox"
-                    className='cursor-pointer'
-                    name={action}
-                    id={action}
-                    onChange={handleAccessibilitiesChange}
-                    checked={isChecked}
-                />
-                <label
-                    htmlFor={action}
-                    className='capitalize tracking-wider font-medium'
-                >
-                    {action}
-                </label>
-            </div>
-        )
-    })
+    let actionsElements = []
+  
 
     const categories = [
-        'orders', 'products', 'users', 'storage'
+        {
+            name: 'Products',
+            actions:[
+                'create', 'read', 'update', 'delete','storage',
+            ]
+        },
+        {
+            name: 'orders',
+            actions:[
+                'create', 'read', 'update', 'delete'
+            ]
+        },
+        {
+            name: 'users',
+            actions:[
+                'create', 'read', 'update', 'delete'
+            ]
+        },
     ]
+
     const categoriesElements = categories.map((category, idx) => {
+        const isSelected = accessGategory === category.name 
+        if(isSelected){
+
+            actionsElements = category.actions.map((action, idx) => {
+                const isChecked = newRole.accessibilities.find(item => item.name === accessGategory)?.accessibilities.includes(action) || false
+                return (
+                    <div key={idx} className="flex gap-2 items-center">
+                        <input
+                            type="checkbox"
+                            className='cursor-pointer'
+                            name={action}
+                            id={action}
+                            onChange={handleAccessibilitiesChange}
+                            checked={isChecked}
+                        />
+                        <label
+                            htmlFor={action}
+                            className='capitalize tracking-wider font-medium'
+                        >
+                            {action}
+                        </label>
+                    </div>
+                )
+            })
+        }
         return (
             <div
                 key={idx}
-                className={`w-1/4 text-center py-6 font-semibold ${accessGategory === category ? 'bg-slate-50 border-t-4 border-blue-500' : 'bg-slate-200 cursor-pointer'}`}
-                onClick={() => setAccessGategory(category)}
+                className={`w-1/4 flex-grow text-center py-6 font-semibold ${isSelected? 'bg-slate-50 border-t-4 border-blue-500' : 'bg-slate-200 cursor-pointer'}`}
+                onClick={() => setAccessGategory(category.name)}
             >
-                {category}
+                {category.name}
             </div>
         )
     })
@@ -185,7 +206,7 @@ function Page() {
                 <div className="flex justify-between w-full">
                     {categoriesElements}
                 </div>
-                <div className="flex justify-between p-8 w-3/4 mx-auto">
+                <div className="grid grid-cols-5 gap-y-8 justify-between p-8 w-3/4 mx-auto">
                     {actionsElements}
                 </div>
             </div>

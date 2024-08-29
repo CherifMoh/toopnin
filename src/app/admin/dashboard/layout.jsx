@@ -5,8 +5,7 @@ export default function Layout({ children, profit, sales, customers, activeP, or
 
       <section>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {/* {sales} */}
-          {profit}
+          {sales}
           {customers}
           {activeP}
         </div>
@@ -15,6 +14,11 @@ export default function Layout({ children, profit, sales, customers, activeP, or
       <section className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {ordersChart}
         {ordersPieChart}
+      </section>
+
+      <section className="pt-4">
+
+        {profit}
       </section>
 
       {children}
