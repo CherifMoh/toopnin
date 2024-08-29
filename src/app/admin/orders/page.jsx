@@ -9,7 +9,7 @@ import 'react-datepicker/dist/react-datepicker.css';
 import { format } from 'date-fns'
 import Link from "next/link";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faMagnifyingGlass, faPen, faPlus, faX, faCheck, faPaperPlane, faArrowDown, faAngleDown, faBan } from '@fortawesome/free-solid-svg-icons'
+import { faMagnifyingGlass, faPen, faPlus, faX, faCheck, faPaperPlane, faArrowDown, faAngleDown, faBan, faTriangleExclamation } from '@fortawesome/free-solid-svg-icons'
 import { faTrashCan } from '@fortawesome/free-regular-svg-icons'
 import { addOrderSchedule, addOrderToZR, addToBlackList, checkEmailAllowance, deleteOrder, expedieOrderToZR, getOrder } from '../../actions/order'
 import { editAddProduct, editMinusProduct } from '../../actions/storage'
@@ -132,6 +132,10 @@ function Orders() {
     const [reaserchedOrders, setReaserchedOrders] = useState([])
 
     const [isTrakingFilterDrop, setIsTrakingFilterDrop] = useState('')
+    
+    const [isMessage, setIsMessage] = useState(false)
+    const [message, setMessage] = useState('')
+    const [messageOrder, setMessageOrder] = useState({})
 
     const router = useRouter()
 
@@ -1220,7 +1224,12 @@ function Orders() {
                                 {!order.blackListed &&
                                 <button
                                     className=' p-2 rounded-md'
-                                    onClick={() => handleAddToBlackList(order)}
+                                    onClick={() => {
+                                        setMessageOrder(order)
+                                        setMessage('Blacklist')
+                                        setIsMessage(true)
+
+                                    }}
                                 >
                                     <FontAwesomeIcon 
                                         icon={faBan} 
@@ -1235,7 +1244,11 @@ function Orders() {
                                 {isDeleteAccess && !deleting.some(item => item.id === order._id && item.state) &&
                                     <button
                                         className=' p-2 rounded-md'
-                                        onClick={() => handleDelete(order._id)}
+                                        onClick={() => {
+                                            setMessageOrder(order)
+                                            setMessage('Delete')
+                                            setIsMessage(true)
+                                        }}
                                     >
                                         <FontAwesomeIcon icon={faTrashCan} className="text-red-700" />
                                     </button>                            
@@ -1588,7 +1601,11 @@ function Orders() {
                                             {!order.blackListed &&
                                             <button
                                                 className=' p-2 rounded-md'
-                                                onClick={() => handleAddToBlackList(order)}
+                                                onClick={() =>{
+                                                    setMessageOrder(order)
+                                                    setMessage('Blacklist')
+                                                    setIsMessage(true)
+                                                }}
                                             >
                                                 <FontAwesomeIcon 
                                                     icon={faBan} 
@@ -1602,7 +1619,11 @@ function Orders() {
                                             {isDeleteAccess && !deleting.some(item => item.id === order._id && item.state) &&
                                                 <button
                                                     className=' p-2 rounded-md'
-                                                    onClick={() => handleDelete(order._id)}
+                                                    onClick={() => {
+                                                        setMessageOrder(order)
+                                                        setMessage('Delete')
+                                                        setIsMessage(true)
+                                                    }}
                                                 >
                                                     <FontAwesomeIcon icon={faTrashCan} className="text-red-700" />
                                                 </button>                            
@@ -2082,6 +2103,58 @@ function Orders() {
                 />
                 {errorNotifiction}
             </div>
+
+            {isMessage &&
+            <div 
+                className="flex flex-col gap-4 items-center justify-center p-16 rounded-lg fixed top-1/2 right-1/2 translate-x-1/2 -translate-y-1/2 w-1/3 h-1/2 aspect-square z-[250] bg-[#f5f5f5]"
+            >
+                <div className="bg-red-200 rounded-full p-4">
+                <FontAwesomeIcon 
+                    icon={faTriangleExclamation} 
+                    className="text-red-500 text-5xl"
+                />
+                </div>
+                <h1 className="text-3xl font-bold mb-4">Are you sure?</h1>
+                <p className="text-lg text-center">Do you relly want to {message} this order? This process cannot be undone</p>
+                <button 
+                    className="rounded-md font-medium border border-red-600 bg-red-600 text-white px-4 py-2 w-full"
+                    onClick={()=>{
+                        if(message === 'Delete') {
+                            handleDelete(messageOrder._id)
+                            setMessageOrder({})
+                            setMessage('')
+                            setIsMessage(false)
+                        }else{
+                            handleAddToBlackList(messageOrder)
+                            setMessageOrder({})
+                            setMessage('')
+                            setIsMessage(false)
+                        }
+                    }}
+                >
+                    {message} the order
+                </button>
+                <button 
+                    className="rounded-md font-medium border border-gray-600 px-4 py-2 w-full"
+                    onClick={()=>{
+                        setMessageOrder({})
+                        setMessage('')
+                        setIsMessage(false)
+                    }}
+                >
+                    Cancel
+                </button>
+            </div>}
+
+            {isMessage &&
+            <div 
+                className="fixed backdrop-filter backdrop-blur-sm bg-[#0000004f] top-0 right-0 w-screen aspect-square z-[249]"
+                onClick={()=>{
+                    setMessageOrder({})
+                    setMessage('')
+                    setIsMessage(false)
+                }}
+            ></div>}
 
             <div className="w-ful h-11 -ml-4 shadow-md flex">
                 {trackingFiltersEle}
