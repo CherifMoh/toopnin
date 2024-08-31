@@ -19,7 +19,7 @@ messaging.onBackgroundMessage((payload) => {
   const notificationTitle = payload.data.title;
   const notificationOptions = {
     body: payload.data.body,
-    icon: payload.data.icon || "https://drawlys.com:8444/images/logo.png",
+    icon: "https://drawlys.com:8444/images/logo.png",
     data: { url: payload.data.link },
   };
 

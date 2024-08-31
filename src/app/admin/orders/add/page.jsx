@@ -40,7 +40,7 @@ async function fetchCommunes() {
 async function fetchUsers() {
     const res = await axios.get('/api/users');
     return res.data;
-  }
+}
   
 
 
@@ -213,23 +213,21 @@ function Page() {
 
         AllTokens.forEach(async (token) => {
         console.log(token)
-        try{
-            const response = await fetch("api/send-notification", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
+        try {
+            const response = await axios.post("/api/send-notification", {
                 token: token,
                 title: "Test Notification",
                 message: "This is a test notification",
                 link: "https://toopnin.com/admin/orders",
-            }),
+            }, {
+                headers: {
+                    "Content-Type": "application/json",
+                },
             });
         
-            const data = await response.json();
+            const data = response.data;
             console.log(data);
-        }catch(error){
+        } catch (error) {
             console.error("Error sending notification:", error);
         }
         })
@@ -254,7 +252,7 @@ function Page() {
         }
 
         const res = await axios.post(`/api/orders`, newOrder)
-        // handleTestNotification()
+        handleTestNotification()
 
         console.log(res)
 

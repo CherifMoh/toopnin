@@ -4,6 +4,7 @@ import { NextResponse } from "next/server";
 import { startOfDay, endOfDay, startOfWeek, endOfWeek, subDays } from 'date-fns';
 import { getUserNameByEmail } from "../../actions/users";
 import { cookies } from "next/headers";
+import { AddToArchive } from "../../actions/order";
 
 export async function GET(req) {
   try {
