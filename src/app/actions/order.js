@@ -229,12 +229,24 @@ export async function AddToArchive(newData){
   
 }
 
-export async function checkEmailAllowance(orderEmail){
-  if(!orderEmail) return true
+export async function checkEmailAllowance(id) {
+  try {
+    const order = await Order.findById(id);
 
-  const email = cookies().get('user-email').value
+    if (!order) {
+      console.log('Order not found');
+      return false;
+    }
 
-  if(email === orderEmail) return true
-  return false
-  
+    const email = cookies().get('user-email').value;
+
+    if (email === order.adminEmail) {
+      return true;
+    }
+
+    return false;
+  } catch (error) {
+    console.error('Error checking email allowance:', error);
+    return false;
+  }
 }

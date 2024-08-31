@@ -431,7 +431,7 @@ function Orders() {
     async function handleDelete(id) {
 
         const order = Orders.find(order => order._id === id)
-        const emailAllowed = await checkEmailAllowance(order.adminEmail)
+        const emailAllowed = await checkEmailAllowance(order._id)
         if(!emailAllowed){
             setErrorNotifiction('You are not allowed to edit this order')
             setEditedOrder({})
@@ -469,7 +469,7 @@ function Orders() {
     })
 
     async function addToZR(order) {
-        const emailAllowed = await checkEmailAllowance(order.adminEmail)
+        const emailAllowed = await checkEmailAllowance(order._id)
         if(!emailAllowed){
             
             setErrorNotifiction('You are not allowed to edit this order')
@@ -530,7 +530,7 @@ function Orders() {
     }
 
     async function validateToZR(order) {
-        const emailAllowed = await checkEmailAllowance(order.adminEmail)
+        const emailAllowed = await checkEmailAllowance(order._id)
         if(!emailAllowed){
             setErrorNotifiction('You are not allowed to edit this order')
             setEditedOrder({})
@@ -573,7 +573,7 @@ function Orders() {
 
     async function handelConfirmOrder(order) {
         let success = true;
-        const emailAllowed = await checkEmailAllowance(order.adminEmail)
+        const emailAllowed = await checkEmailAllowance(order._id)
         if(!emailAllowed){
             setErrorNotifiction('You are not allowed to edit this order')
             setEditedOrder({})
@@ -641,7 +641,7 @@ function Orders() {
             let res= await validateToZR(editedOrder)
         }
 
-        const emailAllowed = await checkEmailAllowance(oldOrder.adminEmail)
+        const emailAllowed = await checkEmailAllowance(oldOrder._id)
         if(!emailAllowed){
             setErrorNotifiction('You are not allowed to edit this order')
             setEditedOrder({})
@@ -1182,7 +1182,7 @@ function Orders() {
     }
 
     async function handleAddToBlackList(order) {
-        const emailAllowed = await checkEmailAllowance(order.adminEmail)
+        const emailAllowed = await checkEmailAllowance(order._id)
         if(!emailAllowed){
             setErrorNotifiction('You are not allowed to edit this order')
             setEditedOrder({})
