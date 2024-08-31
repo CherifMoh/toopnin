@@ -79,6 +79,7 @@ function Page({ params }) {
         }))
     }
 
+
     async function handleSubmit(e){
         setIsSaving(true)
         try{
@@ -104,7 +105,8 @@ function Page({ params }) {
         {
             name: 'orders',
             actions:[
-                'create', 'read', 'update', 'delete'
+                'create', 'read', 'update', 'delete', 'excel',
+                'archive', 'IP block'
             ]
         },
         {
@@ -223,7 +225,7 @@ function Page({ params }) {
                 <div className="flex justify-between w-full">
                     {categoriesElements}
                 </div>
-                <div className="flex justify-between p-8 w-3/4 mx-auto">
+                <div className="grid grid-cols-5 gap-y-8 justify-between p-8 w-3/4 mx-auto">
                     {actionsElements}
                 </div>
             </div>

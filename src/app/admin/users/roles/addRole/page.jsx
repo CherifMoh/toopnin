@@ -90,7 +90,8 @@ function Page() {
         {
             name: 'orders',
             actions:[
-                'create', 'read', 'update', 'delete'
+                'create', 'read', 'update', 'delete', 'excel',
+                'archive', 'IP block'
             ]
         },
         {

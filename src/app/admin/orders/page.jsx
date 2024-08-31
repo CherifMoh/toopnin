@@ -123,6 +123,9 @@ function Orders() {
     const [isCreateAccess, setIsCreateAccess] = useState(false)
     const [isUpdateAccess, setIsUpdateAccess] = useState(false)
     const [isDeleteAccess, setIsDeleteAccess] = useState(false)
+    const [isArchiveAccess, setIsArchiveAccess] = useState(false)
+    const [isExcelAccess, setIsExcelAccess] = useState(false)
+    const [isIpBlockAccess, setIsIpBlockAccess] = useState(false)
     
     const [ordersUpdted, setOrdersUpdted] = useState(false)
     
@@ -166,6 +169,9 @@ function Orders() {
         setIsDeleteAccess(access.accessibilities.includes('delete'))
         setIsUpdateAccess(access.accessibilities.includes('update'))
         setIsCreateAccess(access.accessibilities.includes('create'))
+        setIsArchiveAccess(access.accessibilities.includes('archive'))
+        setIsExcelAccess(access.accessibilities.includes('excel'))
+        setIsIpBlockAccess(access.accessibilities.includes('IP block'))
     },[accessibilities])
 
 
@@ -1221,7 +1227,7 @@ function Orders() {
                     return (
                         <tr key={order._id} className={`h-5 ${order.blackListed && 'bg-red-200'}`}>
                             <td>
-                                {!order.blackListed &&
+                                {(!order.blackListed && isIpBlockAccess) &&
                                 <button
                                     className=' p-2 rounded-md'
                                     onClick={() => {
@@ -1598,7 +1604,7 @@ function Orders() {
                                                 </div>
                                             }
 
-                                            {!order.blackListed &&
+                                            {(!order.blackListed && isIpBlockAccess) &&
                                             <button
                                                 className=' p-2 rounded-md'
                                                 onClick={() =>{
@@ -2188,45 +2194,46 @@ function Orders() {
                     </div>
                 </div>
 
-
-                <div className="relative">
-                    <div
-                        className='relative flex whitespace-nowrap justify-self-end border-gray-500 border p-2 px-4 rounded-xl cursor-pointer'
-                        onClick={() => {
-                            setIsOrderAction(pre=>!pre)
-                        }}
-                    >
-                        {orderAction ? orderAction : 'order Action'}
-                        <Image 
-                            src={downArrow} alt=""
-                            width={24} height={24}
-                            className={`ml-2 transition-all  ${isOrderAction ? 'rotate-180 -translate-y-1' : 'translate-y-1'}`}
-                        />
+                {isUpdateAccess &&
+                    <div className="relative">
+                        <div
+                            className='relative flex whitespace-nowrap justify-self-end border-gray-500 border p-2 px-4 rounded-xl cursor-pointer'
+                            onClick={() => {
+                                setIsOrderAction(pre=>!pre)
+                            }}
+                        >
+                            {orderAction ? orderAction : 'order Action'}
+                            <Image 
+                                src={downArrow} alt=""
+                                width={24} height={24}
+                                className={`ml-2 transition-all  ${isOrderAction ? 'rotate-180 -translate-y-1' : 'translate-y-1'}`}
+                            />
+                        </div>
+                        {isOrderAction &&
+                        <div
+                            className="absolute rounded-lg top-12 right-1/2 translate-x-1/2 border z-[100] border-gray-500 flex flex-col bg-white items-center"
+                        >
+                            <div 
+                                className="px-2 whitespace-nowrap p-1 cursor-pointer border-b-2 border-gray-500  w-full text-start"
+                                onClick={() =>{
+                                    confirmMultibel(selectedOrders)
+                                    setIsOrderAction(pre=>!pre)
+                                }}
+                            >
+                                Confirm
+                            </div>
+                            <div 
+                                className="px-2 whitespace-nowrap cursor-pointer p-1 w-full text-start"
+                                onClick={() =>{
+                                    validateMultibelToZR(selectedOrders,0)
+                                    setIsOrderAction(pre=>!pre)
+                                }}
+                            >
+                                Expedie To ZR
+                            </div>
+                        </div>}
                     </div>
-                    {isOrderAction &&
-                     <div
-                        className="absolute rounded-lg top-12 right-1/2 translate-x-1/2 border z-[100] border-gray-500 flex flex-col bg-white items-center"
-                    >
-                        <div 
-                            className="px-2 whitespace-nowrap p-1 cursor-pointer border-b-2 border-gray-500  w-full text-start"
-                            onClick={() =>{
-                                confirmMultibel(selectedOrders)
-                                setIsOrderAction(pre=>!pre)
-                            }}
-                        >
-                            Confirm
-                        </div>
-                        <div 
-                            className="px-2 whitespace-nowrap cursor-pointer p-1 w-full text-start"
-                            onClick={() =>{
-                                validateMultibelToZR(selectedOrders,0)
-                                setIsOrderAction(pre=>!pre)
-                            }}
-                        >
-                            Expedie To ZR
-                        </div>
-                    </div>}
-                </div>
+                }
                 <div
                     className='relative whitespace-nowrap justify-self-end border-gray-500 border p-2 px-4 rounded-xl cursor-pointer'
                     onClick={() => {
@@ -2241,24 +2248,26 @@ function Orders() {
                     {isCrafting ? 'Show PDF' : 'start Crafting'}
                 </div>
 
-                <div
-                    className='relative h-11 min-w-28 whitespace-nowrap justify-self-end border-gray-500 border p-2 px-4 rounded-xl cursor-pointer'
-                    onClick={() => {
-                        if(isExcel) {
-                            setisExcel(pre => !pre)
-                            generateOrdersExcel(selectedOrders)
-                            setSelectedOrders([])
-                        }else{
-                            setisExcel(pre => !pre)
+                { isExcelAccess && 
+                    <div
+                        className='relative h-11 min-w-28 whitespace-nowrap justify-self-end border-gray-500 border p-2 px-4 rounded-xl cursor-pointer'
+                        onClick={() => {
+                            if(isExcel) {
+                                setisExcel(pre => !pre)
+                                generateOrdersExcel(selectedOrders)
+                                setSelectedOrders([])
+                            }else{
+                                setisExcel(pre => !pre)
+                            }
+                        }}
+                    >
+                        {lablesLoading && 
+                            <Spinner size={'size-6'} containerStyle={'ml-8'} />
                         }
-                    }}
-                >
-                    {lablesLoading && 
-                        <Spinner size={'size-6'} containerStyle={'ml-8'} />
-                    }
-                    {(isExcel && !lablesLoading) && 'Show excel' }
-                    {(!isExcel && !lablesLoading) && 'upload to excel' }
-                </div>
+                        {(isExcel && !lablesLoading) && 'Show excel' }
+                        {(!isExcel && !lablesLoading) && 'upload to excel' }
+                    </div>
+                }
 
                 <select
                     name="date"
@@ -2278,12 +2287,14 @@ function Orders() {
                     </Link>
                 }
 
-            <Link
-                className='justify-self-end  whitespace-nowrap border-gray-500 border p-2 px-4 rounded-xl cursor-pointer'
-                href={'/admin/orders/archive'}
-            >
-                <span className="ml-2 whitespace-nowrap">Archive</span>
-            </Link>
+                {isArchiveAccess &&
+                    <Link
+                        className='justify-self-end  whitespace-nowrap border-gray-500 border p-2 px-4 rounded-xl cursor-pointer'
+                        href={'/admin/orders/archive'}
+                    >
+                        <span className="ml-2 whitespace-nowrap">Archive</span>
+                    </Link>
+                }
             </div>
             }
 

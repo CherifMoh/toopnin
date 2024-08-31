@@ -16,14 +16,11 @@ firebase.initializeApp(firebaseConfig);
 const messaging = firebase.messaging();
 
 messaging.onBackgroundMessage((payload) => {
-  console.log("[firebase-messaging-sw.js] Received background message ", payload);
-
-  const link = payload.data?.link || 'https://drawlys.com/admin/orders';
-  const notificationTitle = payload.notification?.title || payload.data?.title;
+  const notificationTitle = payload.data.title;
   const notificationOptions = {
-    body: payload.notification?.body || payload.data?.body,
-    icon: payload.notification?.icon || payload.data?.icon || "https://drawlys.com:8444/images/logo.png",
-    data: { url: link },
+    body: payload.data.body,
+    icon: payload.data.icon || "https://drawlys.com:8444/images/logo.png",
+    data: { url: payload.data.link },
   };
 
   self.registration.showNotification(notificationTitle, notificationOptions);

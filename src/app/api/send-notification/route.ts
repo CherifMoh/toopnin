@@ -15,20 +15,19 @@ export async function POST(request: NextRequest) {
 
   const payload: Message = {
     token,
-    notification: {
+    data: {
       title: title,
       body: message,
-      imageUrl: 'https://drawlys.com:8444/images/logo.png',
-    },
-    data: {
-      link: link || 'https://drawlys.com/admin/orders',
+      icon: 'https://drawlys.com:8444/images/logo.png',
+      link: link || 'https://toopnin.com/admin/orders',
     },
     webpush: {
       fcmOptions: {
-        link: link || 'https://drawlys.com/admin/orders',
+        link: link || 'https://toopnin.com/admin/orders',
       },
     },
   };
+  
 
   console.log("Sending payload:", payload);
 

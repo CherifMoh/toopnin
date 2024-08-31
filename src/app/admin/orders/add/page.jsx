@@ -64,6 +64,11 @@ function Page() {
 
     const [isBeruAvailable, setIsBeruAvailable] = useState(true)
 
+    const { data: Users, isLoading:UsersIsLoading, isError:UsersIsError, error:UsersError } = useQuery({
+        queryKey: ['users'],
+        queryFn: fetchUsers
+      });
+
     const { data: Designs, isLoading: designsLoding, isError: designsIsErr, error: designsErr } = useQuery({
         queryKey: ['AdminledDesigne'],
         queryFn: fetchDesigns
@@ -170,13 +175,14 @@ function Page() {
     }, [formData.wilaya,communes,wilayat])
 
 
-    if (productsLoding || designsLoding || wilayatLoding|| communesLoding|| feesLoding) return <div>Loading...</div>;
+    if (productsLoding || designsLoding || wilayatLoding|| communesLoding|| feesLoding|| UsersIsLoading) return <div>Loading...</div>;
 
     if (productsIsErr) return <div>Error: {productsErr.message}</div>;
     if (designsIsErr) return <div>Error: {designsErr.message}</div>;
     if (wilayatIsErr) return <div>Error: {wilayatErr.message}</div>;
     if (communesIsErr) return <div>Error: {communesErr.message}</div>;
     if (feesIsErr) return <div>Error: {feesErr.message}</div>;
+    if (UsersIsError) return <div>Error: {UsersError.message}</div>;
 
 
     const handleChange = (e) => {
@@ -190,23 +196,39 @@ function Page() {
     const phonePattern = /^0\d{9}$/;
 
     const handleTestNotification = async () => {
-        try {
-          const response = await axios.post('/api/send-notification', {
-            token: 'fU5aHsSOa_x1DkazrQ-SJl:APA91bEUlOLvWu9Jhz7GFNAEPfSyTuPYl12Z3X_buCYKeCTUeEcaEsStO0i7bxbOB94MHrNOa5-lfa7_wXT1ein-ERWrgaGyQAAqFlsA9IKWOHSyf1movvva35B0jPGh4fCLgVPu3k4v',
-            title: "New Order",
-            message: "A new order has been created",
-            link: "https://toopnin.com/admin/orders",
-          }, {
+        let AllTokens =[ ]
+
+        Users.forEach(user => {
+            if(!Array.isArray(user.fcmTokens) || user.fcmTokens.lenght === 0) return
+            user.fcmTokens.forEach(fcmToken => {
+            AllTokens.push(fcmToken)
+            })
+        });
+
+
+        AllTokens.forEach(async (token) => {
+        console.log(token)
+        try{
+            const response = await fetch("api/send-notification", {
+            method: "POST",
             headers: {
-              "Content-Type": "application/json",
-            }
-          });
-      
-          const data = response.data;
-          console.log(data);
-        } catch (error) {
-          console.error("Error sending notification:", error);
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                token: token,
+                title: "Test Notification",
+                message: "This is a test notification",
+                link: "https://toopnin.com/admin/orders",
+            }),
+            });
+        
+            const data = await response.json();
+            console.log(data);
+        }catch(error){
+            console.error("Error sending notification:", error);
         }
+        })
+    
     };
 
 
