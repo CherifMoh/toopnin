@@ -37,6 +37,11 @@ async function fetchCommunes() {
     const res = await axios.get('/api/wilayas/communes');
     return res.data.communes;
 }
+async function fetchUsers() {
+    const res = await axios.get('/api/users');
+    return res.data;
+  }
+  
 
 
 function Page() {
