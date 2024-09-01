@@ -126,9 +126,10 @@ export async function POST(req) {
 
     const userName = await getUserNameByEmail(cookies().get('user-email')?.value)
     
+
     AddToArchive({
       user: userName,
-      tracking: order.DLVTracking,
+      tracking: order.phoneNumber,
       action: "تم اضافة طلب",
     }); 
 

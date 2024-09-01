@@ -18,10 +18,29 @@ export async function deleteUser(id) {
 }
 
 export async function getUserNameByEmail(email) {
-    await dbConnect()
-    const res = await User.findOne({ email: email }).select('name')
+    try {
+        await dbConnect();
 
-    return res.name
+        if (!email) {
+            const cookie = cookies().get('user-email');
+            if (cookie) {
+                email = cookie.value;
+            } else {
+                throw new Error('Email not provided and no cookie found.');
+            }
+        }
+
+        const user = await User.findOne({ email }).select('name');
+
+        if (!user) {
+            throw new Error('User not found.');
+        }
+
+        return user.name;
+    } catch (error) {
+        console.error('Error fetching user name:', error.message);
+        return null;
+    }
 }
 
 export async function editeUserPfp(email, pfp) {

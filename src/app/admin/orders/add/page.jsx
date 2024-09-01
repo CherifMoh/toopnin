@@ -16,6 +16,8 @@ import Spinner from '../../../../components/loadings/Spinner';
 import { useSelector } from 'react-redux';
 import { generateUniqueString } from '../../../lib/utils';
 import useFcmToken from '../../../../hooks/useFcmToken';
+import { handleSendNotification } from '../../../lib/utils';
+import { getUserNameByEmail } from '../../../actions/users';
 
 async function fetchDesigns() {
     const res = await axios.get('/api/products/ledDesigns');
@@ -37,10 +39,7 @@ async function fetchCommunes() {
     const res = await axios.get('/api/wilayas/communes');
     return res.data.communes;
 }
-async function fetchUsers() {
-    const res = await axios.get('/api/users');
-    return res.data;
-}
+
   
 
 
@@ -69,11 +68,7 @@ function Page() {
 
     const [isBeruAvailable, setIsBeruAvailable] = useState(true)
 
-    const { data: Users, isLoading:UsersIsLoading, isError:UsersIsError, error:UsersError } = useQuery({
-        queryKey: ['users'],
-        queryFn: fetchUsers
-      });
-
+    
     const { data: Designs, isLoading: designsLoding, isError: designsIsErr, error: designsErr } = useQuery({
         queryKey: ['AdminledDesigne'],
         queryFn: fetchDesigns
@@ -109,8 +104,6 @@ function Page() {
         }
        
     },[accessibilities])
-
-
 
     useEffect(() => {
         setFormData(pre => ({
@@ -180,14 +173,14 @@ function Page() {
     }, [formData.wilaya,communes,wilayat])
 
 
-    if (productsLoding || designsLoding || wilayatLoding|| communesLoding|| feesLoding|| UsersIsLoading) return <div>Loading...</div>;
+    if (productsLoding || designsLoding || wilayatLoding|| communesLoding|| feesLoding) return <div>Loading...</div>;
 
     if (productsIsErr) return <div>Error: {productsErr.message}</div>;
     if (designsIsErr) return <div>Error: {designsErr.message}</div>;
     if (wilayatIsErr) return <div>Error: {wilayatErr.message}</div>;
     if (communesIsErr) return <div>Error: {communesErr.message}</div>;
     if (feesIsErr) return <div>Error: {feesErr.message}</div>;
-    if (UsersIsError) return <div>Error: {UsersError.message}</div>;
+
 
 
     const handleChange = (e) => {
@@ -200,39 +193,7 @@ function Page() {
     }
     const phonePattern = /^0\d{9}$/;
 
-    const handleTestNotification = async () => {
-        let AllTokens =[ ]
-
-        Users.forEach(user => {
-            if(!Array.isArray(user.fcmTokens) || user.fcmTokens.lenght === 0) return
-            user.fcmTokens.forEach(fcmToken => {
-            AllTokens.push(fcmToken)
-            })
-        });
-
-
-        AllTokens.forEach(async (token) => {
-        console.log(token)
-        try {
-            const response = await axios.post("/api/send-notification", {
-                token: token,
-                title: "Test Notification",
-                message: "This is a test notification",
-                link: "https://toopnin.com/admin/orders",
-            }, {
-                headers: {
-                    "Content-Type": "application/json",
-                },
-            });
-        
-            const data = response.data;
-            console.log(data);
-        } catch (error) {
-            console.error("Error sending notification:", error);
-        }
-        })
-    
-    };
+   
 
 
     async function handelSubmit(e) {
@@ -251,8 +212,14 @@ function Page() {
             tracking:'غير مؤكدة'
         }
 
+        const userName = await getUserNameByEmail()
+
         const res = await axios.post(`/api/orders`, newOrder)
-        handleTestNotification()
+        handleSendNotification(
+            'طلب جديد',
+            `${userName} قام باضافة طلب جديد`,
+            'https://toopnin.com/admin/orders'
+        )
 
         console.log(res)
 

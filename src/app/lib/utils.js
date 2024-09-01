@@ -56,4 +56,43 @@ export function generateUniqueString(length) {
   return result;
 }
 
+export async function handleSendNotification (title, message, link){
+  try {
+      const res = await axios.get('/api/users');
+      const Users = res.data;
+
+      let AllTokens = [];
+
+      Users.forEach(user => {
+          if (!Array.isArray(user.fcmTokens) || user.fcmTokens.length === 0) return;
+          user.fcmTokens.forEach(fcmToken => {
+              AllTokens.push(fcmToken);
+          });
+      });
+
+      const notificationPromises = AllTokens.map(async (token) => {
+          try {
+              const response = await axios.post("/api/send-notification", {
+                  token: token,
+                  title: title,
+                  message: message,
+                  link: link,
+              }, {
+                  headers: {
+                      "Content-Type": "application/json",
+                  },
+              });
+              
+              console.log(response.data);
+          } catch (error) {
+              console.error("Error sending notification:", error);
+          }
+      });
+
+      await Promise.all(notificationPromises);
+  } catch (error) {
+      console.error("Error fetching users:", error);
+  }
+};
+
 
