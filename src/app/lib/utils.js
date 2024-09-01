@@ -1,4 +1,5 @@
 import { clsx } from "clsx"
+import { removeToken } from "../actions/users"
 import { twMerge } from 'tailwind-merge'; // Import the necessary functions from their respective libraries
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../components/shared/Card";
 import axios from "axios";
@@ -57,43 +58,47 @@ export function generateUniqueString(length) {
   return result;
 }
 
-export async function handleSendNotification (title, message, link){
+export async function handleSendNotification(title, message, link) {
   try {
-      const res = await axios.get('/api/users');
-      const Users = res.data;
+    const res = await axios.get('/api/users');
+    const Users = res.data;
 
-      let AllTokens = [];
+    let AllTokens = [];
 
-      Users.forEach(user => {
-          if (!Array.isArray(user.fcmTokens) || user.fcmTokens.length === 0) return;
-          user.fcmTokens.forEach(fcmToken => {
-              AllTokens.push(fcmToken);
-          });
+    Users.forEach(user => {
+      if (!Array.isArray(user.fcmTokens) || user.fcmTokens.length === 0) return;
+      user.fcmTokens.forEach(fcmToken => {
+        AllTokens.push({ userId: user._id, token: fcmToken });
       });
+    });
 
-      const notificationPromises = AllTokens.map(async (token) => {
-          try {
-              const response = await axios.post("/api/send-notification", {
-                  token: token,
-                  title: title,
-                  message: message,
-                  link: link,
-              }, {
-                  headers: {
-                      "Content-Type": "application/json",
-                  },
-              });
-              
-              console.log(response.data);
-          } catch (error) {
-              console.error("Error sending notification:", error);
-          }
-      });
+    const notificationPromises = AllTokens.map(async ({ userId, token }) => {
+      try {
+        const response = await axios.post("/api/send-notification", {
+          token: token,
+          title: title,
+          message: message,
+          link: link,
+        }, {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
 
-      await Promise.all(notificationPromises);
+        console.log(response.data);
+      } catch (error) {
+        console.error("Error sending notification:", error);
+
+        if (error.response && error.response.data.error === "Invalid token") {
+          // Remove the invalid token from the user's fcmTokens array
+          removeToken(userId,token)
+        }
+      }
+    });
+
+    await Promise.all(notificationPromises);
   } catch (error) {
-      console.error("Error fetching users:", error);
+    console.error("Error fetching users:", error);
   }
-};
-
+}
 

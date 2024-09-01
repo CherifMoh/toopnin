@@ -27,7 +27,6 @@ export async function POST(request: NextRequest) {
       },
     },
   };
-  
 
   console.log("Sending payload:", payload);
 
@@ -36,6 +35,11 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ success: true, message: "Notification sent!" });
   } catch (error) {
     console.error("Error sending notification:", error);
+    if (error.code === 'messaging/invalid-registration-token' ||
+        error.code === 'messaging/registration-token-not-registered') {
+      // Handle invalid token by returning a specific error message
+      return NextResponse.json({ success: false, error: "Invalid token" });
+    }
     return NextResponse.json({ success: false, error });
   }
-}
+}               

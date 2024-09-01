@@ -111,6 +111,27 @@ export async function deleteRole(id) {
     }
 }
 
+export async function removeToken(id,tokenToRemove) {
+    
+
+    try {
+        await dbConnect();
+
+        const oldUser = await User.findById(id);
+
+        // Remove the token from the fcmTokens array
+        oldUser.fcmTokens = oldUser.fcmTokens.filter(token => token !== tokenToRemove);
+
+        // Save the updated user document
+        await oldUser.save();
+
+        return 'deleted';
+    } catch (error) {
+        console.error("Error creating role:", error);
+        throw error;
+    }
+}
+
 export async function updateRole(id,newRole) {
     
 
