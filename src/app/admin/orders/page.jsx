@@ -564,7 +564,7 @@ function Orders() {
         orders.forEach(async(order) => {
             
         
-            let res = await validateToZR(order.DLVTracking)
+            let res = await validateToZR(order)
          
             
             
