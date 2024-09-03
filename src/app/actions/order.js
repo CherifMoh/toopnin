@@ -240,7 +240,7 @@ export async function checkEmailAllowance(id) {
 
     const email = cookies().get('user-email').value;
 
-    if (email === order.adminEmail) {
+    if (email === order.adminEmail || !order.adminEmail) {
       return true;
     }
 

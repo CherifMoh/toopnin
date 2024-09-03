@@ -1,5 +1,5 @@
 
-export default function Layout({ children, profit, sales, customers, activeP, ordersChart, ordersPieChart }) {
+export default function Layout({ ordersByHoursChart, children, profit, sales, customers, activeP, ordersChart, ordersPieChart}) {
   return (
     <main className='bg-white p-4'>
 

@@ -13,7 +13,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChevronDown, faLocationCrosshairs, faLocationDot, faMinus, faPaperPlane, faPhone, faPlus, faUser } from "@fortawesome/free-solid-svg-icons";
 import { addAbandonedCheckout } from "../../actions/order";
 import { checkBlackliste } from "../../lib/ip/checkIPBlacklist";
-import { formatNumberWithCommas } from "../../lib/utils";
+import { formatNumberWithCommas, handleSendNotification } from "../../lib/utils";
 
 
 
@@ -388,7 +388,11 @@ function LindingPage({ params }) {
     try {
         // Make API call
         const res = await addAbandonedCheckout(formData);
-        console.log(res.data)
+        handleSendNotification(
+            'سلة المتروكة',
+            `سلة متروكة جديدة برقم الهاتف ${formData.phoneNumber}`,
+            'https://toopnin.com/admin/orders'
+        )
     } catch (error) {
         // Handle error if necessary
         console.error('Error submitting form:', error);

@@ -18,7 +18,7 @@ async function fetchYesterdayOrders() {
 }
 const OrdersLineChart = () => {
 
-  const { data: todayOrders, todayIsLoading, todayIsError, todayError } = useQuery({
+  const { data: todayOrders, isLoading:todayIsLoading, isError:todayIsError, error:todayError } = useQuery({
     queryKey: ['orders today'],
     queryFn: fetchTodayOrders
   });
@@ -33,10 +33,10 @@ const OrdersLineChart = () => {
 
  
   // Function to aggregate orders by hour
-  const aggregateOrdersByHour = (orders) => {
+  function aggregateOrdersByHour(orders) {
     const hourlyData = Array(24).fill(0); // Initialize an array with 24 zeros
 
-    orders.forEach(order => {
+    orders?.forEach(order => {
       const hour = parseISO(order.createdAt).getHours();
       order.orders?.forEach((product) => {
         

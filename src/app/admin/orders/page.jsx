@@ -451,6 +451,7 @@ function Orders() {
         }]))
         setEditedOrderId('')
         await deleteOrder(id)
+        setSuccessNotifiction('تم حذف الطلب بنجاح')
         router.refresh()
         router.push('/admin/orders')
         queryClient.invalidateQueries(`orders,${dateFilter}`);
