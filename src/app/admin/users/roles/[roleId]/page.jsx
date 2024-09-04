@@ -118,7 +118,7 @@ function Page({ params }) {
         {
             name: 'online',
             actions:[
-                'create', 'read', 'update', 'delete'
+                'create', 'read', 'delete'
             ]
         },
     ]

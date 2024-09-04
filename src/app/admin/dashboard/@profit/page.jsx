@@ -13,10 +13,10 @@ async function fetchProducts() {
 }
 
 const fetchOrders = async (filters) => {
-  
-    const res = await axios.get(`/api/orders?date=${filters.date}&startDate=${filters.startDate}&endDate=${filters.endDate}`);
-    return res.data;
-  };
+
+  const res = await axios.get(`/api/orders?date=${filters.date}&startDate=${filters.startDate}&endDate=${filters.endDate}`);
+  return res.data;
+};
 
 function Profit() {
 
@@ -56,14 +56,11 @@ function Profit() {
     />}
   />;
     
-  if (isError) return <DashboardCard
+  if (isError || isOrdersError) return <DashboardCard
    title="Profit calculator"
-   body={`Error: ${error.message}`}
+   body={`Error: ${error?.message || ordersError?.message}`}
   />;
-  if (isOrdersError) return <DashboardCard
-   title="Profit calculator"
-   body={`Error: ${ordersError.message}`}
-  />;
+  
 
 
   async function calculateProfit() {
@@ -78,12 +75,14 @@ function Profit() {
     
     let ordersProfit = 0;
   
+    
     for (const order of livredOrders) {
         let orderProfit = Number(order.totalPrice) - Number(order.shippingPrice);
 
         for (const product of order.orders) {
             if (product.productID === selectedProduct) {
-                for (const qnt of product.qnts) {
+                if(!product || !product.qnts) continue
+                for (const qnt of product?.qnts) {
                     const productCost = await getProductCost(product.productID);
                     orderProfit -= Number(qnt.qnt) *( Number(qnt.price) + Number(productCost.cost));
                 }

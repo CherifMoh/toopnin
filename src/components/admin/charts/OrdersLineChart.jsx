@@ -5,10 +5,16 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import { format, parseISO } from 'date-fns';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft, faArrowLeftLong, faArrowRightLong } from '@fortawesome/free-solid-svg-icons';
+import { useState } from 'react';
 
 
 async function fetchTodayOrders() {
   const res = await axios.get('/api/orders/createdAt?date=today');
+  return res.data;
+}
+
+async function fetchProducts() {
+  const res = await axios.get('/api/products');
   return res.data;
 }
 
@@ -18,6 +24,10 @@ async function fetchYesterdayOrders() {
 }
 const OrdersLineChart = () => {
 
+  const { data: Products, isLoading:ProductsIsLoading, isError:ProductsIsError,error:ProductsError } = useQuery({
+    queryKey:['Products admin dashboard'],
+    queryFn: fetchProducts
+  });
   const { data: todayOrders, isLoading:todayIsLoading, isError:todayIsError, error:todayError } = useQuery({
     queryKey: ['orders today'],
     queryFn: fetchTodayOrders
@@ -27,11 +37,15 @@ const OrdersLineChart = () => {
     queryFn: fetchYesterdayOrders
   });
 
-  if (isLoading || todayIsLoading) return <div>Loading Chart ...</div>;
-  if (isError || todayIsError) return <div>Error fetching Orders: {error?.message || todayError?.message}</div>;
+  
+  const [selectedProduct, setSelectedProduct] = useState('')
+
+  if (isLoading || todayIsLoading || ProductsIsLoading) return <div>Loading Chart ...</div>;
+  if (isError || todayIsError || ProductsIsError) return <div>Error fetching Orders: {error?.message || todayError?.message || ProductsError?.message}</div>;
   
 
  
+
   // Function to aggregate orders by hour
   function aggregateOrdersByHour(orders) {
     const hourlyData = Array(24).fill(0); // Initialize an array with 24 zeros
@@ -39,6 +53,7 @@ const OrdersLineChart = () => {
     orders?.forEach(order => {
       const hour = parseISO(order.createdAt).getHours();
       order.orders?.forEach((product) => {
+        if (selectedProduct && selectedProduct!==product.productID) return
         
         hourlyData[hour] += Number(product.qnt);
       })
@@ -75,9 +90,29 @@ const OrdersLineChart = () => {
     </div>
   ]
 
+  const productsOptionsElement = Products.map(product => {
+    return <option key={product._id} value={product._id}>{product.title}</option>
+  })
+
+  const productsSelectElement = [
+    <select 
+        key={'productsSelectElement'}
+        name="product" 
+        value={selectedProduct}
+        className="min-w-20 w-1/4 py-2 px-4 bg-transparent border border-gray-200 rounded-md"
+        onChange={e => setSelectedProduct(e.target.value)}
+    >
+        <option hidden>اختر المنتج</option>
+        {productsOptionsElement}
+    </select>
+  ]
+
   return (
     <div className='flex-col'>
-      {qntElement}
+      <div className='flex justify-between'>
+        {qntElement}
+        {productsSelectElement}
+      </div>
       <div className='w-full h-[272px]'>
         <ResponsiveContainer>
           <LineChart data={chartData}>

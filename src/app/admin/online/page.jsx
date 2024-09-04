@@ -6,9 +6,10 @@ import Image from 'next/image';
 import { faFloppyDisk, faPlus, faTrash } from '@fortawesome/free-solid-svg-icons';
 import axios from 'axios';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { addPixel, deletePixel } from '../../actions/pixel';
 import { useRouter } from 'next/navigation';
+import { useSelector } from 'react-redux';
 
 async function fetchPixels() {
     const res = await axios.get('/api/pixel');
@@ -26,6 +27,21 @@ function Page() {
   });
 
   const [pixalId, setPixalId] = useState('');
+
+  const [isCreateAccess, setIsCreateAccess] = useState(false)
+  const [isDeleteAccess, setIsDeleteAccess] = useState(false)
+
+  const accessibilities = useSelector((state) => state.accessibilities.accessibilities)
+
+  useEffect(()=>{
+    if(accessibilities.length === 0)return
+    const access = accessibilities.find(item=>item.name === 'online')
+    if(!access || access.accessibilities.length === 0){
+       return router.push('/admin')
+    }
+    setIsDeleteAccess(access.accessibilities.includes('delete'))
+    setIsCreateAccess(access.accessibilities.includes('create'))
+},[accessibilities])
 
   if (isLoading) return <div>Loading...</div>;
   if (isError) return <div>Error fetching Orders: {error.message}</div>;
@@ -63,12 +79,13 @@ function Page() {
         >
             <span>{pixel.pixelID}</span>
 
+           { isDeleteAccess &&
             <div 
                 className='bg-red-500 rounded-full px-2 py-1 cursor-pointer'
                 onClick={() => handelDelete(pixel._id)}
             >
                 <FontAwesomeIcon icon={faTrash} className='text-white'/>
-            </div>
+            </div>}
         </div>
     )
   })
@@ -98,7 +115,8 @@ function Page() {
             </header>
 
             <main className='w-full h-full py-4 px-6'>
-                <form onSubmit={handleAddPixel}>
+                { isCreateAccess &&
+                 <form onSubmit={handleAddPixel}>
                     <span className='text-sm'>Facebook pixal</span> 
                     <div className='flex items-center gap-3'>
                         <input 
@@ -114,6 +132,7 @@ function Page() {
                         </button>
                     </div>
                 </form>
+                }
                 <div>
                     {pixelIdsElement}
                 </div>

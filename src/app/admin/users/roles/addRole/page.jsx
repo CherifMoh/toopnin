@@ -103,7 +103,7 @@ function Page() {
         {
             name: 'online',
             actions:[
-                'create', 'read', 'update', 'delete'
+                'create', 'read', 'delete'
             ]
         },
     ]

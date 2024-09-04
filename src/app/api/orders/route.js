@@ -81,6 +81,7 @@ export async function GET(req) {
 
     if (email) {
       query = {
+        ...query,
         $or: [
           { adminEmail: email },  // Match the specified email
           { adminEmail: { $exists: false } },  // No email field
@@ -89,8 +90,8 @@ export async function GET(req) {
       };
     }
 
+    console.log(query)
     const result = await Order.find(query).sort({ _id: -1 });
-
 
     return NextResponse.json(result);
   } catch (err) {
