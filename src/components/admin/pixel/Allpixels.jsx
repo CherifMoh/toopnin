@@ -17,7 +17,6 @@ async function Allpixels() {
         console.log(err)
     }
 
-    console.log(Pixels)
 
 
 

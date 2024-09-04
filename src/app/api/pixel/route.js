@@ -1,9 +1,12 @@
 import PixelID from "../../models/pixel"
 import {dbConnect} from "../../lib/dbConnect"
 import { NextResponse } from "next/server"
+import { cookies } from "next/headers";
 
 
 export async function GET() {
+
+  const store = cookies()
   try{
     await dbConnect()
     return PixelID.find().sort({_id: -1})
