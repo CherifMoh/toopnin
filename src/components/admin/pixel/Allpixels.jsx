@@ -21,7 +21,7 @@ async function Allpixels() {
 
     const pixelIdsElement = Pixels?.map(pixel=>{
         return (
-            <PixelScript id={pixel.pixelID} />
+            <PixelScript id={pixel.pixelID} key={pixel.pixelID} />
         )
     })
 

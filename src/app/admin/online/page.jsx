@@ -15,7 +15,7 @@ async function fetchPixels() {
     return res.data;
 }
 
-function page() {
+function Page() {
 
   const  queryClient = useQueryClient()
   const  router = useRouter()
@@ -125,4 +125,4 @@ function page() {
   )
 }
 
-export default page
+export default Page
