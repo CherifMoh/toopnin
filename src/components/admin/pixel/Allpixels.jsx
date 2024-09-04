@@ -3,7 +3,7 @@ import axios from 'axios';
 import PixelScript from './PixelScript'
 
 async function fetchPixels() {
-    const res = await axios.get('https://localhost:3000/api/pixel');
+    const res = await axios.get('https://toopnin.com/api/pixel');
     return res.data;
 }
 
