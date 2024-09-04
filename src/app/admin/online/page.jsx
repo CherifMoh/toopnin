@@ -78,7 +78,7 @@ function page() {
   return (
     <div className='w-full pt-8 h-screen'>
         <div className='w-1/3 h-max min-h-96 mx-auto border-4 border-t-0 border-[rgb(56,92,142)] '>
-            <header className='bg-[rgb(56,92,142)] flex items-center justify-between p-2'>
+            <header className='bg-[rgb(56,92,142)] flex items-center justify-between p-4'>
                 <div className='flex items-center gap-3 text-white font-semibold'>
                     <Image   
                         src={faFacebookF}
@@ -91,10 +91,10 @@ function page() {
                         Facebook pixal settings
                     </span>
                 </div>
-                <div className='bg-white p-4 flex gap-3 items-center text-[rgb(56,92,142)]'>
+                {/* <div className='bg-white p-4 flex gap-3 items-center text-[rgb(56,92,142)]'>
                 <FontAwesomeIcon icon={faFloppyDisk}/>
                 save
-                </div>
+                </div> */}
             </header>
 
             <main className='w-full h-full py-4 px-6'>
