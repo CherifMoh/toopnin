@@ -17,6 +17,8 @@ async function Allpixels() {
         console.log(err)
     }
 
+    console.log(Pixels)
+
 
 
     const pixelIdsElement = Pixels?.map(pixel=>{
