@@ -115,7 +115,7 @@ function ProductsGrid() {
                 >
                     <div className="product-img-container">
                         <img alt="" src={`${product.imageOn}`} width={20} height={20} className="product-img product-img-on" />
-                        <img alt="" src={`${product.imageOff}`} width={20} height={20} className="product-img product-img2 product-img-off" />
+                        <img alt="" src={`${product.imageOn}`} width={20} height={20} className="product-img product-img2 product-img-off" />
                     </div>
                     <div className="card-info">
                         <span className="product-title">{product.title}</span>

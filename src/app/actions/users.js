@@ -17,6 +17,52 @@ export async function deleteUser(id) {
     const res = await User.findByIdAndDelete(id)
 }
 
+export async function getUser() {
+    try {
+        await dbConnect();
+
+        let email;
+        const cookie = cookies().get('user-email');
+        if (cookie) {
+           email = cookie.value;
+        } else {
+            throw new Error('Email not provided and no cookie found.');
+        }
+        
+
+        const user = await User.findOne({ email });
+
+        if (!user) {
+            throw new Error('User not found.');
+        }
+
+        return user;
+    } catch (error) {
+        console.error('Error fetching user name:', error.message);
+        return null;
+    }
+}
+
+export async function isSuper(accessName) {
+    try {
+        const user = await getUser()
+
+        const roleName = user.role
+
+        const role = await getRole(roleName)
+
+        const OrdersAccessibilities = role[0].accessibilities.find(access=>access.name === accessName)
+        
+        const isSuper = OrdersAccessibilities.accessibilities.includes('super')
+
+        return isSuper
+
+    } catch (error) {
+        console.error('Error fetching user name:', error.message);
+        return null;
+    }
+}
+
 export async function getUserNameByEmail(email) {
     try {
         await dbConnect();
@@ -146,6 +192,23 @@ export async function updateRole(id,newRole) {
         throw error;
     }
 }
+
+export async function getRole(name) {
+    
+
+    try {
+        await dbConnect();
+
+        const role = await Role.find({name:name});
+
+        return role;
+    } catch (error) {
+        console.error("Error creating role:", error);
+        throw error;
+    }
+}
+
+
 
 export async function dleleteCookies() {
     cookies().delete('access-token')

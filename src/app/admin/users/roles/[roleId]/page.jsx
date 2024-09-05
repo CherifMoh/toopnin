@@ -52,23 +52,55 @@ function Page({ params }) {
 
 
     function handleAccessibilitiesChange(e) {
-        const updatedAccessibilities = [...accessibilities]
-        const index = updatedAccessibilities.findIndex(item => item.name === accessGategory)
+        const name = e.target.name;
+        const updatedAccessibilities = [...accessibilities];
+        const index = updatedAccessibilities.findIndex(item => item.name === accessGategory);
+    
         if (index > -1) {
-            const selectedAccessibilities = updatedAccessibilities[index].accessibilities
-            if (selectedAccessibilities.includes(e.target.name)) {
-                updatedAccessibilities[index].accessibilities = selectedAccessibilities.filter(access => access !== e.target.name)
+            const selectedAccessibilities = updatedAccessibilities[index].accessibilities;
+    
+            if (name === 'super') {
+                if (e.target.checked) {
+                    // Select all actions when "super" is checked
+                    updatedAccessibilities[index].accessibilities = categories.find(category => category.name === accessGategory).actions;
+                } else {
+                    // Only remove "super" when it's unchecked, leave the other actions unchanged
+                    updatedAccessibilities[index].accessibilities = selectedAccessibilities.filter(access => access !== 'super');
+                }
             } else {
-                updatedAccessibilities[index].accessibilities.push(e.target.name)
+                // Toggle other actions (read, update, delete, etc.)
+                if (selectedAccessibilities.includes(name)) {
+                    updatedAccessibilities[index].accessibilities = selectedAccessibilities.filter(access => access !== name);
+                } else {
+                    if (!selectedAccessibilities.includes('read') && (name === 'delete' || name === 'update')) {
+                        updatedAccessibilities[index].accessibilities.push('read');
+                    }
+                    updatedAccessibilities[index].accessibilities.push(name);
+                }
             }
         } else {
-            updatedAccessibilities.push({ name: accessGategory, accessibilities: [e.target.name] })
+            // If no accessibilities for this category exist yet
+            if (name === 'super') {
+                updatedAccessibilities.push({
+                    name: accessGategory,
+                    accessibilities: categories.find(category => category.name === accessGategory).actions
+                });
+            } else {
+                if (name === 'delete' || name === 'update') {
+                    updatedAccessibilities.push({ name: accessGategory, accessibilities: [name, 'read'] });
+                } else {
+                    updatedAccessibilities.push({ name: accessGategory, accessibilities: [name] });
+                }
+            }
         }
+    
         setNewRole(prev => ({
             ...prev,
             accessibilities: updatedAccessibilities
-        }))
+        }));
     }
+    
+    
 
     function handleChange(e){
         const name = e.target.name
@@ -98,28 +130,19 @@ function Page({ params }) {
     const categories = [
         {
             name: 'Products',
-            actions:[
-                'create', 'read', 'update', 'delete','storage',
-            ]
+            actions: ['super', 'create', 'read', 'update', 'delete', 'storage']
         },
         {
             name: 'orders',
-            actions:[
-                'create', 'read', 'update', 'delete', 'excel',
-                'archive', 'IP block'
-            ]
+            actions: ['super', 'create', 'read', 'update', 'delete', 'excel', 'archive', 'IP block']
         },
         {
             name: 'users',
-            actions:[
-                'create', 'read', 'update', 'delete'
-            ]
+            actions: ['super', 'create', 'read', 'update', 'delete']
         },
         {
             name: 'online',
-            actions:[
-                'create', 'read', 'delete'
-            ]
+            actions: ['super', 'create', 'read', 'delete']
         },
     ]
 

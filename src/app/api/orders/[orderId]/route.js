@@ -4,7 +4,7 @@ import { getUserNameByEmail } from "../../../actions/users"
 import { NextResponse } from "next/server"
 import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
-import { AddToArchive } from "../../../actions/order";
+import { AddToArchive, checkEmailAllowance } from "../../../actions/order";
 
 export async function PUT(req, { params }) {
   try {
@@ -13,16 +13,16 @@ export async function PUT(req, { params }) {
     const NewOrder = await req.json()
     const id = params.orderId
 
+ 
+
     if(!NewOrder.adminEmail){
       NewOrder.adminEmail = cookies().get('user-email')?.value
     }else{
-      const email = cookies().get('user-email')?.value
-
-      if(NewOrder.adminEmail !== email){
+      const emailAllowed = await checkEmailAllowance(id)
+      if(!emailAllowed){
         return Response.json({success:false,message:"you are not allowed to edit this order"})
       }
     }
-
 
     const newDocument = await Order.findByIdAndUpdate(id, NewOrder, { new: true })
 

@@ -285,6 +285,7 @@ function LindingPage({ params }) {
         // Make API call
         const res = await axios.post(`/api/orders`, newOrder);
 
+        localStorage.setItem('wilaya', formData.wilaya)
         // Refresh and navigate to thank you page
         router.refresh();
         router.push('/thankyou');

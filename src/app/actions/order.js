@@ -5,7 +5,7 @@ import OrdersArchive from "../models/ordersArchive"
 import { dbConnect } from "../lib/dbConnect"
 import axios from "axios"
 import BlackList from "../models/blackLists"
-import { getUserNameByEmail } from "./users"
+import { getUserNameByEmail, isSuper } from "./users"
 import { cookies } from "next/headers"
 
 export async function addOrder(formData){ 
@@ -243,6 +243,13 @@ export async function checkEmailAllowance(id) {
     if (email === order.adminEmail || !order.adminEmail) {
       return true;
     }
+
+    const superAccess = await isSuper('orders');
+
+    if (superAccess) {
+      return true;
+    }
+
 
     return false;
   } catch (error) {

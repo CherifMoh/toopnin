@@ -2,7 +2,7 @@ import Order from "../../models/orders";
 import { dbConnect } from "../../lib/dbConnect";
 import { NextResponse } from "next/server";
 import { startOfDay, endOfDay, startOfWeek, endOfWeek, subDays } from 'date-fns';
-import { getUserNameByEmail } from "../../actions/users";
+import { getRole, getUser, getUserNameByEmail, isSuper } from "../../actions/users";
 import { cookies } from "next/headers";
 import { AddToArchive } from "../../actions/order";
 
@@ -79,7 +79,9 @@ export async function GET(req) {
       // No additional filtering needed for 'maximum'
     }
 
-    if (email) {
+    const superAccess = await isSuper('orders');
+
+    if (email && !superAccess) {
       query = {
         ...query,
         $or: [
@@ -90,7 +92,6 @@ export async function GET(req) {
       };
     }
 
-    console.log(query)
     const result = await Order.find(query).sort({ _id: -1 });
 
     return NextResponse.json(result);

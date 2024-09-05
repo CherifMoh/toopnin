@@ -1838,20 +1838,20 @@ function Orders() {
     
         // Map the data to the desired Excel format
         const formattedData = data.map(order => ({
-            'Reference': order.DLVTracking,
-            'Name': order.name,
-            'Phone Number': order.phoneNumber,
-            'Wilaya': order.wilaya,
-            'Address': order.adresse,
-            'Commune': order.commune,
-            'Shipping Method': order.shippingMethod,
-            'Shipping Price': order.shippingPrice,
-            'Total Price': order.totalPrice,
-            'State': order.state,
-            'Tracking': order.tracking,
-            'In Delivery': order.inDelivery ? 'Yes' : 'No',
-            'Created At': new Date(order.createdAt).toLocaleString(),
-            'Blacklisted': order.blackListed ? 'Yes' : 'No',
+            'Tracking': order.DLVTracking,
+            'الاسم': order.name,
+            'الهاتف': order.phoneNumber,
+            'الولاية': order.wilaya,
+            'البلدية': order.commune,
+            'العنوان': order.adresse,
+            'طريقة التوصيل': order.shippingMethod,
+            'سعر التوصيل': order.shippingPrice,
+            'السعر الكلي': order.totalPrice,
+            'الحالة': order.state,
+            'التتبع': order.tracking,
+            'في التوصيل': order.inDelivery ? 'نعم' : 'لا',
+            'تاريخ الانشاء': new Date(order.createdAt).toLocaleString(),
+            'محظور': order.blackListed ? 'نعم' : 'لا',
         }));
     
         // Create a new workbook and add a worksheet

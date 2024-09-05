@@ -109,11 +109,11 @@ const OrdersLineChart = () => {
 
   return (
     <div className='flex-col'>
-      <div className='flex justify-between'>
+      <div className='flex justify-between mb-2'>
         {qntElement}
         {productsSelectElement}
       </div>
-      <div className='w-full h-[272px]'>
+      <div className='w-full h-[292px]'>
         <ResponsiveContainer>
           <LineChart data={chartData}>
             <CartesianGrid strokeDasharray="3 3" strokeOpacity={0.3} />

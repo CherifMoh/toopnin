@@ -5,13 +5,9 @@ import Spinner from "../../../../../components/loadings/Spinner"
 import { createRole } from "../../../../actions/users"
 
 function Page() {
-
     const [accessGategory, setAccessGategory] = useState('orders')
-
     const [isSaving, setIsSaving] = useState(false)
-
     const [error, setError] = useState()
-
     const [newRole, setNewRole] = useState({
         name: '',
         description: '',
@@ -19,44 +15,58 @@ function Page() {
     })
 
     const accessibilities = newRole.accessibilities
-
     const router = useRouter()
 
     function handleAccessibilitiesChange(e) {
-
-        const name = e.target.name
-        const updatedAccessibilities = [...accessibilities]
-
-        const index = updatedAccessibilities.findIndex(item => item.name === accessGategory)
-        
-
+        const name = e.target.name;
+        const updatedAccessibilities = [...accessibilities];
+        const index = updatedAccessibilities.findIndex(item => item.name === accessGategory);
+    
         if (index > -1) {
-            const selectedAccessibilities = updatedAccessibilities[index].accessibilities
-            if(name === 'read' && (selectedAccessibilities.includes('delete') || selectedAccessibilities.includes('update'))){
-                
-            }
-            else if (selectedAccessibilities.includes(name)) {
-                updatedAccessibilities[index].accessibilities = selectedAccessibilities.filter(access => access !== e.target.name)
-            } else {
-                if(!selectedAccessibilities.includes('read') && (name === 'delete' || name === 'update')){
-                    updatedAccessibilities[index].accessibilities.push('read')
+            const selectedAccessibilities = updatedAccessibilities[index].accessibilities;
+    
+            if (name === 'super') {
+                if (e.target.checked) {
+                    // Select all actions when "super" is checked
+                    updatedAccessibilities[index].accessibilities = categories.find(category => category.name === accessGategory).actions;
+                } else {
+                    // Only remove "super" when it's unchecked, leave the other actions unchanged
+                    updatedAccessibilities[index].accessibilities = selectedAccessibilities.filter(access => access !== 'super');
                 }
-                updatedAccessibilities[index].accessibilities.push(name)
+            } else {
+                // Toggle other actions (read, update, delete, etc.)
+                if (selectedAccessibilities.includes(name)) {
+                    updatedAccessibilities[index].accessibilities = selectedAccessibilities.filter(access => access !== name);
+                } else {
+                    if (!selectedAccessibilities.includes('read') && (name === 'delete' || name === 'update')) {
+                        updatedAccessibilities[index].accessibilities.push('read');
+                    }
+                    updatedAccessibilities[index].accessibilities.push(name);
+                }
             }
         } else {
-            if(name === 'delete' || name === 'update'){
-                updatedAccessibilities.push({ name: accessGategory, accessibilities: [name,'read'] })
-            }else{
-                updatedAccessibilities.push({ name: accessGategory, accessibilities: [name] })
+            // If no accessibilities for this category exist yet
+            if (name === 'super') {
+                updatedAccessibilities.push({
+                    name: accessGategory,
+                    accessibilities: categories.find(category => category.name === accessGategory).actions
+                });
+            } else {
+                if (name === 'delete' || name === 'update') {
+                    updatedAccessibilities.push({ name: accessGategory, accessibilities: [name, 'read'] });
+                } else {
+                    updatedAccessibilities.push({ name: accessGategory, accessibilities: [name] });
+                }
             }
         }
+    
         setNewRole(prev => ({
             ...prev,
             accessibilities: updatedAccessibilities
-        }))
+        }));
     }
 
-    function handleChange(e){
+    function handleChange(e) {
         const name = e.target.name
         const value = e.target.value
         setNewRole(prev => ({
@@ -65,53 +75,42 @@ function Page() {
         }))
     }
 
-    async function handleSubmit(e){
+    async function handleSubmit(e) {
         setIsSaving(true)
-        try{
+        try {
             const res = await createRole(newRole)
             router.refresh()
             router.push('/admin/users')
-        }catch(error){
+        } catch (error) {
             setError(error.message)
         }
         setIsSaving(false)
     }
 
     let actionsElements = []
-  
 
     const categories = [
         {
             name: 'Products',
-            actions:[
-                'create', 'read', 'update', 'delete','storage',
-            ]
+            actions: ['super', 'create', 'read', 'update', 'delete', 'storage']
         },
         {
             name: 'orders',
-            actions:[
-                'create', 'read', 'update', 'delete', 'excel',
-                'archive', 'IP block'
-            ]
+            actions: ['super', 'create', 'read', 'update', 'delete', 'excel', 'archive', 'IP block']
         },
         {
             name: 'users',
-            actions:[
-                'create', 'read', 'update', 'delete'
-            ]
+            actions: ['super', 'create', 'read', 'update', 'delete']
         },
         {
             name: 'online',
-            actions:[
-                'create', 'read', 'delete'
-            ]
+            actions: ['super', 'create', 'read', 'delete']
         },
     ]
 
     const categoriesElements = categories.map((category, idx) => {
-        const isSelected = accessGategory === category.name 
-        if(isSelected){
-
+        const isSelected = accessGategory === category.name
+        if (isSelected) {
             actionsElements = category.actions.map((action, idx) => {
                 const isChecked = newRole.accessibilities.find(item => item.name === accessGategory)?.accessibilities.includes(action) || false
                 return (
@@ -137,7 +136,7 @@ function Page() {
         return (
             <div
                 key={idx}
-                className={`w-1/4 flex-grow text-center py-6 font-semibold ${isSelected? 'bg-slate-50 border-t-4 border-blue-500' : 'bg-slate-200 cursor-pointer'}`}
+                className={`w-1/4 flex-grow text-center py-6 font-semibold ${isSelected ? 'bg-slate-50 border-t-4 border-blue-500' : 'bg-slate-200 cursor-pointer'}`}
                 onClick={() => setAccessGategory(category.name)}
             >
                 {category.name}
@@ -158,19 +157,19 @@ function Page() {
                 </div>
                 <div>{error}</div>
                 <div className="flex gap-6">
-                    <button 
+                    <button
                         className="rounded text-gray-400 border border-gray-400 px-6 py-2"
-                        onClick={() => setNewRole({name: '', description: '', accessibilities: []})}
+                        onClick={() => setNewRole({ name: '', description: '', accessibilities: [] })}
                     >
                         Reset
                     </button>
-                    <button 
+                    <button
                         className="rounded border relative border-green-600 bg-green-600 text-white px-20 py-2"
                         onClick={handleSubmit}
                     >
                         {isSaving
-                        ?<Spinner color='border-white' size={'size-7'} containerStyle={'mb-7 mr-7'} />
-                        :'Save'
+                            ? <Spinner color='border-white' size={'size-7'} containerStyle={'mb-7 mr-7'} />
+                            : 'Save'
                         }
                     </button>
                 </div>
