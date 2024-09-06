@@ -412,12 +412,12 @@ function LindingPage({ params }) {
 
         <section 
             ref={ref} id="checkout"  
-            className="w-full relative flex flex-col items-center justify-center p-4"
+            className="w-full overflow-y-hidden relative flex flex-col items-center justify-center p-4"
         > 
             
             <img 
                 src={mproduct?.landingPageImages[2]} alt="" 
-                className="w-full absolute top-0 left-0 -z-10"
+                className="w-full min-h-full absolute top-0 left-0 -z-10"
             />
             <div className="w-full sm:w-3/4 md:w-2/3 lg:w-1/3 xl:w-1/4 p-5">
                 <div className="text-4xl font-semibold w-full text-center mb-2">{mproduct?.title}</div>

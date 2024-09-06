@@ -954,7 +954,7 @@ function Admin() {
     }
 
     function langingPgesElement (){
-        const checkoutHeight = '855'
+        const checkoutHeight = '950'
         const Images = newProduct?.landingPageImages
         if(!Array.isArray(Images) || Images.length === 0){
             return(
