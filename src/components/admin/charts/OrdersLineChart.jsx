@@ -39,6 +39,7 @@ const OrdersLineChart = () => {
 
   
   const [selectedProduct, setSelectedProduct] = useState('')
+  const [showTooltip, setShowTooltip] = useState(false);
 
   if (isLoading || todayIsLoading || ProductsIsLoading) return <div>Loading Chart ...</div>;
   if (isError || todayIsError || ProductsIsError) return <div>Error fetching Orders: {error?.message || todayError?.message || ProductsError?.message}</div>;
@@ -79,16 +80,28 @@ const OrdersLineChart = () => {
   const yesterdayTotalQnt = yesterdayData.reduce((acc, data) => acc + data.qnt, 0);
 
   const todayMore = todayTotalQnt > yesterdayTotalQnt;
+  const difference = Math.abs(todayTotalQnt - yesterdayTotalQnt);
 
-  const qntElement =[
-    <div key={'todayTotalQnt'} className='text-lg font-bold flex gap-2 items-center'>
+  const qntElement = (
+    <div key={'todayTotalQnt'} className="text-lg font-bold flex gap-2 items-center">
       {todayTotalQnt}
-      <FontAwesomeIcon 
-        icon={faArrowRightLong} 
-        className={todayMore ? 'text-green-500 -rotate-45' : 'text-red-500 rotate-45'}
-      />
+      <div 
+        className="relative"
+        onMouseEnter={() => setShowTooltip(true)}
+        onMouseLeave={() => setShowTooltip(false)}
+      >
+        <FontAwesomeIcon
+          icon={faArrowRightLong}
+          className={todayMore ? 'text-green-500 -rotate-45' : 'text-red-500 rotate-45'}
+        />
+        {showTooltip && (
+        <div className="absolute bottom-full whitespace-nowrap left-1/2 transform -translate-x-1/2 mb-2 bg-gray-700 text-white text-sm rounded px-2 py-1">
+          {todayMore ? `أكثر : ${difference}` : `أقل : ${difference}`}
+        </div>
+      )}
+      </div>
     </div>
-  ]
+  );
 
   const productsOptionsElement = Products.map(product => {
     return <option key={product._id} value={product._id}>{product.title}</option>

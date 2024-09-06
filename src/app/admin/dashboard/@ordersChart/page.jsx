@@ -12,7 +12,7 @@ function Admin() {
   return (
     <div className='pt-4'>
         <DashboardCard
-          title="Sales"
+          title="Comparison"
           body={<OrdersLineChart />}
           />
     </div>
