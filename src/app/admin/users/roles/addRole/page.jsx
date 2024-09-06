@@ -1,18 +1,34 @@
 'use client'
 import { useRouter } from "next/navigation"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import Spinner from "../../../../../components/loadings/Spinner"
-import { createRole } from "../../../../actions/users"
+import { createRole, isSuper } from "../../../../actions/users"
 
 function Page() {
+    
     const [accessGategory, setAccessGategory] = useState('orders')
     const [isSaving, setIsSaving] = useState(false)
+    const [superUser, setSuperUser] = useState(false)
     const [error, setError] = useState()
     const [newRole, setNewRole] = useState({
         name: '',
         description: '',
         accessibilities: []
     })
+
+    useEffect(()=>{
+
+        checkSuperUser()
+    },[])
+
+    async function checkSuperUser() {
+        try {
+            const haveSuper = await isSuper('users')
+            setSuperUser(haveSuper)
+        } catch (error) {
+            setError('Failed to check superuser status')
+        }
+    }
 
     const accessibilities = newRole.accessibilities
     const router = useRouter()
@@ -100,7 +116,9 @@ function Page() {
         },
         {
             name: 'users',
-            actions: ['super', 'create', 'read', 'update', 'delete']
+            actions: ['super', 'create', 'read', 'delete', 'update role',
+                'create role', 'delete role', 'duplicate role',
+            ]
         },
         {
             name: 'online',
@@ -111,7 +129,9 @@ function Page() {
     const categoriesElements = categories.map((category, idx) => {
         const isSelected = accessGategory === category.name
         if (isSelected) {
-            actionsElements = category.actions.map((action, idx) => {
+            actionsElements = category.actions
+            .filter(action => action !== 'super' || superUser) 
+            .map((action, idx) => {
                 const isChecked = newRole.accessibilities.find(item => item.name === accessGategory)?.accessibilities.includes(action) || false
                 return (
                     <div key={idx} className="flex gap-2 items-center">

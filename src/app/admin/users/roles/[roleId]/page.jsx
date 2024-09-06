@@ -46,8 +46,6 @@ function Page({ params }) {
     if(isLoading) return <div>Loading ...</div>
     if(isError) return <div>{fetchError.message}</div>
 
-    console.log(newRole)
-
     const accessibilities = newRole.accessibilities
 
 
@@ -138,7 +136,9 @@ function Page({ params }) {
         },
         {
             name: 'users',
-            actions: ['super', 'create', 'read', 'update', 'delete']
+            actions: ['super', 'create', 'read', 'delete', 'update role',
+                        'create role', 'delete role', 'duplicate role',
+                    ]
         },
         {
             name: 'online',

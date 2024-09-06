@@ -34,6 +34,13 @@ function User() {
 
   const [nav, setNav] = useState('users')
 
+  const [isCreateAccess, setIsCreateAccess] = useState(false)
+  const [isDeleteAccess, setIsDeleteAccess] = useState(false)
+  const [isUpdateRoleAccess, setIsUpdateRoleAccess] = useState(false)
+  const [isCreateRoleAccess, setIsCreateRoleAccess] = useState(false)
+  const [isDeleteRoleAccess, setIsDeleteRoleAccess] = useState(false)
+  const [isDuplicateRoleAccess, setIsDuplicateRoleAccess] = useState(false)
+
   const accessibilities = useSelector((state) => state.accessibilities.accessibilities)
 
   const router = useRouter()
@@ -44,6 +51,12 @@ function User() {
       if(!access || access.accessibilities.length === 0){
           router.push('/admin')
       }
+      setIsDeleteAccess(access.accessibilities.includes('delete'))
+      setIsCreateAccess(access.accessibilities.includes('create'))
+      setIsUpdateRoleAccess(access.accessibilities.includes('update role'))
+      setIsCreateRoleAccess(access.accessibilities.includes('create role' ))
+      setIsDeleteRoleAccess(access.accessibilities.includes('delete role'))
+      setIsDuplicateRoleAccess(access.accessibilities.includes('duplicate role'))
   },[accessibilities])
 
   if (isLoading ) return <div>Loading ...</div>
@@ -55,7 +68,7 @@ function User() {
     'Profile picture',
     'E-mail',
     'Role',
-    'Actions',
+    isDeleteAccess && 'Actions',
   ]
   function handelDelete(id) {
     setDeleting(pre => ([...pre, {
@@ -94,6 +107,7 @@ function User() {
         </td>
         <td className='border-0'>{user.email}</td>
         <td className='border-0'>{user.role}</td>
+        {isDeleteAccess &&
         <td className='border-0 relative'>
           {deleting.some(item => item.id === user._id && item.state)
             ? <Spinner
@@ -112,7 +126,7 @@ function User() {
               />
             </div>
           }
-        </td>
+        </td>}
       </tr>
     )
   })
@@ -146,6 +160,7 @@ function User() {
 
       {nav === 'users' ?
         <>
+         { isCreateAccess &&
           <div className='flex justify-end p-4'>
             <Link
               className='bg-gray-400 rounded-lg text-white text-sm px-2 py-1'
@@ -155,7 +170,8 @@ function User() {
               Add New Admin User
             </Link>
           </div>
-          <table className='w-full'>
+          }
+          <table className='w-full mt-4'>
             <thead>
               <tr className='border-y-2 border-y-[#e8edeb] border-x-0'>
                 {headsElement}
@@ -169,6 +185,10 @@ function User() {
         :
         <RolesComp 
           users={users}
+          isDuplicateRoleAccess={isDuplicateRoleAccess}
+          isCreateRoleAccess={isCreateRoleAccess}
+          isDeleteRoleAccess={isDeleteRoleAccess}
+          isUpdateRoleAccess={isUpdateRoleAccess}
         />}
     </section>
   )

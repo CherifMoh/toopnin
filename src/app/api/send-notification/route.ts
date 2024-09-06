@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
     data: {
       title: title,
       body: message,
-      icon: 'https://drawlys.com:8444/images/logo.png',
+      icon: 'https://toopnin.com:8444/images/logo.png-Egx6k.png',
       link: link || 'https://toopnin.com/admin/orders',
     },
     webpush: {

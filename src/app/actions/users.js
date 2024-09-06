@@ -43,11 +43,14 @@ export async function getUser() {
     }
 }
 
-export async function isSuper(accessName) {
+export async function isSuper(accessName,roleName) {
     try {
-        const user = await getUser()
-
-        const roleName = user.role
+        
+        if(!roleName){
+            const user = await getUser()
+    
+            roleName = user.role
+        }
 
         const role = await getRole(roleName)
 
@@ -207,8 +210,6 @@ export async function getRole(name) {
         throw error;
     }
 }
-
-
 
 export async function dleleteCookies() {
     cookies().delete('access-token')
