@@ -286,6 +286,12 @@ function LindingPage({ params }) {
         const res = await axios.post(`/api/orders`, newOrder);
 
         localStorage.setItem('wilaya', formData.wilaya)
+
+        handleSendNotification(
+            'طلب جديد',
+            `طلب جديد لمنتج ${mproduct.title}`,
+            'https://toopnin.com/admin/orders'
+        )
         // Refresh and navigate to thank you page
         router.refresh();
         router.push('/thankyou');
