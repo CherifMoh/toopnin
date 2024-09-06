@@ -105,7 +105,7 @@ function Profit() {
         key={'productsSelectElement'}
         name="product" 
         value={selectedProduct}
-        className="min-w-20 w-1/4 py-2 px-4 bg-transparent border border-gray-200 rounded-md"
+        className="min-w-20 w-full  py-2 px-4 bg-transparent border border-gray-200 rounded-md"
         onChange={e => setSelectedProduct(e.target.value)}
     >
         <option hidden>اختر المنتج</option>
@@ -139,18 +139,14 @@ function Profit() {
   })
   
   const dateSelectElement = [
-    <div className="min-w-20 w-1/4 relative" key={'dateSelectElement'}>
+    <div className="min-w-20 w-full  relative" key={'dateSelectElement'}>
       <select 
         onChange={handleOptionChange} 
         value={selectedDate}
         className="w-full h-full py-2 px-4 bg-transparent border border-gray-200 rounded-md"
     >
         <option hidden>اختر التاريخ</option>
-        {dateOptions.map(date => (
-          <option key={date.value} value={date.value}>
-            {date.name}
-          </option>
-        ))}
+        {dateOptionsElement}
       </select>
 
       {showCustomDate && (
@@ -180,14 +176,14 @@ function Profit() {
 
 
   const bodyElement =[
-    <div className="flex gap-4 w-full" key={'bodyElement'}>
+    <div className="grid h-full grid-cols-2 gap-4 w-full" key={'bodyElement'}>
         {dateSelectElement}
         {productsSelectElement}
         <input 
             type="text" 
             placeholder="cost"
             value={cost}
-            className="no-focus-outline min-w-20 w-1/4 py-2 px-4 bg-transparent border border-gray-200 rounded-md"
+            className="no-focus-outline min-w-20 w-full py-2 px-4 bg-transparent border border-gray-200 rounded-md"
             onChange={e => setCost(e.target.value)}
         />
         <button 
@@ -213,11 +209,13 @@ function Profit() {
 
 
   return (
-    <DashboardCard
-      title="Profit calculator" 
-      subtitle={profit && subtitlelmnt}
-      body={bodyElement}
-    />
+    <div className='pt-4'>
+      <DashboardCard
+        title="Profit calculator" 
+        subtitle={profit && subtitlelmnt}
+        body={bodyElement}
+      />
+    </div>
   )
 }
 
