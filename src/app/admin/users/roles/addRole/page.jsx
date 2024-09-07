@@ -107,7 +107,7 @@ function Page() {
 
     const categories = [
         {
-            name: 'Products',
+            name: 'products',
             actions: ['super', 'create', 'read', 'update', 'delete', 'storage']
         },
         {
