@@ -160,9 +160,7 @@ export async function deleteRole(id) {
     }
 }
 
-export async function removeToken(id,tokenToRemove) {
-    
-
+export async function removeToken(id, tokenToRemove) {
     try {
         await dbConnect();
 
@@ -176,10 +174,33 @@ export async function removeToken(id,tokenToRemove) {
 
         return 'deleted';
     } catch (error) {
-        console.error("Error creating role:", error);
+        console.error("Error removing token:", error);
         throw error;
     }
 }
+
+export async function logoutRemoveToken(tokenToRemove) {
+    try {
+        await dbConnect();
+
+        const email = cookies().get('user-email').value;
+
+        const oldUser = await User.findOne({ email: email });
+
+        // Remove the token from the fcmTokens array
+        oldUser.fcmTokens = oldUser.fcmTokens.filter(token => token !== tokenToRemove);
+
+        // Save the updated user document
+        await oldUser.save();
+
+        return 'deleted';
+    } catch (error) {
+        console.error("Error removing token:", error);
+        throw error;
+    }
+}
+
+
 
 export async function updateRole(id,newRole) {
     

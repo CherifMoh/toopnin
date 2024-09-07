@@ -91,7 +91,7 @@ export async function handleSendNotification(title, message, link) {
 
         if (error.response && error.response.data.error === "Invalid token") {
           // Remove the invalid token from the user's fcmTokens array
-          removeToken(userId,token)
+          await removeToken(userId,token)
         }
       }
     });

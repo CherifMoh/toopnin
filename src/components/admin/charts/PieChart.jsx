@@ -48,7 +48,6 @@ function PieChartC() {
   if (isLoading || ProductsIsLoading) return <div>Loading Chart ...</div>;
   if (isError || ProductsIsError) return <div>Error fetching Orders: {error?.message || ProductsError?.message}</div>;
 
-  console.log(Orders)
 
   const handleOptionChange = (e) => {
     const value = e.target.value;

@@ -182,20 +182,43 @@ const OrdersLineChart = () => {
     </select>
   );
 
+
   const CustomTooltip = ({ active, payload }) => {
     if (active && payload && payload.length) {
       const { day, orders } = payload[0].payload;
+
+      // Find the best hour for the selected day
+      const dailyHourlyCounts = Orders.reduce((acc, order) => {
+        const orderDate = format(parseISO(order.createdAt), 'yyyy-MM-dd');
+        if (orderDate === day) {
+          order.orders.forEach((product) => {
+            if (!selectedProduct || product.productID === selectedProduct) {
+              const hour = format(parseISO(order.createdAt), 'HH');
+              acc[hour] = (acc[hour] || 0) + product.qnt;
+            }
+          });
+        }
+        return acc;
+      }, {});
+
+      const bestHourForDay = Object.keys(dailyHourlyCounts).reduce((a, b) =>
+        dailyHourlyCounts[a] > dailyHourlyCounts[b] ? a : b, '00'
+      );
+
       return (
         <div className="bg-white p-2 border border-gray-300 shadow-lg">
           <p className="label">{`اليوم: ${day}`}</p>
           <p className="intro">{`الطلبات: ${orders}`}</p>
-          <p className="desc">{`أفضل وقت: ${bestHour}:00`}</p>
+          {orders > 0 && (
+            <p className="desc">{`أفضل وقت: ${bestHourForDay}:00`}</p>
+          )}
         </div>
       );
     }
 
     return null;
   };
+
 
   return (
     <div className="flex-col">

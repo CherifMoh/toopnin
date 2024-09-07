@@ -3,14 +3,19 @@
 import { faArrowRightFromBracket } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useRouter } from 'next/navigation';
-import { dleleteCookies } from "../../../app/actions/users";
+import { dleleteCookies, logoutRemoveToken } from "../../../app/actions/users";
+import useFcmToken from "../../../hooks/useFcmToken";
 
 function Logout() {
     const router = useRouter();
+    const { token } = useFcmToken();
 
-    const logout = ()=>{
-        dleleteCookies()
-        router.push('/login')
+    async function logout(){
+       
+            await logoutRemoveToken(token)
+            await dleleteCookies()
+            router.push('/login')
+        
     }
 
     
