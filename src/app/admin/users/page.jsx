@@ -78,6 +78,8 @@ function User() {
     }]))
     deleteUser(id)
     queryClient.invalidateQueries('users')
+    router.refresh()
+    router.push('/admin/users')
   }
 
   const headsElement = headsArray.map(title => {
