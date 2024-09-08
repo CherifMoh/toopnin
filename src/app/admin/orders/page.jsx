@@ -1942,7 +1942,8 @@ function Orders() {
             icon:'livres.png',
             dropDown:[
                 'Livrée',
-                'Livrée [ Encaisser ]'
+                'Livrée [ Encaisser ]',
+                'Livrée [ Recouvert ]'
             ]           
         },{
             name:'returned',
