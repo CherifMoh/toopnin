@@ -1,6 +1,6 @@
 'use client'
 import axios from 'axios'
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -44,6 +44,7 @@ function User() {
   const accessibilities = useSelector((state) => state.accessibilities.accessibilities)
 
   const router = useRouter()
+  const queryClient = useQueryClient()
 
   useEffect(()=>{
     if(accessibilities.length === 0)return
@@ -76,6 +77,7 @@ function User() {
       state: true
     }]))
     deleteUser(id)
+    queryClient.invalidateQueries('users')
   }
 
   const headsElement = headsArray.map(title => {

@@ -1901,6 +1901,10 @@ function Orders() {
             name:'Prêt à expédier',
             icon:'Prêt à expédier.png'      
         },{
+        
+            name:'Dispatcher',
+            icon:'Dispatcher.png'
+        },{
             name:'Au Bureau',
             icon:'Au Bureau.png'      
         },{
@@ -1932,9 +1936,7 @@ function Orders() {
         },{
             name:'A Relancé',
             icon:'A Relancé.png'          
-        },{
-            name:'Dispatcher',
-            icon:'Dispatcher.png'          
+                  
         },{
             name:'Livrée',
             icon:'livres.png',
