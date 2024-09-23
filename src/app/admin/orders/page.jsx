@@ -1286,66 +1286,66 @@ function Orders() {
                                 {order.createdAt}
                             </td>
                             <td className="bg-blue-100">
-                              {order.state  === 'مؤكدة'
+                              {order.state  === 'مؤكدة' && order.state  !== 'abandoned'
                                 ?<div>{editedOrder.name}</div>
                                 :<input
                                     type="text"
                                     onChange={handleChange}
                                     name="name"
                                     defaultValue={editedOrder.name}
-                                    className='border bg-transparent border-[rgba(0, 40, 100, 0.12)] rounded-md pl-1 dynamic-width'
+                                    className='border min-w-full bg-transparent border-[rgba(0, 40, 100, 0.12)] rounded-md pl-1 dynamic-width'
                                 />
                               }
                             </td>
                             <td className="bg-blue-100">
-                             {order.state  === 'مؤكدة'
+                             {order.state  === 'مؤكدة' && order.state  !== 'abandoned'
                                 ?<div>{editedOrder.phoneNumber}</div>
                                 :<input
                                     type='text'
                                     onChange={handleChange}
                                     name="phoneNumber"
                                     defaultValue={editedOrder.phoneNumber}
-                                    className='border bg-transparent border-[rgba(0, 40, 100, 0.12)] rounded-md pl-1 dynamic-width '
+                                    className='border min-w-full bg-transparent border-[rgba(0, 40, 100, 0.12)] rounded-md pl-1 dynamic-width '
                                 />
                              }
                             </td>
                             <td className="bg-blue-100">
-                               {order.state  === 'مؤكدة'
+                               {order.state  === 'مؤكدة' && order.state  !== 'abandoned'
                                 ?<div>{editedOrder.wilaya}</div>
                                 :<input
                                     type="text"
                                     onChange={handleChange}
                                     name="wilaya"
                                     defaultValue={editedOrder.wilaya}
-                                    className='border bg-transparent border-[rgba(0, 40, 100, 0.12)] rounded-md pl-1 dynamic-width'
+                                    className='border min-w-full bg-transparent border-[rgba(0, 40, 100, 0.12)] rounded-md pl-1 dynamic-width'
                                 />}
                             </td>
                             <td className="bg-blue-100">
-                               {order.state  === 'مؤكدة'
+                               {order.state  === 'مؤكدة' && order.state  !== 'abandoned'
                                 ?<div>{editedOrder.commune}</div>
                                 :<input
                                     type="text"
                                     onChange={handleChange}
                                     name="commune"
                                     defaultValue={editedOrder.commune}
-                                    className='border bg-transparent border-[rgba(0, 40, 100, 0.12)] rounded-md pl-1 dynamic-width'
+                                    className='border min-w-full bg-transparent border-[rgba(0, 40, 100, 0.12)] rounded-md pl-1 dynamic-width'
                                 />
                                }
                             </td>
                             <td className="bg-blue-100">
-                              {order.state  === 'مؤكدة'
+                              {order.state  === 'مؤكدة' && order.state  !== 'abandoned'
                                 ?<div>{editedOrder.adresse}</div>
                                 :<input
                                     type="text"
                                     onChange={handleChange}
                                     name="adresse"
                                     defaultValue={editedOrder.adresse}
-                                    className='border bg-transparent border-[rgba(0, 40, 100, 0.12)] rounded-md pl-1 dynamic-width'
+                                    className='border min-w-full bg-transparent border-[rgba(0, 40, 100, 0.12)] rounded-md pl-1 dynamic-width'
                                 />
                               }
                             </td>
                             <td className="bg-gray-200">
-                                {order.state  === 'مؤكدة'
+                                {order.state  === 'مؤكدة' && order.state  !== 'abandoned'
                                 ?<div>{editedOrder.shippingMethod}</div>
                                 :<select
                                     value={editedOrder.shippingMethod}
@@ -1359,26 +1359,26 @@ function Orders() {
                                 }
                             </td>
                             <td className="bg-gray-200">
-                              {order.state  === 'مؤكدة'
+                              {order.state  === 'مؤكدة' && order.state  !== 'abandoned'
                                 ?<div>{editedOrder.shippingPrice}</div>
                                 :<input
                                     type="text"
                                     onChange={handleChange}
                                     name="shippingPrice"
                                     defaultValue={editedOrder.shippingPrice}
-                                    className='border bg-transparent border-[rgba(0, 40, 100, 0.12)] rounded-md pl-1 dynamic-width'
+                                    className='border min-w-full bg-transparent border-[rgba(0, 40, 100, 0.12)] rounded-md pl-1 dynamic-width'
                                 />
                               }
                             </td>
                             <td className="bg-gray-200">
-                              {order.state  === 'مؤكدة'
+                              {order.state  === 'مؤكدة' && order.state  !== 'abandoned'
                                 ?<div>{editedOrder.totalPrice}</div>
                                 :<input
                                     type="text"
                                     onChange={handleChange}
                                     name="totalPrice"
                                     defaultValue={editedOrder.totalPrice}
-                                    className='border bg-transparent border-[rgba(0, 40, 100, 0.12)] rounded-md pl-1 dynamic-width'
+                                    className='border min-w-full bg-transparent border-[rgba(0, 40, 100, 0.12)] rounded-md pl-1 dynamic-width'
                                 />
                               }
                             </td>
@@ -1393,7 +1393,7 @@ function Orders() {
                               
                             </td>
                             <td className="bg-gray-200">
-                               {order.state  === 'مؤكدة'
+                               {order.state  === 'مؤكدة' && order.state  !== 'abandoned'
                                 ?<div>{editedOrder.state}</div>
                                 :<select
                                     onChange={handleChange}
@@ -1429,7 +1429,7 @@ function Orders() {
                             }
                             </td>
                             <td>
-                              {order.state  === 'مؤكدة'
+                              {order.state  === 'مؤكدة' && order.state  !== 'abandoned'
                                 ?<div>{editedOrder.schedule}</div>
                                 :<DatePicker
                                     selected={selectedDate}
@@ -1440,7 +1440,7 @@ function Orders() {
                               }
                             </td>
                             <td>
-                              {order.state  === 'مؤكدة'
+                              {order.state  === 'مؤكدة' && order.state  !== 'abandoned'
                                 ?<div>{editedOrder.deliveryNote}</div>
                                 :<input
                                     type="text"
