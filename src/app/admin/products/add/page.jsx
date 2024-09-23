@@ -1231,7 +1231,6 @@ function Admin() {
                     />
                 </div>
                 <textarea
-                    required
                     ref={textareaRef}
                     placeholder="Description"
                     type='text'
