@@ -1276,7 +1276,7 @@ function Orders() {
     })
 
     const wilayatElemnt =[
-        <div className="flex w-full relative rounded-md border border-[rgba(0, 40, 100, 0.12)]">
+        <div key={'wilayatElemnt'} className="flex w-full relative rounded-md border border-[rgba(0, 40, 100, 0.12)]">
             <div
                 className="w-full items-center flex bg-transparent rounded cursor-pointer"
                 onClick={() => setIsWilayaDropdown(pre=>!pre)}
@@ -1329,7 +1329,7 @@ function Orders() {
     })
 
     const communesElemnt =[
-        <div className="flex w-full relative rounded-md border border-[rgba(0, 40, 100, 0.12)]">
+        <div key={'communesElemnt'} className="flex w-full relative rounded-md border border-[rgba(0, 40, 100, 0.12)]">
             <div
                 className="w-full items-center flex bg-transparent rounded cursor-pointer"
                 onClick={() => setIsCommuneDropdown(pre=>!pre)}
