@@ -9,7 +9,7 @@ import 'react-datepicker/dist/react-datepicker.css';
 import { format } from 'date-fns'
 import Link from "next/link";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faMagnifyingGlass, faPen, faPlus, faX, faCheck, faPaperPlane, faArrowDown, faAngleDown, faBan, faTriangleExclamation } from '@fortawesome/free-solid-svg-icons'
+import { faMagnifyingGlass, faPen, faPlus, faX, faCheck, faPaperPlane, faArrowDown, faAngleDown, faBan, faTriangleExclamation, faChevronDown } from '@fortawesome/free-solid-svg-icons'
 import { faTrashCan } from '@fortawesome/free-regular-svg-icons'
 import { addOrderSchedule, addOrderToZR, addToBlackList, checkEmailAllowance, deleteOrder, expedieOrderToZR, getOrder } from '../../actions/order'
 import { editAddProduct, editMinusProduct } from '../../actions/storage'
@@ -54,6 +54,16 @@ async function fetchProducts() {
     return res.data;
 }
 
+async function fetchWilayt() {
+    const res = await axios.get('/api/wilayas/wilayasCodes');
+    return res.data.wilayas;
+}
+
+async function fetchCommunes() {
+    const res = await axios.get('/api/wilayas/communes');
+    return res.data.communes;
+}
+
 function Orders() {
 
     typeof document !== 'undefined' && document.body.classList.add('bg-white')
@@ -72,6 +82,16 @@ function Orders() {
     const { data: Products, isLoading: ProductsLoding, isError: ProductsIsError, error: ProductsErr } = useQuery({
         queryKey: ['Admin All Products'],
         queryFn: fetchProducts
+    });
+
+    const { data: communes, isLoading: communesLoding, isError: communesIsErr, error: communesErr } = useQuery({
+        queryKey: ['communes'],
+        queryFn: fetchCommunes
+    });
+    
+    const { data: wilayat, isLoading: wilayatLoding, isError: wilayatIsErr, error: wilayatErr } = useQuery({
+        queryKey: ['wilayat'],
+        queryFn: fetchWilayt
     });
 
     const [editedOrder, setEditedOrder] = useState({})
@@ -135,6 +155,17 @@ function Orders() {
     const [reaserchedOrders, setReaserchedOrders] = useState([])
 
     const [isTrakingFilterDrop, setIsTrakingFilterDrop] = useState('')
+
+    const [slectedCommunes, setSlectedCommunes] = useState([]);
+
+    const [wilayaSearch, setWilayaSearch] = useState('')
+    const [isWilayaDropdown, setIsWilayaDropdown] = useState(false);
+    const [selectedWilaya, setSelectedWilaya] = useState("الولاية");
+    
+    const [communeSearch, setCommuneSearch] = useState('')
+    const [isCommuneDropdown, setIsCommuneDropdown] = useState(false);
+    const [selectedCommune, setSelectedCommune] = useState("البلدية");
+    
     
     const [isMessage, setIsMessage] = useState(false)
     const [message, setMessage] = useState('')
@@ -275,16 +306,32 @@ function Orders() {
     }, [Orders, ordersUpdted, dateFilter, queryClient]);
     
 
+    useEffect(() => {
+        if (!communes|| !wilayat||!editedOrder?.wilaya) return
+  
+        const wilayaCode = wilayat.find(wilaya => wilaya.wilaya_name === editedOrder?.wilaya).wilaya_id
+  
+  
+        const communesArray = Object.values(communes);
+        const filteredCommunes = communesArray.filter(commune => commune.wilaya_id === wilayaCode);
+  
+        setSlectedCommunes(filteredCommunes)
+  
+      }, [editedOrder?.wilaya,communes,wilayat])
 
 
     
 
-    if (isLoading) return <div>Loading...</div>;
-    if (isError) return <div>Error fetching Orders: {error.message}</div>;
+    if (isLoading || wilayatLoding || communesLoding || ProductsLoding) return <div>Loading...</div>;
+    if (isError || communesIsErr || wilayatErr || ProductsIsError) {
+        return <div>Error fetching Data: {
+            error?.message ||
+            ProductsErr?.message ||
+            wilayatIsErr?.message ||
+            communesErr?.message
+        }</div>;
+    }
 
-    if (ProductsLoding) return <div>Loading...</div>;
-    if (ProductsIsError) return <div>Error fetching Products: {ProductsErr.message}</div>;
-    
    
 
     
@@ -292,10 +339,10 @@ function Orders() {
        
         const res = await fetchOrderStatus(order.DLVTracking)
 
-        
-        const ZrStatus = res.Colis[0].Situation;
+        if(!res || !res?.Colis) return
+        const ZrStatus = res?.Colis[0].Situation;
         if (ZrStatus === 'Reporté') {
-            const updated = await addOrderSchedule(order,res.Colis[0].Commentaire)
+            const updated = await addOrderSchedule(order,res?.Colis[0].Commentaire)
         }
         const newTracking = newTrackingFromActivity(order, ZrStatus);            
         
@@ -1210,6 +1257,112 @@ function Orders() {
 
     }
 
+    const wilayasOptionsElement = wilayat.map(wilaya => {
+        if(!wilaya.wilaya_name.toLowerCase().includes(wilayaSearch.toLowerCase()) && wilayaSearch !== '') return
+        return(
+            <div
+            key={wilaya.wilaya_name}
+            className="p-2 hover:bg-gray-200 cursor-pointer"
+            onClick={() => {
+                setEditedOrder(pre=>({...pre,wilaya:wilaya.wilaya_name}));
+                setSelectedWilaya(wilaya.wilaya_name);
+                setIsWilayaDropdown(false);
+                setWilayaSearch(""); // Reset search after selection
+            }}
+        >
+            {wilaya.wilaya_name}
+        </div>
+        )
+    })
+
+    const wilayatElemnt =[
+        <div className="flex w-full relative rounded-md border border-[rgba(0, 40, 100, 0.12)]">
+            <div
+                className="w-full items-center flex bg-transparent rounded cursor-pointer"
+                onClick={() => setIsWilayaDropdown(pre=>!pre)}
+            >
+                <div className="px-2 flex items-center justify-between w-full">
+                    {selectedWilaya}
+                    <FontAwesomeIcon icon={faChevronDown} className={`text-sm`} />
+                </div>
+            </div>
+            {isWilayaDropdown&& (
+                <div className="absolute w-max bg-white border border-[rgba(0, 40, 100, 0.12)] rounded shadow-lg z-10">
+                    <div className="flex items-center pr-2 w-full bg-white border border-[rgba(0, 40, 100, 0.12)]">
+                        <input
+                            type="text"
+                            value={wilayaSearch}
+                            onChange={(e) => setWilayaSearch(e.target.value)}
+                            placeholder="ابحث عن الولاية"
+                            className="flex-grow no-focus-outline p-2"
+                        />
+                        <FontAwesomeIcon 
+                            icon={faChevronDown} 
+                            className={`text-sm rotate-180 cursor-pointer`} 
+                            onClick={()=>setIsWilayaDropdown(false)}
+                        />
+                    </div>
+                    <div className="max-h-48 overflow-y-auto">
+                        {wilayasOptionsElement}
+                    </div>
+                </div>
+            )}
+        </div>
+    ]
+
+    const communesOptionsElement = slectedCommunes.map(commune => {
+        if(!commune.nom.toLowerCase().includes(communeSearch.toLowerCase()) && communeSearch !== '') return
+        return(
+            <div
+            key={commune.nom}
+            className="p-2 hover:bg-gray-200 cursor-pointer"
+            onClick={() => {
+                setEditedOrder(prev=>({...prev,commune:commune.nom}));
+                setSelectedCommune(commune.nom);
+                setIsCommuneDropdown(false);
+                setCommuneSearch(""); // Reset search after selection
+            }}
+        >
+            {commune.nom}
+        </div>
+        )
+    })
+
+    const communesElemnt =[
+        <div className="flex w-full relative rounded-md border border-[rgba(0, 40, 100, 0.12)]">
+            <div
+                className="w-full items-center flex bg-transparent rounded cursor-pointer"
+                onClick={() => setIsCommuneDropdown(pre=>!pre)}
+            >
+                <div className="px-2 flex items-center justify-between w-full">
+                    {selectedCommune}
+                    <FontAwesomeIcon icon={faChevronDown} className={`text-sm`} />
+                </div>
+            </div>
+            {(isCommuneDropdown && selectedWilaya !== 'الولاية')&& (
+                <div className="absolute w-max bg-white border border-[rgba(0, 40, 100, 0.12)] rounded shadow-lg z-10">
+                    <div className="flex items-center pr-2 w-full bg-white border border-[rgba(0, 40, 100, 0.12)]">
+                        <input
+                            type="text"
+                            value={communeSearch}
+                            onChange={(e) => setCommuneSearch(e.target.value)}
+                            placeholder="ابحث في الولاية"
+                            className="flex-grow no-focus-outline p-2"
+                        />
+                        <FontAwesomeIcon 
+                            icon={faChevronDown} 
+                            className={`text-sm rotate-180 cursor-pointer`} 
+                            onClick={()=>setIsCommuneDropdown(false)}
+                        />
+                    </div>
+                    <div className="max-h-48 overflow-y-auto">
+                        {communesOptionsElement}
+                    </div>
+                </div>
+            )}
+        </div>
+    ]
+
     function ordersElement(data){
 
         return data.map((order, index) => {
@@ -1312,24 +1465,13 @@ function Orders() {
                             <td className="bg-blue-100">
                                {order.state  === 'مؤكدة' && order.state  !== 'abandoned'
                                 ?<div>{editedOrder.wilaya}</div>
-                                :<input
-                                    type="text"
-                                    onChange={handleChange}
-                                    name="wilaya"
-                                    defaultValue={editedOrder.wilaya}
-                                    className='border min-w-full bg-transparent border-[rgba(0, 40, 100, 0.12)] rounded-md pl-1 dynamic-width'
-                                />}
+                                :wilayatElemnt
+                                }
                             </td>
                             <td className="bg-blue-100">
                                {order.state  === 'مؤكدة' && order.state  !== 'abandoned'
                                 ?<div>{editedOrder.commune}</div>
-                                :<input
-                                    type="text"
-                                    onChange={handleChange}
-                                    name="commune"
-                                    defaultValue={editedOrder.commune}
-                                    className='border min-w-full bg-transparent border-[rgba(0, 40, 100, 0.12)] rounded-md pl-1 dynamic-width'
-                                />
+                                :communesElemnt
                                }
                             </td>
                             <td className="bg-blue-100">
