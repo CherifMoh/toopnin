@@ -38,6 +38,7 @@ import 'jspdf-autotable';
 import Spinner from '../../../components/loadings/Spinner'
 import { useSelector } from "react-redux";
 import { fetchOrderStatus } from "../../actions/order";
+import { ConvertCommuneToJSON, getTrafication, getWilayas, updateWilayas } from "../../actions/wilayas";
 
 
 async function fetchOrders(date) {
@@ -320,6 +321,9 @@ function Orders() {
       }, [editedOrder?.wilaya,communes,wilayat])
 
 
+    useEffect(() => {
+        // updateWilayat()
+    }, []);
     
 
     if (isLoading || wilayatLoding || communesLoding || ProductsLoding) return <div>Loading...</div>;
@@ -333,6 +337,13 @@ function Orders() {
     }
 
    
+    async function updateWilayat() {
+        const wilaya = await getWilayas();
+        const fees = await getTrafication()
+        const commune = await ConvertCommuneToJSON();
+        await updateWilayas(wilaya, fees, commune)
+        
+    }
 
     
     async function getOrderStatus(order) {            
@@ -533,7 +544,8 @@ function Orders() {
         }
 
         if(!order.name||!order.phoneNumber||!order.adresse||!order.commune){
-            return setErrorNotifiction("couldn't set the order in ZR")
+            setErrorNotifiction("couldn't set the order in ZR")
+            return 
         }
         
         const wilayatresponse = await axios.get('/api/wilayas/wilayasCodes');
