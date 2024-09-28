@@ -483,7 +483,7 @@ function LindingPage({ params }) {
                             className="flex-grow pl-2 bg-transparent"
                             placeholder="رقم الهاتف"
                             name="phoneNumber"
-                            type="text"
+                            type="number"
                         />
                     </div>
                 </div>
