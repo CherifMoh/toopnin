@@ -2435,15 +2435,12 @@ function Orders() {
                     {dateFilterElements}
                 </select>
 
-                {isCreateAccess &&
-                    <Link
-                        className='justify-self-end  whitespace-nowrap border-gray-500 border p-2 px-4 rounded-xl cursor-pointer'
-                        href={'/admin/orders/add'}    
-                        >
-                        <FontAwesomeIcon icon={faPlus} />
-                        <span className="ml-2 whitespace-nowrap">Add a new order</span>
-                    </Link>
-                }
+                <Link
+                    className='justify-self-end  whitespace-nowrap border-gray-500 border p-2 px-4 rounded-xl cursor-pointer'
+                    href={'/admin/orders/fees'}    
+                    >
+                    <span className="ml-2 whitespace-nowrap">Fees</span>
+                </Link>
 
                 {isArchiveAccess &&
                     <Link
@@ -2451,6 +2448,16 @@ function Orders() {
                         href={'/admin/orders/archive'}
                     >
                         <span className="ml-2 whitespace-nowrap">Archive</span>
+                    </Link>
+                }
+
+                {isCreateAccess &&
+                    <Link
+                        className='justify-self-end  whitespace-nowrap border-gray-500 border p-2 px-4 rounded-xl cursor-pointer'
+                        href={'/admin/orders/add'}    
+                        >
+                        <FontAwesomeIcon icon={faPlus} />
+                        <span className="ml-2 whitespace-nowrap">Add a new order</span>
                     </Link>
                 }
             </div>

@@ -8,35 +8,62 @@ import { fileURLToPath } from 'url';
 import fs from 'fs/promises';
 import axios from "axios";
 
-export async function updateWilayas(wilayat,fees,communes){
-    
-    try{
-        await dbConnect()
-        
-        // const oldWilayas = await Wilayas.find()
+export async function updateWilayas(wilayat, fees, communes) {
+  try {
+    await dbConnect(); // Connect to the database
 
-        const newWilayas = {
-            wilayas:wilayat,
-            fees:fees,
-            communes:communes
-        }
-        // console.log(newWilayas)
-
-        // if(!oldWilayas){
-          await Wilayas.create(newWilayas)
-        // }else{
-        //     Wilayas.findByIdAndUpdate(oldWilayas._id,newWilayas)
-        // }
-
-       
-        console.log("Wilayas Updated")
+    if(!wilayat){
+      wilayat = getWilayas()
+    }
+    if(!communes){
+      communes = ConvertCommuneToJSON()
+    }
+    if(!fees){
+      fees = getTrafication()
+    }
     
-        return "Wilayas Updates " + newWilayas
     
-      }catch(err){
-        return "Error :" + err
-      } 
+    // Find the existing wilayat record
+    const existingWilayas = await Wilayas.findOne();
+
+    
+
+    const updatedWilayas = {
+      wilayas: wilayat,
+      fees: fees,
+      communes: communes,
+    };
+
+    if (existingWilayas) {
+
+      // if(!wilayat){
+      //   wilayat = existingWilayas.wilayas
+      // }
+      // if(!communes){
+      //   communes = existingWilayas.communes
+      // }
+      // if(!fees){
+      //   fees = existingWilayas.fees
+      // }
+      // Update the existing wilayas record
+      await Wilayas.findByIdAndUpdate(existingWilayas._id, updatedWilayas, {
+        new: true, // Return the updated document
+        upsert: true, // Create a new record if none is found
+      });
+      console.log("Wilayas updated successfully");
+    } else {
+      // Create a new wilayas record if none exists
+      await Wilayas.create(updatedWilayas);
+      console.log("New Wilayas created");
+    }
+
+    return "Wilayas Updated: " + JSON.stringify(updatedWilayas);
+  } catch (err) {
+    console.error("Error:", err);
+    return "Error: " + err.message;
+  }
 }
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -63,7 +90,6 @@ export async function ConvertCommuneToJSON() {
     }));
 
     // Log or return the result
-    console.log(result);
     return result;
   } catch (err) {
     console.error(`Error reading file: ${err}`);
