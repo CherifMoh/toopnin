@@ -3,7 +3,7 @@ import Script from 'next/script'
 function PixelScript({id}) {
   return (
     <Script
-    id='faceboockPixel'
+    id={`facebookPixel-${id}`}
     strategy='afterInteractive'
     dangerouslySetInnerHTML={{
       __html:`
