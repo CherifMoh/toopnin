@@ -191,7 +191,7 @@ function Page() {
 
             </main>
         </div>
-        {/* <div className='w-1/3 h-max min-h-96 mx-auto border-4 border-t-0 border-[#080404] '>
+        <div className='w-1/3 h-max min-h-96 mx-auto border-4 border-t-0 border-[#080404] '>
             <header className='bg-[#080404] flex items-center justify-between p-4'>
                 <div className='flex items-center gap-3 text-white font-semibold'>
                     <Image   
@@ -208,7 +208,7 @@ function Page() {
                 {/* <div className='bg-white p-4 flex gap-3 items-center text-[rgb(56,92,142)]'>
                 <FontAwesomeIcon icon={faFloppyDisk}/>
                 save
-                </div> 
+                </div> */}
             </header>
 
             <main className='w-full h-full py-4 px-6'>
@@ -235,7 +235,7 @@ function Page() {
                 </div>
 
             </main>
-        </div> */}
+        </div>
     </div>
 
   )
