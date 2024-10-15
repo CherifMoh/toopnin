@@ -124,6 +124,9 @@ function Orders() {
     const [isGallery, setIsGallery] = useState([])
 
     const [scheduleQnt, setScheduleQnt] = useState()
+    
+    const [deliveryAgentSlection, setDeliveryAgentSlection] = useState(false)
+    const [deliveryAgent, setDeliveryAgent] = useState()
 
     const [isSchedule, setIsSchedule] = useState(false)
 
@@ -147,6 +150,7 @@ function Orders() {
     const [isArchiveAccess, setIsArchiveAccess] = useState(false)
     const [isExcelAccess, setIsExcelAccess] = useState(false)
     const [isIpBlockAccess, setIsIpBlockAccess] = useState(false)
+    const [superEdit, setSuperEdit] = useState(false)
     
     const [ordersUpdted, setOrdersUpdted] = useState(false)
     
@@ -198,6 +202,7 @@ function Orders() {
         if(!access || access.accessibilities.length === 0){
            return router.push('/admin')
         }
+        setSuperEdit(access.accessibilities.includes('superEdit'))
         setIsDeleteAccess(access.accessibilities.includes('delete'))
         setIsUpdateAccess(access.accessibilities.includes('update'))
         setIsCreateAccess(access.accessibilities.includes('create'))
@@ -268,6 +273,8 @@ function Orders() {
                 await Promise.all(
                     Orders.map(async (order) => {
                         const currentDate = format(new Date(), 'yyyy-MM-dd');
+
+                        if(order.deliveryAgent !== 'ZR') return
     
                         if(order.state !== 'مؤكدة') return
                         // if (order.tracking === 'Livrée' || order.tracking === 'returned') return;
@@ -404,6 +411,11 @@ function Orders() {
 
         const name = input.name;
         const value = input.value;
+
+        
+        if(name === 'state' && value === 'مؤكدة') {
+            setDeliveryAgentSlection(true)
+        }
         
         if(name === 'state' && (editedOrder.tracking === 'غير مؤكدة' || editedOrder.tracking === 'ملغاة' || editedOrder.tracking === 'لم يرد')) {
             console.log('tracking changed')
@@ -414,6 +426,8 @@ function Orders() {
             }));
             return
         }
+        
+
 
         if (name !== 'schedule') input.style.width = `${(input.value.length + 2) * 9}px`;
         setEditedOrder(prev => ({
@@ -534,6 +548,7 @@ function Orders() {
     })
 
     async function addToZR(order) {
+        
         const emailAllowed = await checkEmailAllowance(order._id)
         if(!emailAllowed){
             
@@ -619,7 +634,6 @@ function Orders() {
         
     }
     
-
     async function validateMultibelToZR(orders){
         orders.forEach(async(order) => {
             
@@ -671,15 +685,15 @@ function Orders() {
         setSaving(pre => ([...pre, id]))
         const oldOrder = Orders.find(order => order._id === id)
 
-        if(oldOrder.tracking !== 'delivered' && editedOrder.tracking === 'delivered'){
-            ordersQnts.forEach(order=>{
-                editMinusProduct(order.title,order.qnt)
-            })
-        }
+        // if(oldOrder.tracking !== 'delivered' && editedOrder.tracking === 'delivered'){
+        //     ordersQnts.forEach(order=>{
+        //         editMinusProduct(order.title,order.qnt)
+        //     })
+        // }
 
 
         let newOrder = editedOrder
-        if(oldOrder.state !== 'مؤكدة' && editedOrder.state  === 'مؤكدة'){
+        if(oldOrder.state !== 'مؤكدة' && editedOrder.state  === 'مؤكدة' && editedOrder.deliveryAgent === 'ZR'){
             const res = await handelConfirmOrder(editedOrder)
             if(res.success){
                 await addToZR(editedOrder)
@@ -703,7 +717,7 @@ function Orders() {
         
        
 
-        if(oldOrder.inDelivery !== true && editedOrder.inDelivery  === true && editedOrder.state  === 'مؤكدة'){
+        if(oldOrder.inDelivery !== true && editedOrder.inDelivery  === true && editedOrder.deliveryAgent === 'ZR' && editedOrder.state  === 'مؤكدة'){
             let res= await validateToZR(editedOrder)
         }
 
@@ -715,6 +729,21 @@ function Orders() {
             return
         }
 
+        if(editedOrder.deliveryAgent === 'Livreur' && oldOrder.state !== 'مؤكدة'){
+            newOrder = {
+                ...newOrder,
+                tracking : 'En preparation',
+                inDelivery : true
+            }
+        }
+
+        newOrder = {
+            ...newOrder,
+            deliveryAgent: editedOrder.deliveryAgent
+        }
+
+        console.log(newOrder)
+
         const res = await axios.put(`/api/orders/${editedOrderId}`, newOrder, { headers: { 'Content-Type': 'application/json' } });
         if(res.data.success){
             setSuccessNotifiction('تم تعديل الطلب بنجاح');
@@ -724,6 +753,8 @@ function Orders() {
             router.push('/admin/orders')
         }
         queryClient.invalidateQueries(`orders,${dateFilter}`);
+
+        setDeliveryAgentSlection(false)
         setIsProductDeleted([])
         setSelectedDate(null)
         setSaving(pre => {
@@ -732,6 +763,7 @@ function Orders() {
         })
 
     }
+
 
     async function confirmMultibel(orders) {
         orders.forEach(async(order) => {
@@ -1375,6 +1407,21 @@ function Orders() {
         </div>
     ]
 
+    const allDelevryAgents =[
+        'ZR',
+        'Livreur',
+    ]
+    const allDelevryAgentsOptionsElement = allDelevryAgents.map(agent => {
+        return(
+            <option
+            key={agent}
+            className="p-2 hover:bg-gray-200 cursor-pointer"
+            >
+                {agent}
+            </option>
+        )
+    })
+
     function ordersElement(data){
 
         return data.map((order, index) => {
@@ -1451,7 +1498,7 @@ function Orders() {
                                 {order.createdAt}
                             </td>
                             <td className="bg-blue-100">
-                              {order.state  === 'مؤكدة' && order.state  !== 'abandoned'
+                              {order.state  === 'مؤكدة' && order.state  !== 'abandoned' && superEdit === true
                                 ?<div>{editedOrder.name}</div>
                                 :<input
                                     type="text"
@@ -1463,7 +1510,7 @@ function Orders() {
                               }
                             </td>
                             <td className="bg-blue-100">
-                             {order.state  === 'مؤكدة' && order.state  !== 'abandoned'
+                             {order.state  === 'مؤكدة' && order.state  !== 'abandoned' && superEdit === true
                                 ?<div>{editedOrder.phoneNumber}</div>
                                 :<input
                                     type='text'
@@ -1475,19 +1522,19 @@ function Orders() {
                              }
                             </td>
                             <td className="bg-blue-100">
-                               {order.state  === 'مؤكدة' && order.state  !== 'abandoned'
+                               {order.state  === 'مؤكدة' && order.state  !== 'abandoned' && superEdit === true
                                 ?<div>{editedOrder.wilaya}</div>
                                 :wilayatElemnt
                                 }
                             </td>
                             <td className="bg-blue-100">
-                               {order.state  === 'مؤكدة' && order.state  !== 'abandoned'
+                               {order.state  === 'مؤكدة' && order.state  !== 'abandoned' && superEdit === true
                                 ?<div>{editedOrder.commune}</div>
                                 :communesElemnt
                                }
                             </td>
                             <td className="bg-blue-100">
-                              {order.state  === 'مؤكدة' && order.state  !== 'abandoned'
+                              {order.state  === 'مؤكدة' && order.state  !== 'abandoned' && superEdit === true
                                 ?<div>{editedOrder.adresse}</div>
                                 :<input
                                     type="text"
@@ -1499,7 +1546,7 @@ function Orders() {
                               }
                             </td>
                             <td className="bg-gray-200">
-                                {order.state  === 'مؤكدة' && order.state  !== 'abandoned'
+                                {order.state  === 'مؤكدة' && order.state  !== 'abandoned' && superEdit === true
                                 ?<div>{editedOrder.shippingMethod}</div>
                                 :<select
                                     value={editedOrder.shippingMethod}
@@ -1513,7 +1560,7 @@ function Orders() {
                                 }
                             </td>
                             <td className="bg-gray-200">
-                              {order.state  === 'مؤكدة' && order.state  !== 'abandoned'
+                              {order.state  === 'مؤكدة' && order.state  !== 'abandoned' && superEdit === true
                                 ?<div>{editedOrder.shippingPrice}</div>
                                 :<input
                                     type="text"
@@ -1525,7 +1572,7 @@ function Orders() {
                               }
                             </td>
                             <td className="bg-gray-200">
-                              {order.state  === 'مؤكدة' && order.state  !== 'abandoned'
+                              {order.state  === 'مؤكدة' && order.state  !== 'abandoned' && superEdit === true
                                 ?<div>{editedOrder.totalPrice}</div>
                                 :<input
                                     type="text"
@@ -1547,9 +1594,27 @@ function Orders() {
                               
                             </td>
                             <td className="bg-gray-200">
-                               {order.state  === 'مؤكدة' && order.state  !== 'abandoned'
+                               {order.state  === 'مؤكدة' && order.state  !== 'abandoned' && superEdit === true
                                 ?<div>{editedOrder.state}</div>
-                                :<select
+                                :<div>
+                                    {deliveryAgentSlection?
+                                        <div>
+                                            <select 
+                                                name="deliveryAgent" 
+
+                                                className="w-full border bg-inherit z-10 border-[rgba(0, 40, 100, 0.12)] rounded-md pl-1"
+                                                value={deliveryAgent}
+                                                onChange={(e) =>{
+                                                    setDeliveryAgent(e.target.value)
+                                                    handleChange(e)
+                                                }}
+                                            >
+                                                <option hidden>طريقة التوصيل</option>
+                                                {allDelevryAgentsOptionsElement}
+                                            </select>
+                                        </div>
+                                    :
+                                    <select
                                     onChange={handleChange}
                                     value={editedOrder.state}
                                     className="border bg-transparent border-[rgba(0, 40, 100, 0.12)] rounded-md pl-1 max-w-32"
@@ -1579,11 +1644,13 @@ function Orders() {
                                     >
                                         ملغاة
                                     </option>
-                                </select>
+                                    </select>
+                                    }
+                                </div>
                             }
                             </td>
                             <td>
-                              {order.state  === 'مؤكدة' && order.state  !== 'abandoned'
+                              {order.state  === 'مؤكدة' && order.state  !== 'abandoned' && superEdit === true
                                 ?<div>{editedOrder.schedule}</div>
                                 :<DatePicker
                                     selected={selectedDate}
@@ -1594,7 +1661,7 @@ function Orders() {
                               }
                             </td>
                             <td>
-                              {order.state  === 'مؤكدة' && order.state  !== 'abandoned'
+                              {order.state  === 'مؤكدة' && order.state  !== 'abandoned' && superEdit === true
                                 ?<div>{editedOrder.deliveryNote}</div>
                                 :<input
                                     type="text"
@@ -1622,7 +1689,21 @@ function Orders() {
                                 }
                             </td>
                             <td>
-                                <div>{editedOrder.tracking}</div>
+                                {order.state  === 'مؤكدة'
+                                ? <select 
+                                    name="tracking" 
+                                    className="w-full border bg-inherit z-10 border-[rgba(0, 40, 100, 0.12)] rounded-md pl-1"
+                                    value={editedOrder.tracking}
+                                    onChange={handleChange}
+                                >
+                                    <option hidden>تتبع</option>
+                                    <option value="Livrée">Livrée</option>
+                                    <option value="Livrée [ Recouvert ]">Livrée [ Recouvert ]</option>
+                                    <option value="Retour Navette">Retour Navette</option>
+                                    <option value="Retour de Dispatche">Retour de Dispatche</option>
+                                </select>
+                                :<div>{editedOrder.tracking} : {editedOrder.deliveryAgent}</div>
+                                }
                             </td>
                             {cartItemsElemnt}
                             <td>
@@ -1884,7 +1965,7 @@ function Orders() {
                                     {order.tracking}
                                 </div>
                                 <div className='z-10 text-center w-full whitespace-nowrap  pl-6 absolute top-1/2 right-3 -translate-y-1/2'>
-                                    {order.tracking}
+                                    {order.tracking} : {order?.deliveryAgent}
                                 </div>
                                 <Image 
                                     src={trackingBg(order.tracking)} 

@@ -132,7 +132,7 @@ function Page({ params }) {
         },
         {
             name: 'orders',
-            actions: ['super', 'create', 'read', 'update', 'delete', 'excel', 'archive', 'IP block']
+            actions: ['super', 'create', 'read', 'update', 'superEdit', 'delete', 'excel', 'archive', 'IP block']
         },
         {
             name: 'users',

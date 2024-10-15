@@ -215,11 +215,11 @@ function Page() {
         const userName = await getUserNameByEmail()
 
         const res = await axios.post(`/api/orders`, newOrder)
-        handleSendNotification(
-            'طلب جديد',
-            `${userName} قام باضافة طلب جديد`,
-            'https://toopnin.com/admin/orders'
-        )
+        // handleSendNotification(
+        //     'طلب جديد',
+        //     `${userName} قام باضافة طلب جديد`,
+        //     'https://toopnin.com/admin/orders'
+        // )
 
         console.log(res)
 
