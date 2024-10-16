@@ -21,7 +21,8 @@ const OrderSchem = new mongoose.Schema({
     },
     deliveryAgent: {
         type: String,
-        required: false
+        required: false,
+        default:'ZR'
     },
     blackListed: {
         type: Boolean,
