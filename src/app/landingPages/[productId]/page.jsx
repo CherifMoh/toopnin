@@ -395,11 +395,11 @@ function LindingPage({ params }) {
     try {
         // Make API call
         const res = await addAbandonedCheckout(formData);
-        handleSendNotification(
-            'سلة المتروكة',
-            `سلة متروكة جديدة برقم الهاتف ${formData.phoneNumber}`,
-            'https://toopnin.com/admin/orders'
-        )
+        // handleSendNotification(
+        //     'سلة المتروكة',
+        //     `سلة متروكة جديدة برقم الهاتف ${formData.phoneNumber}`,
+        //     'https://toopnin.com/admin/orders'
+        // )
     } catch (error) {
         // Handle error if necessary
         console.error('Error submitting form:', error);
