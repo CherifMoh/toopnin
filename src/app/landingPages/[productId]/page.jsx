@@ -437,7 +437,7 @@ function LindingPage({ params }) {
                 onSubmit={handelSubmit} 
                 className={`${wrongSubmit && 'bg-gradient-radial from-red-300  to-transparent bg-opacity-10'} w-full sm:w-3/4 md:w-2/3 lg:w-1/3 xl:w-1/4 p-5 border-2 border-black rounded-3xl`}
             >
-                <div>
+                <div className="w-full text-center">
                     {mproduct?.description}
                 </div>
                 <h1 className="text-2xl font-semibold text-center tracking-wide">
