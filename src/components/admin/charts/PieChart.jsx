@@ -66,7 +66,7 @@ function PieChartC() {
 
     if(selectedProduct &&order.orders.some(obj => obj.productID !== selectedProduct)) return false
 
-    if(order.tracking === 'Livrée' || order.tracking === 'Livrée [ Encaisser ]'){
+    if(order.tracking === 'Livrée' || order.tracking === 'Livrée [ Encaisser ]' || order.tracking === 'Livrée [ Recouvert ]'){
       result = true
     }
     return result
