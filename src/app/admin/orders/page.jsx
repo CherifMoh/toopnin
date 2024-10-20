@@ -329,9 +329,14 @@ function Orders() {
 
 
     useEffect(() => {
+        if(!editedOrder) return
+        if(editedOrder.wilaya) setSelectedWilaya(editedOrder.wilaya)
+        if(editedOrder.commune) setSelectedCommune(editedOrder.commune)
+    }, [editedOrder]);
+    
+    useEffect(() => {
         // updateWilayat()
     }, []);
-    
 
     if (isLoading || wilayatLoding || communesLoding || ProductsLoding) return <div>Loading...</div>;
     if (isError || communesIsErr || wilayatErr || ProductsIsError) {
@@ -1422,6 +1427,7 @@ function Orders() {
         )
     })
 
+
     function ordersElement(data){
 
         return data.map((order, index) => {
@@ -1540,7 +1546,7 @@ function Orders() {
                                     type="text"
                                     onChange={handleChange}
                                     name="adresse"
-                                    defaultValue={editedOrder.adresse}
+                                    value={editedOrder.adresse}
                                     className='border min-w-full bg-transparent border-[rgba(0, 40, 100, 0.12)] rounded-md pl-1 dynamic-width'
                                 />
                               }
@@ -1603,7 +1609,7 @@ function Orders() {
                                                 name="deliveryAgent" 
 
                                                 className="w-full border bg-inherit z-10 border-[rgba(0, 40, 100, 0.12)] rounded-md pl-1"
-                                                value={deliveryAgent}
+                                                value={editedOrder.deliveryAgent}
                                                 onChange={(e) =>{
                                                     setDeliveryAgent(e.target.value)
                                                     handleChange(e)
