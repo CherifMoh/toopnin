@@ -185,15 +185,17 @@ function LindingPage({ params }) {
         let sales
         let isSales = false
 
-
+        
         mproduct.sales?.forEach(sale => {
-            if(Number(sale.qnt) <= qnt){
-              sales = sale.percen
-              isSales = true
+            if(Number(sale.qnt) === qnt){
+                sales = sale.price
+                isSales = true
             }
         });
 
-        setPrice(sales?(beforePrice-(beforePrice*sales)/100)*qnt:beforePrice*qnt)
+        
+        
+        setPrice(sales?sales:beforePrice*qnt)
         
     }, [qnt,mproduct])
 
@@ -406,6 +408,8 @@ function LindingPage({ params }) {
     }
 
   }
+
+
 
 
   return (
