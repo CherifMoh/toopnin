@@ -99,10 +99,12 @@ function LindingPage({ params }) {
     useEffect(() => {
         if (!products) return
         setMproduct(products[0])
+        
         setFormData(pre => ({
             ...pre,
             orders:[{
                 title: products[0].title,
+                code: products[0].code || null,
                 productID: products[0]._id,
                 imageOn: products[0].imageOn,
                 qnt: qnt,
@@ -113,6 +115,7 @@ function LindingPage({ params }) {
         }))
     }, [products,qnt])
     
+ 
     useEffect(() => {
         if (!mproduct) return
        
@@ -245,6 +248,8 @@ function LindingPage({ params }) {
   if (typeof products !== 'object' || mproduct?.landingPageImages?.length === 0) {
     return notFound()
   }
+
+
 
 
   const phonePattern = /^0\d{9}$/;
@@ -603,9 +608,9 @@ function LindingPage({ params }) {
                     <p className="font-semibold">
                         أدخل الكمية
                     </p>
-                    <div className="flex justify-between w-2/3 bg-white h-10 rounded-md border border-[#a64100]">
+                    <div className="flex justify-between w-2/3 bg-white h-10 rounded-md border border-[#ad0000]">
                         <div 
-                            className="w-14 text-center bg-[#a64100] cursor-pointer"
+                            className="w-14 text-center bg-[#ad0000] cursor-pointer"
                             onClick={handelQntPlus}
                         >
                             <FontAwesomeIcon 
@@ -617,7 +622,7 @@ function LindingPage({ params }) {
                             {qnt}
                         </div>
                         <div 
-                            className="w-14 text-center bg-[#a64100] cursor-pointer"
+                            className="w-14 text-center bg-[#ad0000] cursor-pointer"
                             onClick={handelQntMinus}
                         >
                             <FontAwesomeIcon 
@@ -627,7 +632,7 @@ function LindingPage({ params }) {
                         </div>
                     </div>
                 </div>
-                <div className="w-full bg-[#a64100] mt-4 text-white">
+                <div className="w-full bg-[#ad0000] mt-4 text-white">
                     <div className="text-center font-semibold text-xl pt-4">
                         ملخص الطلب
                     </div>

@@ -1173,6 +1173,16 @@ function ProductUpdate({ params }) {
                     value={newProduct.title}
                     onChange={(e) => setNewProduct(pre => ({ ...pre, title: e.target.value }))}
                 />
+                <input
+                    className='border-2 border-gray-400 rounded-md p-4'
+                    required
+                    placeholder="Code"
+                    type="text"
+                    label="Code"
+                    name="code"
+                    value={newProduct.code}
+                    onChange={(e) => setNewProduct(pre => ({ ...pre, code: e.target.value }))}
+                />
                 <div className="flex gap-5 w-full">
                     <input
                         required

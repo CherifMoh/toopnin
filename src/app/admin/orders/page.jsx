@@ -579,7 +579,11 @@ function Orders() {
         order.orders.forEach(order=>{
             const i =products.findIndex(product=>product === order.title)
             if(i === -1){
-                products.push(order.title)
+                if(!order.code){
+                    products.push(order.title)
+                }else{
+                    products.push(order.code)
+                }
             }
         })
 

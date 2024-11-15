@@ -1183,6 +1183,16 @@ function Admin() {
                     value={newProduct?.title}
                     onChange={handleChange}
                 />
+                <input
+                    required
+                    placeholder="Code"
+                    type="text"
+                    label="Code"
+                    name="code"
+                    className="border-[1px] border-gray-400 p-2"
+                    value={newProduct?.code}
+                    onChange={handleChange}
+                />
                 <div className="flex gap-5 w-full">
 
                     <input
