@@ -11,7 +11,7 @@ import Link from "next/link";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faMagnifyingGlass, faPen, faPlus, faX, faCheck, faPaperPlane, faArrowDown, faAngleDown, faBan, faTriangleExclamation, faChevronDown } from '@fortawesome/free-solid-svg-icons'
 import { faTrashCan } from '@fortawesome/free-regular-svg-icons'
-import { addOrderSchedule, addOrderToZR, addToBlackList, checkEmailAllowance, deleteOrder, expedieOrderToZR, getOrder } from '../../actions/order'
+import { addOrder, addOrderSchedule, addOrderToZR, addToBlackList, checkEmailAllowance, deleteOrder, expedieOrderToZR, fetchShopify, getOrder } from '../../actions/order'
 import { editAddProduct, editMinusProduct } from '../../actions/storage'
 import { useRouter } from "next/navigation";
 import { v4 as uuidv4 } from 'uuid'
@@ -38,7 +38,9 @@ import 'jspdf-autotable';
 import Spinner from '../../../components/loadings/Spinner'
 import { useSelector } from "react-redux";
 import { fetchOrderStatus } from "../../actions/order";
+import { generateUniqueString } from "../../lib/utils";
 import { ConvertCommuneToJSON, getTrafication, getWilayas, updateWilayas } from "../../actions/wilayas";
+import { title } from "process";
 
 
 async function fetchOrders(date) {
@@ -263,7 +265,7 @@ function Orders() {
 
         if (!Orders || ordersUpdted) return;
 
-        console.log('Orders Updating ...');
+        
 
         setOrdersUpdted(true);
 
@@ -292,9 +294,9 @@ function Orders() {
 
                         const updtedOrder = respones.data;
 
-                        // console.log(typeof updtedOrder);
+                    
 
-                        console.log('Orders Updated');
+                        
                         
                     })
                 );
@@ -338,6 +340,11 @@ function Orders() {
         // updateWilayat()
     }, []);
 
+    useEffect(() => {
+        if(!Products, !wilayat) return
+        handleShopifyOrders()
+    }, [wilayat,Products]);
+
     if (isLoading || wilayatLoding || communesLoding || ProductsLoding) return <div>Loading...</div>;
     if (isError || communesIsErr || wilayatErr || ProductsIsError) {
         return <div>Error fetching Data: {
@@ -348,6 +355,107 @@ function Orders() {
         }</div>;
     }
 
+    
+    async function handleShopifyOrders() {
+        const orders = await fetchShopify();
+    
+        const newOrders = orders.orders
+            .map(order => transformShopifyOrder(order))
+            .filter(Boolean); // Remove null values from the array
+    
+        newOrders.forEach(order => {
+            addOrder(order)
+        });
+    
+        
+    }
+    
+    
+
+    function extractNoteValue(notes, noteName) {
+        // Find the note with the matching name
+        const note = notes.find(n => n.name === noteName);
+        
+        // Return the value of the note or null if not found
+        return note ? note.value : null;
+    }
+
+    function getWilayaName(wilayaId) {
+        if (wilayat && Array.isArray(wilayat)) {
+          const wilaya = wilayat.find(item => item.wilaya_id === wilayaId);
+          return wilaya ? wilaya.wilaya_name : ''; // Return name if found, else empty string
+        }
+        return ''; // Default to empty string if wilayat is not available or empty
+    }
+
+    function getProductIdByTitle(title) {
+        if (Products && Array.isArray(Products)) {
+          const product = Products.find(item => item.title === title);
+          return product ? product._id : null; // Return _id if found, else null
+        }
+        return null; // Default to null if products is not available or empty
+    }
+    function getProductCodeByTitle(title) {
+        if (Products && Array.isArray(Products)) {
+          const product = Products.find(item => item.title === title);
+          return product ? product.code : null; // Return _id if found, else null
+        }
+        return null; // Default to null if products is not available or empty
+    }
+      
+    // Updated transformShopifyOrder function
+    function transformShopifyOrder(order) {
+        // Extract wilaya_id from the Province note (e.g., "25. قسنطينة")
+        const provinceNote = extractNoteValue(order.note_attributes, "Province");
+        const wilayaId = provinceNote ? parseInt(provinceNote.split('.')[0].trim(), 10) : null;
+    
+        // Get the wilaya name using the wilaya_id from the order
+        const wilayaName = getWilayaName(wilayaId);
+    
+        // Filter the orders array to remove items without a valid productId
+        const orders = order.line_items
+            .map(item => {
+                const productId = getProductIdByTitle(item.name);
+                const productCode = getProductCodeByTitle(item.name);
+                return productId ? { 
+                    productId, 
+                    title: item.name, 
+                    qnt: item.quantity, 
+                    code: productCode 
+                } : null;
+            })
+            .filter(Boolean); // Remove null entries
+    
+        // Return null if the orders array is empty
+        if (orders.length === 0) {
+            return null;
+        }
+    
+        return {
+            DLVTracking: generateUniqueString(9),
+            name: `${order.customer.first_name} ${order.customer.last_name || ''}`, // Assuming customer details are available
+            adminEmail: order.contact_email || '',
+            ip: extractNoteValue(order.note_attributes, "IP ADDRESS"),
+            deliveryAgent: 'ZR', // Default value
+            blackListed: false, // Default value
+            instaUserName: '', // Not provided in Shopify data
+            phoneNumber: order.shipping_address?.phone || '',
+            wilaya: wilayaName || '', // Use the wilaya name fetched from getWilayaName
+            commune: extractNoteValue(order.note_attributes, "Commune") === "None" ? "" : extractNoteValue(order.note_attributes, "Commune") || '', // Handle "None"
+            adresse: order.shipping_address?.address1 || '',
+            shippingMethod: 'بيت',
+            shippingPrice: parseFloat(order.shipping_lines?.[0]?.price || 0),
+            suorce: 'shopify',
+            totalPrice: parseFloat(order.total_price || 0),
+            orders, // Updated orders array
+            state: 'غير مؤكدة', // Default value
+            schedule: '', // Default value
+            deliveryNote: '', // Default value
+            inDelivery: false, // Default value
+            tracking: '', // Default value
+            note: order.note || '', // General order note
+        };
+    }
    
     async function updateWilayat() {
         const wilaya = await getWilayas();
@@ -397,7 +505,7 @@ function Orders() {
                 })
             });
         }
-        console.log('newTracking',newTracking)
+       
         return newTracking
     }
     
@@ -423,7 +531,7 @@ function Orders() {
         }
         
         if(name === 'state' && (editedOrder.tracking === 'غير مؤكدة' || editedOrder.tracking === 'ملغاة' || editedOrder.tracking === 'لم يرد')) {
-            console.log('tracking changed')
+          
             setEditedOrder(prev => ({
                 ...prev,
                 tracking: value,
@@ -572,7 +680,7 @@ function Orders() {
         const wilayat = wilayatresponse.data.wilayas; // Get the data from the response
 
         const wilayaCode =wilayat.find(wilaya=>wilaya.wilaya_name === order.wilaya).wilaya_id
-        console.log(wilayaCode)
+        
                
         let products =[]
 
@@ -703,14 +811,23 @@ function Orders() {
 
         let newOrder = editedOrder
         if(oldOrder.state !== 'مؤكدة' && editedOrder.state  === 'مؤكدة' && editedOrder.deliveryAgent === 'ZR'){
+            if(!editedOrder.wilaya || !editedOrder.commune || !editedOrder.adresse){
+                setIsProductDeleted([])
+                setSelectedDate(null)
+                setSaving(pre => {
+                    const nweSaving = pre.filter(SId => SId !== id)
+                    return nweSaving
+                })
+                return setErrorNotifiction("ادخل كل المعلومات اللازمة")
+            }
             const res = await handelConfirmOrder(editedOrder)
+            console.log(res)
             if(res.success){
-                await addToZR(editedOrder)
-                newOrder = {
-                    ...res.order,
-                    tracking : 'En preparation'
-                }
-
+                // await addToZR(editedOrder)
+                // newOrder = {
+                //     ...res.order,
+                //     tracking : 'En preparation'
+                // }
             }
             if(!res.success){
                 setIsProductDeleted([])
@@ -751,16 +868,16 @@ function Orders() {
             deliveryAgent: editedOrder.deliveryAgent
         }
 
-        console.log(newOrder)
+        
 
-        const res = await axios.put(`/api/orders/${editedOrderId}`, newOrder, { headers: { 'Content-Type': 'application/json' } });
-        if(res.data.success){
-            setSuccessNotifiction('تم تعديل الطلب بنجاح');
-        }else{
-            setErrorNotifiction(res.data.message);
-            router.refresh()
-            router.push('/admin/orders')
-        }
+        // const res = await axios.put(`/api/orders/${editedOrderId}`, newOrder, { headers: { 'Content-Type': 'application/json' } });
+        // if(res.data.success){
+        //     setSuccessNotifiction('تم تعديل الطلب بنجاح');
+        // }else{
+        //     setErrorNotifiction(res.data.message);
+        //     router.refresh()
+        //     router.push('/admin/orders')
+        // }
         queryClient.invalidateQueries(`orders,${dateFilter}`);
 
         setDeliveryAgentSlection(false)

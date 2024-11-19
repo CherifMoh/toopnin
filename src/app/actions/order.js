@@ -7,6 +7,7 @@ import axios from "axios"
 import BlackList from "../models/blackLists"
 import { getUserNameByEmail, isSuper } from "./users"
 import { cookies } from "next/headers"
+import FetchDate from "../models/shpifyFetchdate"
 
 export async function addOrder(formData){ 
   try{
@@ -231,6 +232,7 @@ export async function AddToArchive(newData){
 
 export async function checkEmailAllowance(id) {
   try {
+    await dbConnect()
     const order = await Order.findById(id);
 
     if (!order) {
@@ -255,5 +257,53 @@ export async function checkEmailAllowance(id) {
   } catch (error) {
     console.error('Error checking email allowance:', error);
     return false;
+  }
+}
+
+export async function fetchShopify() {
+  try {
+    // Connect to the database if not already connected
+    await dbConnect()
+
+    // Retrieve the last fetch date
+    let fetchDateDoc = await FetchDate.findOne({ name: 'shopify' });
+    let createdAtMin = null;
+
+    if (fetchDateDoc) {
+      // Use the updatedAt value if the document exists
+      createdAtMin = fetchDateDoc.updatedAt.toISOString(); // Convert to ISO 8601 format
+    }
+
+    // createdAtMin = null
+    // Construct the Shopify API URL
+    const url = createdAtMin
+      ? `https://knin.store/admin/api/2024-10/orders.json?created_at_min=${createdAtMin}`
+      : 'https://knin.store/admin/api/2024-10/orders.json';
+
+    // Fetch orders from Shopify
+    const res = await axios.get(url, {
+      headers: {
+        'X-Shopify-Access-Token': process.env.SHOPIFY_ACCESS_TOKEN, // Replace with your actual access token
+        'Content-Type': 'application/json',
+      },
+    });
+
+    const orders = res.data; // Shopify orders
+
+    // Update the fetch date document
+    if (!fetchDateDoc) {
+      // Create a new document if it doesn't exist
+      fetchDateDoc = new FetchDate({ name: 'shopify', updatedAt: new Date() });
+    } else {
+      // Update the `updatedAt` field
+      fetchDateDoc.updatedAt = new Date();
+    }
+
+    await fetchDateDoc.save(); // Save the changes to the database
+
+    return orders; // Return the fetched orders
+  } catch (error) {
+    console.error('Error fetching Shopify orders:', error.response?.data || error.message);
+    throw error; // Re-throw the error for further handling
   }
 }
