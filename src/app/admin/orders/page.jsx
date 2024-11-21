@@ -662,69 +662,69 @@ function Orders() {
 
     async function addToZR(order) {
         
-        const emailAllowed = await checkEmailAllowance(order._id)
-        if(!emailAllowed){
+        // const emailAllowed = await checkEmailAllowance(order._id)
+        // if(!emailAllowed){
             
-            setErrorNotifiction('You are not allowed to edit this order')
-            setEditedOrder({})
-            queryClient.invalidateQueries(`orders,${dateFilter}`);
-            return
-        }
+        //     setErrorNotifiction('You are not allowed to edit this order')
+        //     setEditedOrder({})
+        //     queryClient.invalidateQueries(`orders,${dateFilter}`);
+        //     return
+        // }
 
-        if(!order.name||!order.phoneNumber||!order.adresse||!order.commune){
-            setErrorNotifiction("couldn't set the order in ZR")
-            return 
-        }
+        // if(!order.name||!order.phoneNumber||!order.adresse||!order.commune){
+        //     setErrorNotifiction("couldn't set the order in ZR")
+        //     return 
+        // }
         
-        const wilayatresponse = await axios.get('/api/wilayas/wilayasCodes');
-        const wilayat = wilayatresponse.data.wilayas; // Get the data from the response
+        // const wilayatresponse = await axios.get('/api/wilayas/wilayasCodes');
+        // const wilayat = wilayatresponse.data.wilayas; // Get the data from the response
 
-        const wilayaCode =wilayat.find(wilaya=>wilaya.wilaya_name === order.wilaya).wilaya_id
+        // const wilayaCode =wilayat.find(wilaya=>wilaya.wilaya_name === order.wilaya).wilaya_id
         
                
-        let products =[]
+        // let products =[]
 
-        order.orders.forEach(order=>{
-            const i =products.findIndex(product=>product === order.title)
-            if(i === -1){
-                if(!order.code){
-                    products.push(order.title)
-                }else{
-                    products.push(order.code)
-                }
-            }
-        })
+        // order.orders.forEach(order=>{
+        //     const i =products.findIndex(product=>product === order.title)
+        //     if(i === -1){
+        //         if(!order.code){
+        //             products.push(order.title)
+        //         }else{
+        //             products.push(order.code)
+        //         }
+        //     }
+        // })
 
 
-        const ZROrder ={
-            Tracking:order.DLVTracking,
-            TypeLivraison:order.shippingMethod === 'مكتب' ? 1 : 0,
-            TypeColis:0,
-            Confrimee:'',
-            Client:order.name,
-            MobileA:order.phoneNumber,
-            MobileB:'',
-            Adresse:order.adresse,
-            IDWilaya:wilayaCode,
-            Commune:order.commune,
-            Total:order.totalPrice,
-            Note:order.deliveryNote,
-            TProduit:products.join(),
-            id_Externe:order._id,
-            Source:''
-        }
+        // const ZROrder ={
+        //     Tracking:order.DLVTracking,
+        //     TypeLivraison:order.shippingMethod === 'مكتب' ? 1 : 0,
+        //     TypeColis:0,
+        //     Confrimee:'',
+        //     Client:order.name,
+        //     MobileA:order.phoneNumber,
+        //     MobileB:'',
+        //     Adresse:order.adresse,
+        //     IDWilaya:wilayaCode,
+        //     Commune:order.commune,
+        //     Total:order.totalPrice,
+        //     Note:order.deliveryNote,
+        //     TProduit:products.join(),
+        //     id_Externe:order._id,
+        //     Source:''
+        // }
 
      
 
-        try {
-            await addOrderToZR(ZROrder)
-        } catch (error) {
-            setErrorNotifiction("couldn't set the order in ZR")
-            setEditedOrder(pre=>{
-                return {...pre, state: 'غير مؤكدة'}
-            })
-            console.error('Error:', error.response?.data || error.message);
-        }
+        // try {
+        //     await addOrderToZR(ZROrder)
+        // } catch (error) {
+        //     setErrorNotifiction("couldn't set the order in ZR")
+        //     setEditedOrder(pre=>{
+        //         return {...pre, state: 'غير مؤكدة'}
+        //     })
+        //     console.error('Error:', error.response?.data || error.message);
+        // }
     }
 
     async function validateToZR(order) {
@@ -820,14 +820,15 @@ function Orders() {
                 })
                 return setErrorNotifiction("ادخل كل المعلومات اللازمة")
             }
+            
             const res = await handelConfirmOrder(editedOrder)
-            console.log(res)
+
             if(res.success){
-                // await addToZR(editedOrder)
-                // newOrder = {
-                //     ...res.order,
-                //     tracking : 'En preparation'
-                // }
+                await addToZR(editedOrder)
+                newOrder = {
+                    ...res.order,
+                    tracking : 'En preparation'
+                }
             }
             if(!res.success){
                 setIsProductDeleted([])
@@ -870,14 +871,14 @@ function Orders() {
 
         
 
-        // const res = await axios.put(`/api/orders/${editedOrderId}`, newOrder, { headers: { 'Content-Type': 'application/json' } });
-        // if(res.data.success){
-        //     setSuccessNotifiction('تم تعديل الطلب بنجاح');
-        // }else{
-        //     setErrorNotifiction(res.data.message);
-        //     router.refresh()
-        //     router.push('/admin/orders')
-        // }
+        const res = await axios.put(`/api/orders/${editedOrderId}`, newOrder, { headers: { 'Content-Type': 'application/json' } });
+        if(res.data.success){
+            setSuccessNotifiction('تم تعديل الطلب بنجاح');
+        }else{
+            setErrorNotifiction(res.data.message);
+            router.refresh()
+            router.push('/admin/orders')
+        }
         queryClient.invalidateQueries(`orders,${dateFilter}`);
 
         setDeliveryAgentSlection(false)
