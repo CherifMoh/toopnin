@@ -449,6 +449,7 @@ function Orders() {
             totalPrice: parseFloat(order.total_price || 0),
             orders, // Updated orders array
             state: 'غير مؤكدة', // Default value
+            tracking: 'غير مؤكدة', // Default value
             schedule: '', // Default value
             deliveryNote: '', // Default value
             inDelivery: false, // Default value
