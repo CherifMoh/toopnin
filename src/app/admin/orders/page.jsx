@@ -369,6 +369,7 @@ function Orders() {
 
     
         newOrders.forEach(order => {
+            // console.log(order)
             addOrder(order)
         });
     

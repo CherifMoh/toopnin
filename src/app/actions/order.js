@@ -263,22 +263,17 @@ export async function checkEmailAllowance(id) {
 export async function fetchShopify() {
   try {
     // Connect to the database if not already connected
-    await dbConnect()
+    await dbConnect();
 
     // Retrieve the last fetch date
     let fetchDateDoc = await FetchDate.findOne({ name: 'shopify' });
     let createdAtMin = null;
 
     if (fetchDateDoc) {
-      // Use the updatedAt value if the document exists
-      const fetchDateDoc = { updatedAt: new Date() }; // Example date
       const date = new Date(fetchDateDoc.updatedAt); // Create a Date object from updatedAt
-      date.setHours(date.getHours() + 1); // Subtract one hour
-      createdAtMin = date.toISOString();; // Convert to ISO 8601 format
+      createdAtMin = date.toISOString(); // Initial value for comparison
     }
 
-    
-  
     // Construct the Shopify API URL
     const url = createdAtMin
       ? `https://knin.store/admin/api/2024-10/orders.json?created_at_min=${createdAtMin}`
@@ -293,29 +288,32 @@ export async function fetchShopify() {
     });
 
     const allOrders = res.data.orders; // Shopify orders array
+    console.log("Created At Min (before filter):", createdAtMin);
+    console.log("All Orders Length:", allOrders.length);
 
     // Refilter orders to match `createdAtMin` with full ISO timestamp
     let filteredOrders = allOrders;
     if (createdAtMin) {
       const minDate = new Date(createdAtMin);
-      
-      filteredOrders = allOrders.filter(order =>new Date(order.created_at) > minDate);
-    }
-  
-
-    // Update the fetch date document
-    if (!fetchDateDoc) {
-      // Create a new document if it doesn't exist
-      fetchDateDoc = new FetchDate({ name: 'shopify', updatedAt: new Date() });
-    } else {
-      // Update the `updatedAt` field
-      fetchDateDoc.updatedAt = new Date();
+      filteredOrders = allOrders.filter(order => new Date(order.created_at) > minDate);
     }
 
-    await fetchDateDoc.save(); // Save the changes to the database
+    console.log(createdAtMin);
+
+    // Only calculate `createdAtMin` for the next request if there are new orders
+    if (filteredOrders.length > 0) {
+      if (!fetchDateDoc) {
+        // Create a new document if it doesn't exist
+        fetchDateDoc = new FetchDate({ name: 'shopify', updatedAt: new Date() });
+      } else {
+        // Update the `updatedAt` field
+        fetchDateDoc.updatedAt = new Date(); // This will influence future `createdAtMin`
+      }
+
+      await fetchDateDoc.save(); // Save changes to the database
+    }
 
     return filteredOrders; // Return the filtered orders
-
   } catch (error) {
     console.error('Error fetching Shopify orders:', error.response?.data || error.message);
     throw error; // Re-throw the error for further handling
