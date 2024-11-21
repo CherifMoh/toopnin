@@ -358,10 +358,15 @@ function Orders() {
     
     async function handleShopifyOrders() {
         const orders = await fetchShopify();
-    
-        const newOrders = orders.orders
+        
+        if(!orders || !Array.isArray(orders) || orders.length === 0) return
+        
+
+     
+        const newOrders = orders
             .map(order => transformShopifyOrder(order))
             .filter(Boolean); // Remove null values from the array
+
     
         newOrders.forEach(order => {
             addOrder(order)
@@ -412,6 +417,7 @@ function Orders() {
       
     // Updated transformShopifyOrder function
     function transformShopifyOrder(order) {
+       
         // Extract wilaya_id from the Province note (e.g., "25. قسنطينة")
         const provinceNote = extractNoteValue(order.note_attributes, "Province");
         const wilayaId = provinceNote ? parseInt(provinceNote.split('.')[0].trim(), 10) : null;
@@ -434,7 +440,7 @@ function Orders() {
                 } : null;
             })
             .filter(Boolean); // Remove null entries
-    
+        
         // Return null if the orders array is empty
         if (orders.length === 0) {
             return null;
@@ -458,11 +464,10 @@ function Orders() {
             totalPrice: parseFloat(order.total_price || 0),
             orders, // Updated orders array
             state: 'غير مؤكدة', // Default value
-            tracking: 'غير مؤكدة', // Default value
             schedule: '', // Default value
             deliveryNote: '', // Default value
             inDelivery: false, // Default value
-            tracking: '', // Default value
+            tracking: 'غير مؤكدة', // Default value
             note: order.note || '', // General order note
         };
     }

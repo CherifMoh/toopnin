@@ -271,10 +271,14 @@ export async function fetchShopify() {
 
     if (fetchDateDoc) {
       // Use the updatedAt value if the document exists
-      createdAtMin = fetchDateDoc.updatedAt.toISOString(); // Convert to ISO 8601 format
+      const fetchDateDoc = { updatedAt: new Date() }; // Example date
+      const date = new Date(fetchDateDoc.updatedAt); // Create a Date object from updatedAt
+      date.setHours(date.getHours() + 1); // Subtract one hour
+      createdAtMin = date.toISOString();; // Convert to ISO 8601 format
     }
 
-    // createdAtMin = null
+    
+  
     // Construct the Shopify API URL
     const url = createdAtMin
       ? `https://knin.store/admin/api/2024-10/orders.json?created_at_min=${createdAtMin}`
@@ -288,7 +292,16 @@ export async function fetchShopify() {
       },
     });
 
-    const orders = res.data; // Shopify orders
+    const allOrders = res.data.orders; // Shopify orders array
+
+    // Refilter orders to match `createdAtMin` with full ISO timestamp
+    let filteredOrders = allOrders;
+    if (createdAtMin) {
+      const minDate = new Date(createdAtMin);
+      
+      filteredOrders = allOrders.filter(order =>new Date(order.created_at) > minDate);
+    }
+  
 
     // Update the fetch date document
     if (!fetchDateDoc) {
@@ -301,7 +314,8 @@ export async function fetchShopify() {
 
     await fetchDateDoc.save(); // Save the changes to the database
 
-    return orders; // Return the fetched orders
+    return filteredOrders; // Return the filtered orders
+
   } catch (error) {
     console.error('Error fetching Shopify orders:', error.response?.data || error.message);
     throw error; // Re-throw the error for further handling
