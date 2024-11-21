@@ -369,8 +369,6 @@ function Orders() {
     
         
     }
-    
-    
 
     function extractNoteValue(notes, noteName) {
         // Find the note with the matching name
@@ -388,6 +386,14 @@ function Orders() {
         return ''; // Default to empty string if wilayat is not available or empty
     }
 
+    function getProductImageOnByTitle(title) {
+        if (Products && Array.isArray(Products)) {
+          const product = Products.find(item => item.title === title);
+          return product ? product.imageOn : null; // Return _id if found, else null
+        }
+        return null; // Default to null if products is not available or empty
+    }
+
     function getProductIdByTitle(title) {
         if (Products && Array.isArray(Products)) {
           const product = Products.find(item => item.title === title);
@@ -395,6 +401,7 @@ function Orders() {
         }
         return null; // Default to null if products is not available or empty
     }
+
     function getProductCodeByTitle(title) {
         if (Products && Array.isArray(Products)) {
           const product = Products.find(item => item.title === title);
@@ -417,9 +424,11 @@ function Orders() {
             .map(item => {
                 const productId = getProductIdByTitle(item.name);
                 const productCode = getProductCodeByTitle(item.name);
+                const imageOn = getProductImageOnByTitle(item.name);
                 return productId ? { 
                     productId, 
                     title: item.name, 
+                    imageOn:imageOn,
                     qnt: item.quantity, 
                     code: productCode 
                 } : null;
