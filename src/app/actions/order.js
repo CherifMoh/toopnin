@@ -80,20 +80,20 @@ export async function addOrderSchedule(order,schedule) {
 
 export async function fetchOrderStatus(tracking) {
   try{
-    // const response = await axios.post('https://procolis.com/api_v1/lire', 
-    //   {
-    //       Colis: [
-    //           { "Tracking": tracking }
-    //       ]
-    //   }, 
-    //   {
-    //       headers: {
-    //           key: process.env.ZR_API_KEY,
-    //           token: process.env.ZR_API_TOKEN
-    //       }
-    //   }
-    // );
-    return null
+    const response = await axios.post('https://procolis.com/api_v1/lire', 
+      {
+          Colis: [
+              { "Tracking": tracking }
+          ]
+      }, 
+      {
+          headers: {
+              key: process.env.ZR_API_KEY,
+              token: process.env.ZR_API_TOKEN
+          }
+      }
+    );
+    return response.data
   }catch(err){
       console.log(err.message)
       return null
