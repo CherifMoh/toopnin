@@ -271,16 +271,21 @@ function Orders() {
 
         const fetchAndUpdateOrders = async () => {
             try {
+                let index = 0
                 // const allPages = await fetchAllPages();
                 await Promise.all(
                     Orders.map(async (order) => {
+                       
                         const currentDate = format(new Date(), 'yyyy-MM-dd');
 
                         if(order.deliveryAgent !== 'ZR') return
-    
+
+                        
                         if(order.state !== 'مؤكدة') return
+                        
                         // if (order.tracking === 'Livrée' || order.tracking === 'returned') return;
                         let newTracking = await getOrderStatus(order) 
+                        
                    
                         // counter++;
                         if (newTracking === order.tracking) return;
@@ -485,6 +490,8 @@ function Orders() {
     async function getOrderStatus(order) {            
        
         const res = await fetchOrderStatus(order.DLVTracking)
+        console.log(res)
+        
 
         if(!res || !res?.Colis) return
         const ZrStatus = res?.Colis[0].Situation;
