@@ -796,9 +796,9 @@ function Orders() {
     
         for (const item of order.orders) {
             if (!success) break;
-    
+            
             const res = await editMinusProduct(item.productID, item.qnt, 'confirmed order');
-    
+          
             if (res.success) {
                 item.qnts = res.removedItems;
             } else {
@@ -1154,7 +1154,7 @@ function Orders() {
                     qnt: selectqnt,
                     title: addedOrder.title,
                     options: addedOrder.options,
-                    _id: uuidv4()
+                    productID: addedOrder._id
                 }
             ]
 

@@ -33,7 +33,7 @@ export async function editAddProduct(id,newQnts){
 export async function editMinusProduct(id, newQnt, note, option) {
     const firstQnt = newQnt;
     let result = await Product.findOne({ _id: id });
-
+    console.log(result)
     if (!result || !result.qnts || !result.qnts.length) {
         console.log('No data found or qnts array is empty');
         return { success: false };
