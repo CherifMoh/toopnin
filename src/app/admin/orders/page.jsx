@@ -1195,7 +1195,7 @@ function Orders() {
         setAddedOrder(pre => ({ ...pre, options: newOptions }))
     }
 
-    const ordersElementFun = (product, i, order) => {
+    const ordersElementFun = (product, i, order ,newOrderslength) => {
 
         if (isProductDeleted.includes(product._id)) return
 
@@ -1233,10 +1233,14 @@ function Orders() {
             }
         })
 
+
+
+
         return (
             <td
                 key={i}
-                className=" border-y border-solid border-[rgba(0, 40, 100, 0.12)] relative font-medium p-2 pr-4 text-center h-8"
+                colSpan={longesOrder.length/newOrderslength}
+                className=" border-y bg-blue-100 border-solid border-[rgba(0, 40, 100, 0.12)] relative font-medium p-2 pr-4 text-center h-8"
             >
                {order._id !== editedOrderId &&
                 <div 
@@ -1265,7 +1269,7 @@ function Orders() {
                     }
                 </div>}
 
-                {order._id === editedOrderId
+                {(order._id === editedOrderId && optionElement?.length > 0)
                     ?
                     <select
                         onChange={(e) => handleOptChange(e, i)}
@@ -1345,6 +1349,113 @@ function Orders() {
                     >
                         {product.qnt}
                     </span>
+                }
+                {(order._id === editedOrderId && i === newOrderslength-1) &&
+                    <FontAwesomeIcon
+                        icon={faPlus}
+                        className='cursor-pointer'
+                        onClick={() => toggleIsAding(order._id)}
+                    />
+                }
+                        
+                {(isAddingProduct.includes(order._id) && i === newOrderslength-1) &&
+                    <div className='flex items-center justify-center gap-8'>
+                        {addedOrder.image
+                            ?
+                            <img
+                                src={addedOrder.image}
+                                alt=''
+                                width={64} height={64}
+                                onClick={() => {
+                                    setIsAddedProducts(pre => {
+                                        if (pre.includes(order._id)) {
+                                            return pre.filter(item => item !== order._id)
+                                        }
+                                        pre = [...pre, order._id]
+                                        return pre
+                                    })
+                                    setAddedOrder({})
+                                }}
+                            />
+                            :
+                            <div className='flex items-center gap-16'>
+                                <div>
+                                    <div
+                                        onClick={() => {
+                                            setIsAddedProducts(pre => {
+                                                if (pre.includes(order._id)) {
+                                                    return pre.filter(item => item !== order._id)
+                                                }
+                                                pre = [...pre, order._id]
+                                                return pre
+                                            })
+                                        }}
+                                        className='border border-gray-500 w-40 h-14 flex items-center p-2 cursor-pointer'
+                                    >
+                                        <p>Select a Product</p>
+                                    </div>
+
+                                    {isAddedProducts?.includes(order._id) &&
+                                        <div
+                                            className='max-w-96 bg-white border border-gray-500 z-50 absolute mt-2'
+                                        >
+                                            <div className='flex justify-center mt-2 border-b-2 border-gray-500'>
+                                                <FontAwesomeIcon
+                                                    icon={faMagnifyingGlass}
+                                                    className={`pt-2 pointer-events-none z-10 absolute left-64 ${search ? 'hidden' : 'opacity-50'}`}
+                                                />
+                                                <input
+                                                    id="search"
+                                                    type='search'
+                                                    className='w-64 px-2 py-1 rounded-xl border border-gray-500 no-focus-outline text-black bg-stone-200'
+                                                    placeholder={`Search`}
+                                                    onChange={(e) => setSearch(e.target.value)}
+                                                />
+                                            </div>
+                                            <div
+                                                className='max-h-[484px] w-80 z-50 overflow-y-auto'
+                                            >
+                                                {addProductsOptionsElent(order._id)}
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+
+                            </div>
+                        }
+                        <input
+                            type="number"
+                            placeholder='Qntity'
+                            value={selectqnt}
+                            className='w-10 h-14 rounded-md border border-gray-600 pl-1 dynamic-width'
+                            min={1}
+                            onChange={(e) => setSelectqnt(e.target.value)}
+                        />
+
+                        {productOptsElement?.length > 0 &&
+                            <select
+                                name="options"
+                                onChange={handelOptChange}
+                                className='m-0 p-2 h-14 rounded-md border border-gray-600'
+                            >
+                                <option hidden>
+                                    اختر الخيار
+                                </option>
+                                {productOptsElement}
+                            </select>
+                        }
+
+                        <button
+                            className='bg-green-300 px-3 py-2 rounded-lg'
+                            onClick={()=>{
+                                addToOrders()
+                                toggleIsAding(order._id)
+                            }}
+                        >
+                            Add
+                        </button>
+
+                    </div>
                 }
             </td>
         )
@@ -1574,15 +1685,15 @@ function Orders() {
             if (filterOrders(order, currentDate) || reaserchedOrders.length > 0) {
                 let cartItemsElemnt
                 if (order.orders) {
-                    cartItemsElemnt = order.orders.map((product, i) => ordersElementFun(product, i, order))
+                    cartItemsElemnt = order.orders.map((product, i) => ordersElementFun(product, i, order,order.orders.length))
     
                     if (editedOrderId === order._id && Array.isArray(newOrders)) {
-                        cartItemsElemnt = newOrders.map((product, i) => ordersElementFun(product, i, order))
+                        cartItemsElemnt = newOrders.map((product, i) => ordersElementFun(product, i, order,newOrders.length))
                     }
                 }
                 if (editedOrderId === order._id) {
                     return (
-                        <tr key={order._id} className={`h-5 ${order.blackListed && 'bg-red-200'}`}>
+                        <tr key={order._id} className={`h-5  ${order.blackListed && 'bg-red-200'}`}>
                             <td>
                                 {(!order.blackListed && isIpBlockAccess) &&
                                 <button
@@ -1638,9 +1749,7 @@ function Orders() {
                             
                                 
                             </td>
-                            <td className="bg-blue-100">
-                                {order.createdAt}
-                            </td>
+                            {cartItemsElemnt}
                             <td className="bg-blue-100">
                               {order.state  === 'مؤكدة' && order.state  !== 'abandoned' && superEdit === true
                                 ?<div>{editedOrder.name}</div>
@@ -1849,111 +1958,113 @@ function Orders() {
                                 :<div>{editedOrder.tracking} : {editedOrder.deliveryAgent}</div>
                                 }
                             </td>
-                            {cartItemsElemnt}
-                            <td>
-                            {order.state  !== 'مؤكدة' &&
-                               <FontAwesomeIcon
-                                    icon={faPlus}
-                                    className='cursor-pointer'
-                                    onClick={() => toggleIsAding(order._id)}
-                                />
-                            }
-                                {isAddingProduct.includes(order._id) &&
-                                    <div className='flex items-center justify-center gap-8'>
-                                        {addedOrder.image
-                                            ?
-                                            <img
-                                                src={addedOrder.image}
-                                                alt=''
-                                                width={64} height={64}
-                                                onClick={() => {
-                                                    setIsAddedProducts(pre => {
-                                                        if (pre.includes(order._id)) {
-                                                            return pre.filter(item => item !== order._id)
-                                                        }
-                                                        pre = [...pre, order._id]
-                                                        return pre
-                                                    })
-                                                    setAddedOrder({})
-                                                }}
-                                            />
-                                            :
-                                            <div className='flex items-center gap-16'>
-                                                <div>
-                                                    <div
-                                                        onClick={() => {
-                                                            setIsAddedProducts(pre => {
-                                                                if (pre.includes(order._id)) {
-                                                                    return pre.filter(item => item !== order._id)
-                                                                }
-                                                                pre = [...pre, order._id]
-                                                                return pre
-                                                            })
-                                                        }}
-                                                        className='border border-gray-500 w-40 h-14 flex items-center p-2 cursor-pointer'
-                                                    >
-                                                        <p>Select a Product</p>
-                                                    </div>
-    
-                                                    {isAddedProducts?.includes(order._id) &&
-                                                        <div
-                                                            className='max-w-96 bg-white border border-gray-500 z-50 absolute mt-2'
-                                                        >
-                                                            <div className='flex justify-center mt-2 border-b-2 border-gray-500'>
-                                                                <FontAwesomeIcon
-                                                                    icon={faMagnifyingGlass}
-                                                                    className={`pt-2 pointer-events-none z-10 absolute left-64 ${search ? 'hidden' : 'opacity-50'}`}
-                                                                />
-                                                                <input
-                                                                    id="search"
-                                                                    type='search'
-                                                                    className='w-64 px-2 py-1 rounded-xl border border-gray-500 no-focus-outline text-black bg-stone-200'
-                                                                    placeholder={`Search`}
-                                                                    onChange={(e) => setSearch(e.target.value)}
-                                                                />
-                                                            </div>
-                                                            <div
-                                                                className='max-h-[484px] w-80 z-50 overflow-y-auto'
-                                                            >
-                                                                {addProductsOptionsElent(order._id)}
-                                                            </div>
-                                                        </div>
+                            {/* <td>
+                            
+                            <FontAwesomeIcon
+                                icon={faPlus}
+                                className='cursor-pointer'
+                                onClick={() => toggleIsAding(order._id)}
+                            />
+                        
+                            {isAddingProduct.includes(order._id) &&
+                                <div className='flex items-center justify-center gap-8'>
+                                    {addedOrder.image
+                                        ?
+                                        <img
+                                            src={addedOrder.image}
+                                            alt=''
+                                            width={64} height={64}
+                                            onClick={() => {
+                                                setIsAddedProducts(pre => {
+                                                    if (pre.includes(order._id)) {
+                                                        return pre.filter(item => item !== order._id)
                                                     }
-                                                </div>
-    
-                                            </div>
-                                        }
-                                        <input
-                                            type="number"
-                                            placeholder='Qntity'
-                                            value={selectqnt}
-                                            className='w-10 h-14 rounded-md border border-gray-600 pl-1 dynamic-width'
-                                            min={1}
-                                            onChange={(e) => setSelectqnt(e.target.value)}
+                                                    pre = [...pre, order._id]
+                                                    return pre
+                                                })
+                                                setAddedOrder({})
+                                            }}
                                         />
-    
-                                        {productOptsElement?.length > 0 &&
-                                            <select
-                                                name="options"
-                                                onChange={handelOptChange}
-                                                className='m-0 p-2 h-14 rounded-md border border-gray-600'
-                                            >
-                                                <option hidden>
-                                                    اختر الخيار
-                                                </option>
-                                                {productOptsElement}
-                                            </select>
-                                        }
-    
-                                        <button
-                                            className='bg-green-300 px-3 py-2 rounded-lg'
-                                            onClick={addToOrders}
+                                        :
+                                        <div className='flex items-center gap-16'>
+                                            <div>
+                                                <div
+                                                    onClick={() => {
+                                                        setIsAddedProducts(pre => {
+                                                            if (pre.includes(order._id)) {
+                                                                return pre.filter(item => item !== order._id)
+                                                            }
+                                                            pre = [...pre, order._id]
+                                                            return pre
+                                                        })
+                                                    }}
+                                                    className='border border-gray-500 w-40 h-14 flex items-center p-2 cursor-pointer'
+                                                >
+                                                    <p>Select a Product</p>
+                                                </div>
+
+                                                {isAddedProducts?.includes(order._id) &&
+                                                    <div
+                                                        className='max-w-96 bg-white border border-gray-500 z-50 absolute mt-2'
+                                                    >
+                                                        <div className='flex justify-center mt-2 border-b-2 border-gray-500'>
+                                                            <FontAwesomeIcon
+                                                                icon={faMagnifyingGlass}
+                                                                className={`pt-2 pointer-events-none z-10 absolute left-64 ${search ? 'hidden' : 'opacity-50'}`}
+                                                            />
+                                                            <input
+                                                                id="search"
+                                                                type='search'
+                                                                className='w-64 px-2 py-1 rounded-xl border border-gray-500 no-focus-outline text-black bg-stone-200'
+                                                                placeholder={`Search`}
+                                                                onChange={(e) => setSearch(e.target.value)}
+                                                            />
+                                                        </div>
+                                                        <div
+                                                            className='max-h-[484px] w-80 z-50 overflow-y-auto'
+                                                        >
+                                                            {addProductsOptionsElent(order._id)}
+                                                        </div>
+                                                    </div>
+                                                }
+                                            </div>
+
+                                        </div>
+                                    }
+                                    <input
+                                        type="number"
+                                        placeholder='Qntity'
+                                        value={selectqnt}
+                                        className='w-10 h-14 rounded-md border border-gray-600 pl-1 dynamic-width'
+                                        min={1}
+                                        onChange={(e) => setSelectqnt(e.target.value)}
+                                    />
+
+                                    {productOptsElement?.length > 0 &&
+                                        <select
+                                            name="options"
+                                            onChange={handelOptChange}
+                                            className='m-0 p-2 h-14 rounded-md border border-gray-600'
                                         >
-                                            Add
-                                        </button>
-    
-                                    </div>
-                                }
+                                            <option hidden>
+                                                اختر الخيار
+                                            </option>
+                                            {productOptsElement}
+                                        </select>
+                                    }
+
+                                    <button
+                                        className='bg-green-300 px-3 py-2 rounded-lg'
+                                        onClick={addToOrders}
+                                    >
+                                        Add
+                                    </button>
+
+                                </div>
+                            }
+                            </td> */}
+                            <td className="">
+                                {order.createdAt}
                             </td>
                         </tr>
                     )
@@ -2045,21 +2156,15 @@ function Orders() {
                                 
                                 
                             </td>
-                            <td className="bg-blue-100">
-                                {new Date(order.createdAt).toLocaleDateString('en-GB', {
-                                    year: 'numeric',
-                                    month: '2-digit',
-                                    day: '2-digit',
-                                    timeZone: 'Africa/Algiers' // Timezone for Algeria
-                                })}
-                                <br />
-                                {new Date(order.createdAt).toLocaleTimeString('en-GB', {
-                                    hour: '2-digit',
-                                    minute: '2-digit',
-                                    timeZone: 'Africa/Algiers' // Timezone for Algeria
-                                })}
+                            {cartItemsElemnt}
+                            <td className="bg-blue-100 relative  max-w-36 whitespace-nowrap overflow-hidden text-ellipsis hover:overflow-visible group">
+                                <div className="overflow-hidden text-ellipsis">
+                                    {order.name}
+                                </div>
+                                <div className="absolute top-0 left-0 mt-2 w-max max-w-xs p-2 bg-gray-700 text-white text-sm rounded-md shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                    {order.name}
+                                </div>
                             </td>
-                            <td className="bg-blue-100">{order.name}</td>
                             <td className="bg-blue-100">{order.phoneNumber}</td>
                             <td className="bg-blue-100">{order.wilaya}</td>
                             <td className="bg-blue-100">{order.commune}</td>
@@ -2118,7 +2223,21 @@ function Orders() {
                                     className='absolute opacity-50 top-1/2 right-3 w-3/4 -translate-y-1/2'
                                 />
                             </td>
-                            {cartItemsElemnt}
+                            <td className="">
+                                {new Date(order.createdAt).toLocaleDateString('en-GB', {
+                                    year: 'numeric',
+                                    month: '2-digit',
+                                    day: '2-digit',
+                                    timeZone: 'Africa/Algiers' // Timezone for Algeria
+                                })}
+                                <br />
+                                {new Date(order.createdAt).toLocaleTimeString('en-GB', {
+                                    hour: '2-digit',
+                                    minute: '2-digit',
+                                    timeZone: 'Africa/Algiers' // Timezone for Algeria
+                                })}
+                            </td>
+                            
                         </tr>
                     )
     
@@ -2370,6 +2489,8 @@ function Orders() {
                         setIsSearching(false)
                         setReaserchedOrders([])
                         setIsTrakingFilterDrop('')
+                        setEditedOrderId('')
+                        setEditedOrder({})
                     }}
                 >
                     <p className="text-sm whitespace-nowrap ">{dropDown}</p>
@@ -2400,6 +2521,8 @@ function Orders() {
                         setTrackingFilter(name)
                         setIsSearching(false)
                         setReaserchedOrders([])
+                        setEditedOrderId('')
+                        setAddedOrder({})
 
                     }
                 }}
@@ -2441,7 +2564,6 @@ function Orders() {
     }
     const thArray = [
         { className: "bg-blue-100", content: "Ref" },
-        { className: "bg-blue-100", content: "التاريخ" },
         { className: "bg-blue-100", content: "الأسم" },
         { className: "bg-blue-100", content: "الرقم" },
         { className: "bg-blue-100", content: "الولاية" },
@@ -2456,6 +2578,7 @@ function Orders() {
         { className: "", content: "ملاحظة التوصيل" },
         { className: "", content: "في التوصيل" },
         { className: "", content: "التتبع" },
+        { className: "", content: "التاريخ" },
     ];
     
     const thElement = thArray.map((th, i) => (
@@ -2552,6 +2675,8 @@ function Orders() {
                     onClick={() =>{
                         setIsSearching(pre=>!pre)
                         setTrackingFilter('')
+                        setEditedOrder({})
+                        setEditedOrderId('')
                     }}
                 >
                     <FontAwesomeIcon icon={faMagnifyingGlass} /> 
@@ -2710,12 +2835,20 @@ function Orders() {
                                 </div>
                             </th>
                         )}
-                            {thElement}
-                            <th colSpan={longesOrder.length}>
-                                <div className=" border-y border-solid border-[rgba(0, 40, 100, 0.12)] p-[13px]">
-                                الطلبيات      
-                                </div>
-                            </th>
+                          {thElement.map((item, index) => (
+                            index === 1 ? (
+                                <>
+                                <th className="bg-blue-100" key={`orders-${index}`} colSpan={longesOrder.length}>
+                                    <div className="border-y border-solid border-[rgba(0, 40, 100, 0.12)] p-[13px]">
+                                    الطلبيات
+                                    </div>
+                                </th>
+                                {item}
+                                </>
+                            ) : (
+                                item
+                            )
+                        ))}
                            
                         </tr>
                     </thead>
@@ -2769,12 +2902,20 @@ function Orders() {
                                    
                                 </th>
                             )}
-                                {thElement}
-                                <th colSpan={longesOrder.length}>
-                                    <div className=" border-y border-solid border-[rgba(0, 40, 100, 0.12)] p-[13px]">
-                                    الطلبيات      
-                                    </div>
-                                </th>
+                                {thElement.map((item, index) => (
+                                    index === 1 ? (
+                                        <>
+                                        <th className="bg-blue-100" key={`orders-${index}`} colSpan={longesOrder.length}>
+                                            <div className="border-y border-solid border-[rgba(0, 40, 100, 0.12)] p-[13px]">
+                                            الطلبيات
+                                            </div>
+                                        </th>
+                                        {item}
+                                        </>
+                                    ) : (
+                                        item
+                                    )
+                                ))}
                             
                             </tr>
                         </thead>
