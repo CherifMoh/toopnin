@@ -11,7 +11,7 @@ import Link from "next/link";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faMagnifyingGlass, faPen, faPlus, faX, faCheck, faPaperPlane, faArrowDown, faAngleDown, faBan, faTriangleExclamation, faChevronDown } from '@fortawesome/free-solid-svg-icons'
 import { faTrashCan } from '@fortawesome/free-regular-svg-icons'
-import { addOrder, addOrderSchedule, addOrderToZR, addToBlackList, checkEmailAllowance, deleteOrder, expedieOrderToZR, fetchShopify, getOrder } from '../../actions/order'
+import { addOrder, addOrderSchedule, addOrderToZR, addToBlackList, checkEmailAllowance, deleteOrder, expedieOrderToZR, fetchAllOrderStatuses, fetchShopify, getOrder, ZrfetchDate } from '../../actions/order'
 import { editAddProduct, editMinusProduct } from '../../actions/storage'
 import { useRouter } from "next/navigation";
 import { v4 as uuidv4 } from 'uuid'
@@ -261,56 +261,53 @@ function Orders() {
     
 
     useEffect(() => {
-        let isMounted = true; // Flag to track component mount status
-
+        let isMounted = true;
+    
         if (!Orders || ordersUpdted) return;
-
-        
-
+    
         setOrdersUpdted(true);
-
+    
         const fetchAndUpdateOrders = async () => {
             try {
-                // const allPages = await fetchAllPages();
-                await Promise.all(
-                    Orders.map(async (order) => {
-                        const currentDate = format(new Date(), 'yyyy-MM-dd');
-
-                        if(order.deliveryAgent !== 'ZR') return
-    
-                        if(order.state !== 'مؤكدة') return
-                        // if (order.tracking === 'Livrée' || order.tracking === 'returned') return;
-                        let newTracking = await getOrderStatus(order) 
-                   
-                        // counter++;
-                        if (newTracking === order.tracking) return;
-    
-                        const newOrder = { ...order, tracking: newTracking };
-    
-                        
-                        const respones = await axios.put(`/api/orders/${order._id}`, newOrder, {
-                            headers: { 'Content-Type': 'application/json' }
-                        });
-
-                        const updtedOrder = respones.data;
-
-                    
-
-                        
-                        
-                    })
+                const dateFilter = await ZrfetchDate()
+                // console.log(dateFilter)
+                // if(!dateFilter) return
+                const relevantOrders = Orders.filter(
+                    (order) =>
+                        order.deliveryAgent === 'ZR' && order.state === 'مؤكدة'
                 );
-                queryClient.invalidateQueries(['orders', dateFilter]);
-            } catch (err) {   
+    
+                if (relevantOrders.length === 0) return;
+    
+                
+                // Fetch tracking statuses for all relevant orders
+                // const trackingData = await fetchAllOrderStatuses(relevantOrders);
+                // console.log(trackingData)
+    
+                // Update orders in the database
+                // await Promise.all(
+                //     relevantOrders.map(async (order) => {
+                //         const newTracking = getOrderStatus(order,trackingData[]);
+                //         if (newTracking === order.tracking) return;
+    
+                //         const newOrder = { ...order, tracking: newTracking };
+                //         console.log(newOrder)
+                //         // await axios.put(`/api/orders/${order._id}`, newOrder, {
+                //         //     headers: { 'Content-Type': 'application/json' },
+                //         // });
+                //     })
+                // );
+    
+                // queryClient.invalidateQueries(['orders', dateFilter]);
+            } catch (err) {
                 setOrdersUpdted(false);
-                console.log(err); 
+                console.log(err);
             }
         };
-
+    
         fetchAndUpdateOrders();
-
+    
         return () => {
-            // Cleanup function
             isMounted = false;
         };
     }, [Orders, ordersUpdted, dateFilter, queryClient]);
@@ -482,14 +479,13 @@ function Orders() {
     }
 
     
-    async function getOrderStatus(order) {            
+    async function getOrderStatus(order,allZrFetched) {            
        
-        const res = await fetchOrderStatus(order.DLVTracking)
 
-        if(!res || !res?.Colis) return
-        const ZrStatus = res?.Colis[0].Situation;
+        if(!allZrFetched || !allZrFetched?.Colis) return
+        const ZrStatus = allZrFetched?.Colis[0].Situation;
         if (ZrStatus === 'Reporté') {
-            const updated = await addOrderSchedule(order,res?.Colis[0].Commentaire)
+            const updated = await addOrderSchedule(order,allZrFetched?.Colis[0].Commentaire)
         }
         const newTracking = newTrackingFromActivity(order, ZrStatus);            
         
@@ -757,6 +753,7 @@ function Orders() {
             const newOrder = {
                 ...order,
                 inDelivery: true,
+                tracking: 'Prêt à expédier',
             };
             const response = await axios.put(`/api/orders/${order._id}`, newOrder, { headers: { 'Content-Type': 'application/json' } });
             queryClient.invalidateQueries(`orders,${dateFilter}`);

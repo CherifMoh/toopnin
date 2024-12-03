@@ -78,27 +78,68 @@ export async function addOrderSchedule(order,schedule) {
   }
 }
 
-export async function fetchOrderStatus(tracking) {
-  try{
-    const response = await axios.post('https://procolis.com/api_v1/lire', 
-      {
-          Colis: [
-              { "Tracking": tracking }
-          ]
-      }, 
-      {
-          headers: {
-              key: process.env.ZR_API_KEY,
-              token: process.env.ZR_API_TOKEN
+export async function fetchAllOrderStatuses(orders) {
+  try {
+      const requestBody = {
+          Colis: orders.map((order) => ({ Tracking: order.tracking })),
+      };
+
+      const response = await axios.post(
+          'https://procolis.com/api_v1/lire',
+          requestBody,
+          {
+              headers: {
+                  key: process.env.ZR_API_KEY,
+                  token: process.env.ZR_API_TOKEN,
+              },
           }
-      }
-    );
-    return response.data
-  }catch(err){
-      console.log(err.message)
-      return null
+      );
+
+      // const trackingResults = response.data; // Assuming response contains tracking info
+      // const trackingMap = {};
+      // orders.forEach((order, index) => {
+      //     trackingMap[order._id] = trackingResults[index]?.tracking || order.tracking; // Keep old tracking if no change
+      // });
+
+      return response.data;
+  } catch (err) {
+      console.log(err.message);
+      return {};
   }
 }
+
+export async function ZrfetchDate() {
+  try {
+    let fetchDateDoc = await FetchDate.findOne({ name: 'ZR' });
+
+    // If no document exists, create one and return true
+    if (!fetchDateDoc) {
+      fetchDateDoc = new FetchDate({ name: 'ZR', updatedAt: new Date() });
+      await fetchDateDoc.save();
+      return true;
+    }
+
+    const now = new Date();
+    const lastUpdated = new Date(fetchDateDoc.updatedAt);
+
+    // Check if 10 minutes have passed
+    const tenMinutesInMs = 10 * 60 * 1000;
+    if (now - lastUpdated >= tenMinutesInMs) {
+      fetchDateDoc.updatedAt = now;
+      await fetchDateDoc.save(); // Update the `updatedAt` field
+      return true;
+    }
+
+    return false; // Less than 10 minutes
+  } catch (err) {
+    console.log(err.message);
+    return null; // Handle error scenario
+  }
+}
+
+
+
+
 export async function addOrderToZR(order) {
   try{
     const response = await axios.post('https://procolis.com/api_v1/add_colis', 
@@ -298,7 +339,7 @@ export async function fetchShopify() {
       filteredOrders = allOrders.filter(order => new Date(order.created_at) > minDate);
     }
 
-    console.log(createdAtMin);
+    
 
     // Only calculate `createdAtMin` for the next request if there are new orders
     if (filteredOrders.length > 0) {
