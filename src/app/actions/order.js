@@ -49,6 +49,28 @@ export async function getOrder(methode, value){
       }); 
     return formattedRes
 }
+export async function updateByNumber(phone, state){
+  await dbConnect()
+  let res 
+  if(state !== "غير مؤكدة" && state !== "En preparation"){
+    res = await Order.findOneAndUpdate({phoneNumber: phone}, {tracking: state, state: 'مؤكدة', inDelivery: true})
+  }else if(state === "غير مؤكدة"){
+    res = await Order.findOneAndUpdate({phoneNumber: phone}, {tracking: 'غير مؤكدة', state: 'غير مؤكدة'})
+  }else{
+    res = await Order.findOneAndUpdate({phoneNumber: phone}, {tracking: state, state: 'مؤكدة'})
+  }
+}
+export async function updateByDLVTracking(DLVTracking, state){
+  await dbConnect()
+  let res 
+  if(state !== "غير مؤكدة" && state !== "En preparation"){
+    res = await Order.findOneAndUpdate({DLVTracking: DLVTracking}, {tracking: state, state: 'مؤكدة', inDelivery: true})
+  }else if(state === "غير مؤكدة"){
+    res = await Order.findOneAndUpdate({DLVTracking: DLVTracking}, {tracking: 'غير مؤكدة', state: 'غير مؤكدة', inDelivery: false})
+  }else{
+    res = await Order.findOneAndUpdate({DLVTracking: DLVTracking}, {tracking: state, state: 'مؤكدة', inDelivery: false})
+  }
+}
 
 export async function addOrderSchedule(order,schedule) {
     
