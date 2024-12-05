@@ -124,4 +124,4 @@ function Fix() {
   )
 }
 
-export default page
+export default Fix
