@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { updateByDLVTracking, updateByNumber } from "../../../actions/order"
 
-function page() {
+function Fix() {
 
     const [method, setMethod] = useState("phone")
     const [track, setTrack] = useState("")
