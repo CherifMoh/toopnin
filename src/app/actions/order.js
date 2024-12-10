@@ -103,8 +103,9 @@ export async function addOrderSchedule(order,schedule) {
 export async function fetchAllOrderStatuses(orders) {
   try {
       const requestBody = {
-          Colis: orders.map((order) => ({ Tracking: order.tracking })),
+          Colis: orders.map((order) => ({ Tracking: order.DLVTracking })),
       };
+      
 
       const response = await axios.post(
           'https://procolis.com/api_v1/lire',
@@ -117,11 +118,11 @@ export async function fetchAllOrderStatuses(orders) {
           }
       );
 
-      // const trackingResults = response.data; // Assuming response contains tracking info
-      // const trackingMap = {};
-      // orders.forEach((order, index) => {
-      //     trackingMap[order._id] = trackingResults[index]?.tracking || order.tracking; // Keep old tracking if no change
-      // });
+      // // const trackingResults = response.data; // Assuming response contains tracking info
+      // // const trackingMap = {};
+      // // orders.forEach((order, index) => {
+      // //     trackingMap[order._id] = trackingResults[index]?.tracking || order.tracking; // Keep old tracking if no change
+      // // });
 
       return response.data;
   } catch (err) {
@@ -146,6 +147,7 @@ export async function ZrfetchDate() {
 
     // Check if 10 minutes have passed
     const tenMinutesInMs = 10 * 60 * 1000;
+    
     if (now - lastUpdated >= tenMinutesInMs) {
       fetchDateDoc.updatedAt = now;
       await fetchDateDoc.save(); // Update the `updatedAt` field

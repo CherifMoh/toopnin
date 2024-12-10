@@ -287,22 +287,24 @@ function Orders() {
               
     
                 // Fetch tracking statuses for all relevant orders
-                const trackingData = await fetchAllOrderStatuses(relevantOrders);
-                console.log(trackingData)
-    
+                let trackingData = await fetchAllOrderStatuses(relevantOrders);
+                trackingData = trackingData.Colis
+                
                 // Update orders in the database
-                // await Promise.all(
-                //     relevantOrders.map(async (order) => {
-                //         const newTracking = getOrderStatus(order,trackingData[]);
-                //         if (newTracking === order.tracking) return;
+                await Promise.all(
+                    relevantOrders.map(async (order,i) => {
+                        
+                        const newTracking = await getOrderStatus(order,trackingData[i]);
+                      
+                        if (newTracking === order.tracking || !newTracking) return;
     
-                //         const newOrder = { ...order, tracking: newTracking };
-                //         console.log(newOrder)
-                //         // await axios.put(`/api/orders/${order._id}`, newOrder, {
-                //         //     headers: { 'Content-Type': 'application/json' },
-                //         // });
-                //     })
-                // );
+                        const newOrder = { ...order, tracking: newTracking };
+                        
+                        await axios.put(`/api/orders/${order._id}`, newOrder, {
+                            headers: { 'Content-Type': 'application/json' },
+                        });
+                    })
+                );
     
                 queryClient.invalidateQueries(['orders', dateFilter]);
             } catch (err) {
@@ -485,13 +487,13 @@ function Orders() {
     }
 
     
-    async function getOrderStatus(order,allZrFetched) {            
+    async function getOrderStatus(order,coli) {            
        
 
-        if(!allZrFetched || !allZrFetched?.Colis) return
-        const ZrStatus = allZrFetched?.Colis[0].Situation;
+        if(!coli) return
+        const ZrStatus = coli.Situation;
         if (ZrStatus === 'Reporté') {
-            const updated = await addOrderSchedule(order,allZrFetched?.Colis[0].Commentaire)
+            const updated = await addOrderSchedule(order,coli.Commentaire)
         }
         const newTracking = newTrackingFromActivity(order, ZrStatus);            
         
