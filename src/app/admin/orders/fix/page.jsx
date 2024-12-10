@@ -106,7 +106,7 @@ function Fix() {
                     <option value="Livrée">Livrée</option>
                     <option value="Retour Navette">Retour Navette</option>
                     <option value="Retour de Dispatche">Retour de Dispatché</option>
-                    <option value="Retour de Dispatche">Retour Client</option>
+                    <option value="Retour Client">Retour Client</option>
                 </select>
 
             </div>
