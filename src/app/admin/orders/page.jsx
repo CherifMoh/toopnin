@@ -861,6 +861,12 @@ function Orders() {
                 return setErrorNotifiction("Not enough items in stock")
             }
         }
+        if(oldOrder.inDelivery !== true && editedOrder.inDelivery  === true){
+            newOrder = {
+                ...newOrder,
+                tracking : 'Prêt à expédier'
+            }
+        }
         
         
        
