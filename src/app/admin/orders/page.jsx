@@ -266,25 +266,26 @@ function Orders() {
         if (!Orders || ordersUpdted) return;
     
         setOrdersUpdted(true);
-    
+       
         const fetchAndUpdateOrders = async () => {
             try {
                 const dateFilter = await ZrfetchDate()
                 console.log(dateFilter)
+                
                 if(!dateFilter) return
                 const relevantOrders = Orders.filter(
                     (order) =>
-                        order.deliveryAgent === 'ZR' 
-                        && order.state === 'مؤكدة'
-                        && order.tracking !== 'Retour de Dispatche'
-                        && order.tracking !== 'Livrée [ Recouvert ]'
-
-
+                        order.deliveryAgent === 'ZR' &&
+                        order.state === 'مؤكدة' &&
+                        order.tracking !== 'Retour de Dispatche' &&
+                        order.tracking !== 'Livrée' &&
+                        order.tracking !== 'Livrée [ Recouvert ]'
                 );
+                
     
                 if (relevantOrders.length === 0) return;
+              
     
-               
                 // Fetch tracking statuses for all relevant orders
                 const trackingData = await fetchAllOrderStatuses(relevantOrders);
                 console.log(trackingData)
@@ -2451,7 +2452,8 @@ function Orders() {
             dropDown:[
                 'Retour Livreur',
                 'Retour Navette',
-                'Retour de Dispatche'
+                'Retour de Dispatche',
+                'Retour Client'
             ]         
         }
     ]
