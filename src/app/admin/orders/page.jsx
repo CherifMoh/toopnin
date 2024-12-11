@@ -258,7 +258,17 @@ function Orders() {
 
     }, [errorNotifiction]);
 
-    
+    // useEffect(()=>{
+    //     if(!Orders) return
+
+    //     const o = Orders.filter(order => order.state === 'غير مؤكدة' )
+    //     o.forEach(order => {
+    //         deleteOrder(order._id)
+    //         console.log(order.name)
+    //         queryClient.invalidateQueries('orders');
+    //     })
+
+    // },[Orders])
 
     useEffect(() => {
         let isMounted = true;
@@ -363,7 +373,8 @@ function Orders() {
 
     
     async function handleShopifyOrders() {
-        const orders = await fetchShopify();
+        let orders = await fetchShopify();
+        orders = orders.reverse();
         
         if(!orders || !Array.isArray(orders) || orders.length === 0) return
         
@@ -378,6 +389,7 @@ function Orders() {
         
         newOrders.forEach(order => {
             queryClient.invalidateQueries('orders');
+            
             addOrder(order)
         });
 
@@ -479,6 +491,7 @@ function Orders() {
             deliveryNote: '', // Default value
             inDelivery: false, // Default value
             tracking: 'غير مؤكدة', // Default value
+            createdAt: order.created_at,
             note: order.note || '', // General order note
         };
     }

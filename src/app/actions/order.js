@@ -370,9 +370,6 @@ export async function fetchShopify() {
 
 
    
-    
-
-    console.log(filteredOrders.length)
 
     return filteredOrders; // Return the filtered orders
 
