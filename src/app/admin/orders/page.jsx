@@ -11,7 +11,7 @@ import Link from "next/link";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faMagnifyingGlass, faPen, faPlus, faX, faCheck, faPaperPlane, faArrowDown, faAngleDown, faBan, faTriangleExclamation, faChevronDown } from '@fortawesome/free-solid-svg-icons'
 import { faTrashCan } from '@fortawesome/free-regular-svg-icons'
-import { addOrder, addOrderSchedule, addOrderToZR, addToBlackList, checkEmailAllowance, deleteOrder, expedieOrderToZR, fetchAllOrderStatuses, fetchShopify, getOrder, ZrfetchDate } from '../../actions/order'
+import { addOrder, addOrderSchedule, addOrderToZR, addToBlackList, checkEmailAllowance, deleteOrder, expedieOrderToZR, fetchAllOrderStatuses, fetchShopify, getOrder, updateShopifyDate, ZrfetchDate } from '../../actions/order'
 import { editAddProduct, editMinusProduct } from '../../actions/storage'
 import { useRouter } from "next/navigation";
 import { v4 as uuidv4 } from 'uuid'
@@ -347,6 +347,7 @@ function Orders() {
 
     useEffect(() => {
         if(!Products, !wilayat) return
+        
         handleShopifyOrders()
     }, [wilayat,Products]);
 
@@ -366,17 +367,21 @@ function Orders() {
         
         if(!orders || !Array.isArray(orders) || orders.length === 0) return
         
-
+        
      
         const newOrders = orders
             .map(order => transformShopifyOrder(order))
             .filter(Boolean); // Remove null values from the array
 
+        
     
+        
         newOrders.forEach(order => {
-            // console.log(order)
+            queryClient.invalidateQueries('orders');
             addOrder(order)
         });
+
+        if(newOrders.length>0) updateShopifyDate()
     
         
     }

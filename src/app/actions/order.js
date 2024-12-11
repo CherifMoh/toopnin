@@ -341,7 +341,7 @@ export async function fetchShopify() {
 
     // Construct the Shopify API URL
     const url = createdAtMin
-      ? `https://knin.store/admin/api/2024-10/orders.json?created_at_min=${createdAtMin}`
+      ? `https://knin.store/admin/api/2024-10/orders.json`
       : 'https://knin.store/admin/api/2024-10/orders.json';
 
     // Fetch orders from Shopify
@@ -352,35 +352,49 @@ export async function fetchShopify() {
       },
     });
 
+
     const allOrders = res.data.orders; // Shopify orders array
     console.log("Created At Min (before filter):", createdAtMin);
     console.log("All Orders Length:", allOrders.length);
-
     // Refilter orders to match `createdAtMin` with full ISO timestamp
     let filteredOrders = allOrders;
     if (createdAtMin) {
       const minDate = new Date(createdAtMin);
-      filteredOrders = allOrders.filter(order => new Date(order.created_at) > minDate);
+      
+      filteredOrders = allOrders.filter(order => {
+        
+        return new Date(order.created_at) > minDate
+      });
+      
     }
 
+
+   
     
 
-    // Only calculate `createdAtMin` for the next request if there are new orders
-    if (filteredOrders.length > 0) {
-      if (!fetchDateDoc) {
-        // Create a new document if it doesn't exist
-        fetchDateDoc = new FetchDate({ name: 'shopify', updatedAt: new Date() });
-      } else {
-        // Update the `updatedAt` field
-        fetchDateDoc.updatedAt = new Date(); // This will influence future `createdAtMin`
-      }
-
-      await fetchDateDoc.save(); // Save changes to the database
-    }
+    console.log(filteredOrders.length)
 
     return filteredOrders; // Return the filtered orders
+
   } catch (error) {
     console.error('Error fetching Shopify orders:', error.response?.data || error.message);
     throw error; // Re-throw the error for further handling
   }
+}
+
+export async function updateShopifyDate() {
+  let fetchDateDoc = await FetchDate.findOne({ name: 'shopify' });
+
+    if (!fetchDateDoc) {
+      // Create a new document if it doesn't exist
+      fetchDateDoc = new FetchDate({ name: 'shopify', updatedAt: new Date() });
+    } else {
+      // Update the `updatedAt` field
+      fetchDateDoc.updatedAt = new Date(); // This will influence future `createdAtMin`
+    }
+  
+    // Add a 20-second delay
+    // await new Promise((resolve) => setTimeout(resolve, 20000));
+    await fetchDateDoc.save(); // Save changes to the database
+  
 }
