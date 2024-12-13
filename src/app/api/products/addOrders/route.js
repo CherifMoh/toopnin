@@ -11,7 +11,7 @@ export async function GET() {
 
   try{
     await dbConnect()
-    return Product.find().select('title options imageOn')
+    return Product.find().select('title options imageOn code')
     .then(result=> Response.json(result))
     .catch(err=>Response.json({message:err.message}))
 

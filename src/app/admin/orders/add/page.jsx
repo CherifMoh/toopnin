@@ -267,6 +267,7 @@ function Page() {
     })
 
     const productsOptionsElent = Products.map(products => {
+        
         if (products.title.toLowerCase().includes(search.toLocaleLowerCase()) || search === '') {
             return (
                 <div
@@ -382,6 +383,7 @@ function Page() {
    
         
     }
+    console.log(formData)
 
 
 
@@ -394,6 +396,7 @@ function Page() {
                 gallery: selectedProduct.gallery,
                 qnt: selectqnt,
                 title: selectedProduct.title,
+                code: selectedProduct.code,
                 productID: selectedProduct._id,
                 options: selectedProduct.options,
                 _id: uuidv4()
