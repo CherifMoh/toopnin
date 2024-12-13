@@ -37,6 +37,8 @@ function Page() {
     const [isUpdateAccess, setIsUpdateAccess] = useState(false)
     const [isDeleteAccess, setIsDeleteAccess] = useState(false)
 
+    const [inActive, setInActive] = useState(false)
+
     const [realTimeActiveUsers, setRealTimeActiveUsers] = useState([])
     const [allActiveUsers, setAllActiveUsers] = useState([])
 
@@ -133,16 +135,12 @@ function Page() {
         
 
       
-        const isMatchingDateFilter = true
-        // const isMatchingDateFilter = (
-        //     dateFilter === 'today' && createdDate === currentDate ||
-        //     dateFilter === 'yesterday' && createdDate === yesterdayDate ||
-        //     dateFilter === 'this Week' && isWithinPastWeek(createdDate) ||
-        //     dateFilter === 'this Month' && isDateInPastMonth(createdDate) ||
-        //     dateFilter === 'maximum'
-        // );
+        let isActive = true
 
-        return isMatchingDateFilter && (isMatchingSearch && isMatchingTraking);
+        if(product.active === false && !inActive) isActive = false
+        
+
+        return isActive && (isMatchingSearch && isMatchingTraking);
     }
 
     async function submitAddProductStorage(id){
@@ -392,6 +390,19 @@ function Page() {
                 />
             </div>
 
+
+            <div
+                className={`justify-self-end whitespace-nowrap rounded-xl border p-2 px-4 cursor-pointer ${
+                    !inActive
+                        ? 'border-green-500 text-green-600'
+                        : 'border-gray-400 text-gray-600'
+                }`}
+                onClick={() => setInActive(pre => !pre)}
+            >
+                {!inActive ? 'Active' : 'Inactive'}
+            </div>
+
+
             <div>
                 <select 
                     onChange={(e)=>setSelectedTimeOfAU(e.target.value)}
@@ -403,6 +414,8 @@ function Page() {
                     <option value="maximum">Maximum</option>
                 </select>
             </div>
+
+
 
 
             {isCreateAccess &&
