@@ -73,7 +73,7 @@ function Orders() {
 
     const [deleting, setDeleting] = useState([])
 
-    const [dateFilter, setDateFilter] = useState('Maximum')
+    const [dateFilter, setDateFilter] = useState('today')
 
     const { data: Orders, isLoading, isError, error } = useQuery({
         queryKey: ['orders',dateFilter],
