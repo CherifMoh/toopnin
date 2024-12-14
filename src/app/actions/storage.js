@@ -30,10 +30,15 @@ export async function editAddProduct(id,newQnts){
     return newDocument       
 }
 
-export async function editMinusProduct(id, newQnt, note, option) {
+export async function editMinusProduct(id, newQnt, note, option,title) {
     const firstQnt = newQnt;
     let result = await Product.findOne({ _id: id });
     console.log(result)
+
+    if(!result || !result.qnts || !result.qnts.length){
+        result = await Product.findOne({ title: title });
+
+    }
     if (!result || !result.qnts || !result.qnts.length) {
         console.log('No data found or qnts array is empty');
         return { success: false };
@@ -92,7 +97,7 @@ export async function editMinusProduct(id, newQnt, note, option) {
    
     AddToArchive({
         user: userName,
-        name: result.title,
+        name: title,
         qnt: firstQnt,
         note,
         action: 'اخراج',

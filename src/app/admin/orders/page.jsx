@@ -825,8 +825,8 @@ function Orders() {
     
         for (const item of order.orders) {
             if (!success) break;
-            
-            const res = await editMinusProduct(item.productID, item.qnt, 'confirmed order');
+           
+            const res = await editMinusProduct(item.productID, item.qnt, 'confirmed order',null,item.title);
           
             if (res.success) {
                 item.qnts = res.removedItems;
