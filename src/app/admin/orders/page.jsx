@@ -568,7 +568,13 @@ function Orders() {
             setDeliveryAgentSlection(true)
         }
         
-        if(name === 'state' && (editedOrder.tracking === 'غير مؤكدة' || editedOrder.tracking === 'ملغاة' || editedOrder.tracking === 'لم يرد')) {
+        if(name === 'state' && (editedOrder.tracking === 'غير مؤكدة' || 
+            editedOrder.tracking === 'ملغاة' || 
+            editedOrder.tracking === '1 لم يرد' ||
+            editedOrder.tracking === '2 لم يرد' ||
+            editedOrder.tracking === '3 لم يرد' ||
+            editedOrder.tracking === 'لم يرد' 
+        )) {
           
             setEditedOrder(prev => ({
                 ...prev,
@@ -1527,7 +1533,11 @@ function Orders() {
         if(state === 'غير مؤكدة'){
             return orangeBg
         }
-        if(state === 'لم يرد'){
+        if(state === 'لم يرد' ||
+            state === '1 لم يرد' ||
+            state === '2 لم يرد' ||
+            state=== '3 لم يرد' 
+        ){
             return yellowBg
         }
         return transparent
@@ -1913,6 +1923,25 @@ function Orders() {
                                         className="bg-green-300"
                                     >
                                         مؤكدة
+                                    </option>
+                                 
+                                    <option 
+                                        value="1 لم يرد"
+                                        className="bg-orange-300"
+                                    >
+                                        1 لم يرد
+                                    </option>
+                                    <option 
+                                        value="2 لم يرد"
+                                        className="bg-orange-300"
+                                    >
+                                        2 لم يرد
+                                    </option>
+                                    <option 
+                                        value="3 لم يرد"
+                                        className="bg-orange-300"
+                                    >
+                                        3 لم يرد
                                     </option>
                                     <option 
                                         value="لم يرد"
@@ -2415,6 +2444,9 @@ function Orders() {
             icon:'not confirmed.png' ,
             dropDown:[
                 'غير مؤكدة',
+                '1 لم يرد',
+                '2 لم يرد',
+                '3 لم يرد',
                 'لم يرد',
                 'ملغاة',,
             ]  
