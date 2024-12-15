@@ -659,7 +659,7 @@ function Orders() {
         setEditedOrder(prev => ({
             ...prev,
             schedule: formattedDate,
-            tracking: 'scheduled'
+            tracking: 'Scheduled'
 
         }));
     }
