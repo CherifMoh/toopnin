@@ -390,7 +390,7 @@ function Orders() {
         newOrders.forEach(order => {
             queryClient.invalidateQueries('orders');
             
-            // addOrder(order)
+            addOrder(order)
         });
         console.log(newOrders.length)
 
