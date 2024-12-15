@@ -390,8 +390,9 @@ function Orders() {
         newOrders.forEach(order => {
             queryClient.invalidateQueries('orders');
             
-            addOrder(order)
+            // addOrder(order)
         });
+        console.log(newOrders.length)
 
         if(newOrders.length>0) updateShopifyDate()
     

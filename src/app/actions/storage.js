@@ -97,7 +97,7 @@ export async function editMinusProduct(id, newQnt, note, option,title) {
    
     AddToArchive({
         user: userName,
-        name: title,
+        name: result.title,
         qnt: firstQnt,
         note,
         action: 'اخراج',

@@ -370,15 +370,16 @@ export async function fetchShopify() {
     }
 
     const now = new Date();
-    const tenMinutesAgo = new Date(now.getTime() - 10 * 60 * 1000); // 10 minutes in the past
+    const tenMinutesAgo = new Date(now.getTime() - 10 * 60 * 1000);
+    const twentyFourHoursAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
 
     // Fetch orders from the database created in the last 10 minutes
     const recentOrders = await Order.find({
-      createdAt: { $gte: tenMinutesAgo },
+      createdAt: { $gte: twentyFourHoursAgo },
     });
     
     const recentPhoneNumbers = new Set(recentOrders.map(order => order.phoneNumber));
-    console.log(recentPhoneNumbers);
+   
 
     // Filter out orders with phone numbers already in recent orders
     filteredOrders = filteredOrders.filter(order => {
