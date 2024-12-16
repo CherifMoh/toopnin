@@ -45,10 +45,17 @@ function Sales() {
 
   let confTotalQnt= 0 
   Orders.forEach(order => {
-    if(order.tracking !== "livred") return
+    
+    if(
+      order.tracking === 'Livrée' || 
+      order.tracking === 'Livrée [ Encaisser ]' || 
+      order.tracking === 'Livrée [ Recouvert ]'
+    ){
+    console.log(order.tracking)
     order.orders.forEach(item => {
+      
       confTotalQnt+=Number(item.qnt)
-    });
+    });}
   });
 
   
