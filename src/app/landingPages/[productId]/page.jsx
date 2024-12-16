@@ -77,6 +77,8 @@ function LindingPage({ params }) {
 
   const [qnt, setQnt] = useState(1)
 
+  const [promotionPrice, setPromotionPrice] = useState(false)
+
   const [shippingPrice, setShippingPrice] = useState(null)
 
   const [price, setPrice] = useState(null)
@@ -182,7 +184,7 @@ function LindingPage({ params }) {
     }, [formData.wilaya,formData.shippingMethod,mproduct])
 
     useEffect(() => {
-        if(!mproduct) return
+        if(!mproduct || promotionPrice) return
 
         let beforePrice = mproduct.price  
         let sales
@@ -413,8 +415,39 @@ function LindingPage({ params }) {
     }
 
   }
-
-
+  console.log(price)
+  const promotionsElement = mproduct?.promotions?.map((promotion, index) => {
+    return(
+        <div
+          key={index}
+          onClick={() => {
+            setQnt(Number(promotion.qnt));
+            setPrice(Number(promotion.price));
+            setPromotionPrice(true);
+          }}
+          className={`
+            flex items-center space-x-2 rtl:space-x-reverse 
+            px-3 py-2 border-2 rounded-lg cursor-pointer 
+            min-w-[200px] w-full whitespace-nowrap
+            transition-all duration-300
+            ${qnt === Number(promotion.qnt) 
+              ? 'border-blue-500 bg-blue-50 shadow-sm' 
+              : 'border-gray-300 hover:border-blue-300 hover:bg-blue-50/20'}
+          `}
+        >
+          <div className="flex-grow flex items-center justify-between">
+            <span className="text-blue-500 text-md font-semibold ml-2"> {promotion.price} دج </span>
+            <span className="font-semibold text-gray-800 text-sm">{promotion.text}</span>
+          </div>
+          <input  
+            type="radio" 
+            name="promotion"
+            checked={qnt === Number(promotion.qnt)}
+            className="form-radio h-4 w-4 text-blue-600 rtl:ml-2"
+          />
+        </div>
+    )
+  })
 
 
   return (
@@ -604,6 +637,7 @@ function LindingPage({ params }) {
                         </div>
                     }
                 </div>
+                {mproduct.promotions?.length ===0 ?
                 <div className="flex justify-between items-center mt-4">
                     <p className="font-semibold">
                         أدخل الكمية
@@ -632,6 +666,11 @@ function LindingPage({ params }) {
                         </div>
                     </div>
                 </div>
+                :
+                <div className="flex flex-col items-center gap-1 w-full overflow-x-auto p-2">
+                    {promotionsElement}
+                </div>
+                }
                 <div className="w-full bg-[#ad0000] mt-4 text-white">
                     <div className="text-center font-semibold text-xl pt-4">
                         ملخص الطلب

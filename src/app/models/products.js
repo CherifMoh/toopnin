@@ -51,6 +51,11 @@ const productSchem = new mongoose.Schema({
         type: Array,
         required: true
     },
+    promotions: {
+        type: Array,
+        required: false,
+        default: []
+    },
     parts: {
         type: Array,
         required: false

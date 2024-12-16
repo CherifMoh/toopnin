@@ -444,6 +444,96 @@ function ProductUpdate({ params }) {
         )
     })
 
+    function handleRemovePromotion(index) {
+
+        if (Array.isArray(newProduct.promotions)) {
+
+            setNewProduct(prevState => {
+                const updatedPromotions = [...prevState.promotions]; // Create a copy of options array
+                updatedPromotions.splice(index, 1); // Remove the option at the specified index
+                return {
+                    ...prevState,
+                    promotions: updatedPromotions // Set the updated options array
+                };
+            });
+        }
+
+        // setPromotionArray(prevOptions => {
+        //     const updatedOptions = prevOptions.filter((_, i) => i !== index); // Remove the option at the specified index
+        //     return updatedOptions;
+        // });
+    }
+
+    function handleAddPromotion() {
+        setNewProduct(pre => ({
+            ...pre,
+            promotions: [...pre?.promotions, {}]
+        }))
+    }
+
+    function handelPromotionChange(e, i) {
+        const value = e.target.value
+        const name = e.target.name
+
+        setNewProduct(prevState => {
+            if (prevState?.promotions) {
+
+                const updatedPromotions = [...prevState.promotions]; // Create a copy of Promotions array
+                updatedPromotions[i] = { ...updatedPromotions[i], [name]: value }; // Update the specific sale at index i
+
+                return {
+                    ...prevState,
+                    promotions: updatedPromotions // Set the updated Promotions array
+                };
+            } else {
+                return {
+                    ...prevState,
+                    promotions: [{ [name]: value }]
+                }
+            }
+        });
+    }
+  
+    const PromotionElemnt = newProduct.promotions?.map((num, i) => {
+        return (
+            <div className="flex gap-2 mt-6 relative" key={num}>
+
+                <div
+                    className="bg-gray-400 cursor-pointer rounded-full px-2 absolute -top-2 -right-2"
+                    onClick={() => handleRemovePromotion(i)}
+                >
+                    X
+                </div>
+                <div className="flex gap-2 flex-col">
+                    <input
+                        type="Number"
+                        placeholder="Quantity"
+                        name="qnt"
+                        value={num.qnt}
+                        onChange={(e) => handelPromotionChange(e, i)}
+                        className="border-2 border-gray-400 rounded-md p-4"
+                    />
+                    <input
+                        type="Number"
+                        placeholder="Price"
+                        name="price"
+                        value={num.price}
+                        onChange={(e) => handelPromotionChange(e, i)}
+                        className="border-2 border-gray-400 rounded-md p-4 w-full"
+                    />
+                </div>
+                <textarea
+                    type="test"
+                    placeholder="Text"
+                    name="text"
+                    value={num.text}
+                    onChange={(e) => handelPromotionChange(e, i)}
+                    className="border-2 border-gray-400 rounded-md h-32 p-4 w-full"
+                />
+            </div>
+        )
+    })
+
     function handelPartChange(e, i) {
         const value = e.target.value
         let name = e.target.name
@@ -1279,6 +1369,16 @@ function ProductUpdate({ params }) {
                         onClick={handleAddSale}
                     >
                         Add sale
+                    </div>
+                </div>
+                <div className="text-center">
+                    <h1 className="font-semibold text-xl"> Promotions </h1>
+                    {PromotionElemnt}
+                    <div
+                        className="mt-6 bg-stone-500 px-4 py-3 cursor-pointer text-white rounded-3xl max-w-40 m-auto"
+                        onClick={handleAddPromotion}
+                    >
+                        Add a Promotion
                     </div>
                 </div>
                 {/* <div className="text-center relative">
