@@ -51,7 +51,6 @@ function Sales() {
       order.tracking === 'Livrée [ Encaisser ]' || 
       order.tracking === 'Livrée [ Recouvert ]'
     ){
-    console.log(order.tracking)
     order.orders.forEach(item => {
       
       confTotalQnt+=Number(item.qnt)

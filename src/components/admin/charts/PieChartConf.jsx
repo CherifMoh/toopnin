@@ -63,10 +63,15 @@ function PieChartC() {
 
   const confirmed = Orders.filter(order =>{
     let result = false
-
-    if(selectedProduct &&order.orders.some(obj => obj.productID !== selectedProduct)) return false
+  
+    if(selectedProduct &&order.orders.some(obj =>{
+      
+      return obj.title !== selectedProduct
+    })) return false
+    
 
     if(order.state === 'مؤكدة' ){
+      if(order.phoneNumber === '0671281010') console.log(order.name)
       result = true
     }
     return result
@@ -75,7 +80,7 @@ function PieChartC() {
   const inConfirmed = Orders.filter(order =>{
     let result = false
 
-    if(selectedProduct &&order.orders.some(obj => obj.productID !== selectedProduct)) return false
+    if(selectedProduct &&order.orders.some(obj => obj.title !== selectedProduct)) return false
 
     if(order.state === 'غير مؤكدة'){
       result = true
@@ -85,7 +90,7 @@ function PieChartC() {
   const between = Orders.filter(order =>{
     let result = false
 
-    if(selectedProduct &&order.orders.some(obj => obj.productID !== selectedProduct)) return false
+    if(selectedProduct &&order.orders.some(obj => obj.title !== selectedProduct)) return false
 
     if(order.state !== 'غير مؤكدة' && order.state !== 'مؤكدة'){
       result = true
@@ -118,7 +123,7 @@ function PieChartC() {
   };
 
   const productsOptionsElement = Products.map(product => {
-    return <option key={product._id} value={product._id}>{product.title}</option>
+    return <option key={product._id} value={product.title}>{product.title}</option>
   })
 
   const productsSelectElement = [
