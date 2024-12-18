@@ -305,24 +305,26 @@ function Orders() {
                 
                 if (relevantOrders.length === 0) return;
               
-    
+               
                 // Fetch tracking statuses for all relevant orders
                 let trackingData = await fetchAllOrderStatuses(relevantOrders);
+              
                 trackingData = trackingData.Colis
                 
+               
                 // Update orders in the database
                 await Promise.all(
                     relevantOrders.map(async (order,i) => {
                         
                         const newTracking = await getOrderStatus(order,trackingData[i]);
-                      
-                        if (newTracking === order.tracking || !newTracking) return;
-    
+                        if ( !newTracking) return;
+                    
                         const newOrder = { ...order, tracking: newTracking };
                         
-                        await axios.put(`/api/orders/${order._id}`, newOrder, {
+                        const res = await axios.put(`/api/orders/${order._id}`, newOrder, {
                             headers: { 'Content-Type': 'application/json' },
                         });
+                    
                     })
                 );
     
@@ -522,7 +524,8 @@ function Orders() {
        
 
         if(!coli) return
-        const ZrStatus = coli.Situation;
+        const ZrStatus = coli.Situation.trim();
+        
         if (ZrStatus === 'Reporté') {
             const updated = await addOrderSchedule(order,coli.Commentaire)
         }
@@ -533,17 +536,25 @@ function Orders() {
     }
 
     function newTrackingFromActivity(order, ZrStatus) {
-        let newTracking = ZrStatus
+        let newTracking =''
         if (!order.inDelivery && order.state !== 'مؤكدة') {
             newTracking = '';
         } else if (!order.inDelivery && order.state === 'مؤكدة' || ZrStatus === 'En Preparation') {
             newTracking = 'En preparation';
         } else if (ZrStatus === 'En Traitement - Prêt à Expédie') {
             newTracking = 'Prêt à expédier'; 
+        } else if (ZrStatus === 'Dispatcher') {
+            newTracking = 'Dispatcher'; 
+        } else if (ZrStatus === 'Au Bureau') {
+            newTracking = 'Au Bureau'; 
         } else if (ZrStatus === 'SD - Appel sans Réponse 3') {
             newTracking = 'SD - Appel sans Réponse 2'; 
         } else if (ZrStatus === 'SD - En Attente du Client') {
             newTracking = 'En Attente du Client'; 
+        } else if (ZrStatus === 'En livraison') {
+            newTracking = 'En livraison'; 
+        } else if (ZrStatus === 'Livrée [ Encaisser ]') {
+            newTracking = 'Livrée [ Encaisser ]'; 
         } else if (ZrStatus === 'Reporté') {
             newTracking = 'Scheduled'; 
         }

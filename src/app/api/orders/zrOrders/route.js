@@ -8,7 +8,7 @@ export async function GET(req) {
     await dbConnect();
     
 
-    const result = await Order.find({state:'مؤكدة' ,deliveryAgent:'ZR'}).sort({ _id: -1 }).select('deliveryAgent state tracking');
+    const result = await Order.find({state:'مؤكدة' ,deliveryAgent:'ZR'}).sort({ _id: -1 }).select('deliveryAgent DLVTracking state tracking state inDelivery orders');
 
     return NextResponse.json(result);
   } catch (err) {
