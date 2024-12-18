@@ -71,7 +71,7 @@ function PieChartC() {
     
 
     if(order.state === 'مؤكدة' ){
-      if(order.phoneNumber === '0671281010') console.log(order.name)
+    
       result = true
     }
     return result

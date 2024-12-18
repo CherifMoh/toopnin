@@ -50,6 +50,10 @@ async function fetchOrders(date) {
     });
     return res.data;
 }
+async function fetchZrOrders() {
+    const res = await axios.get('/api/orders/zrOrders');
+    return res.data;
+}
 
 
 async function fetchProducts() {
@@ -78,6 +82,11 @@ function Orders() {
     const { data: Orders, isLoading, isError, error } = useQuery({
         queryKey: ['orders',dateFilter],
         queryFn: ({queryKey})=>fetchOrders(queryKey[1]),
+        // enabled: !!dateFilter,
+    });
+    const { data: ZrOrders, isLoading : zrOrdersLoding, isError:ZrOrdersIsError, error:ZrOrdersError } = useQuery({
+        queryKey: ['zr orders'],
+        queryFn: fetchZrOrders,
         // enabled: !!dateFilter,
     });
 
@@ -273,7 +282,7 @@ function Orders() {
     useEffect(() => {
         let isMounted = true;
     
-        if (!Orders || ordersUpdted) return;
+        if (!ZrOrders || ordersUpdted) return;
     
         setOrdersUpdted(true);
        
@@ -283,7 +292,7 @@ function Orders() {
                 console.log(dateFilter)
                 
                 if(!dateFilter) return
-                const relevantOrders = Orders.filter(
+                const relevantOrders = ZrOrders.filter(
                     (order) =>
                         order.deliveryAgent === 'ZR' &&
                         order.state === 'مؤكدة' &&
@@ -292,7 +301,7 @@ function Orders() {
                         order.tracking !== 'Livrée [ Recouvert ]'
                 );
                 
-    
+                
                 if (relevantOrders.length === 0) return;
               
     
@@ -328,7 +337,7 @@ function Orders() {
         return () => {
             isMounted = false;
         };
-    }, [Orders, ordersUpdted, dateFilter, queryClient]);
+    }, [ZrOrders, ordersUpdted, queryClient]);
     
 
     useEffect(() => {
@@ -361,15 +370,17 @@ function Orders() {
         handleShopifyOrders()
     }, [wilayat,Products]);
 
-    if (isLoading || wilayatLoding || communesLoding || ProductsLoding) return <div>Loading...</div>;
-    if (isError || communesIsErr || wilayatErr || ProductsIsError) {
+    if (isLoading || wilayatLoding || communesLoding || ProductsLoding || zrOrdersLoding) return <div>Loading...</div>;
+    if (isError || communesIsErr || wilayatErr || ProductsIsError || ZrOrdersIsError) {
         return <div>Error fetching Data: {
             error?.message ||
+            ZrOrdersError?.message ||
             ProductsErr?.message ||
             wilayatIsErr?.message ||
             communesErr?.message
         }</div>;
     }
+
 
     
     async function handleShopifyOrders() {

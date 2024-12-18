@@ -415,7 +415,7 @@ function LindingPage({ params }) {
     }
 
   }
-  console.log(price)
+
   const promotionsElement = mproduct?.promotions?.map((promotion, index) => {
     return(
         <div
