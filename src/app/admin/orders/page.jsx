@@ -536,14 +536,13 @@ function Orders() {
     }
 
     function newTrackingFromActivity(order, ZrStatus) {
-        let newTracking =''
+        let newTracking =ZrStatus
         if (!order.inDelivery && order.state !== 'مؤكدة') {
             newTracking = '';
         } else if (!order.inDelivery && order.state === 'مؤكدة' || ZrStatus === 'En Preparation') {
             newTracking = 'En preparation';
-        } else if (ZrStatus === 'En Traitement - Prêt à Expédie') {
-            newTracking = 'Prêt à expédier'; 
-        } else if (ZrStatus === 'Dispatcher') {
+        }
+         else if (ZrStatus === 'Dispatcher') {
             newTracking = 'Dispatcher'; 
         } else if (ZrStatus === 'Au Bureau') {
             newTracking = 'Au Bureau'; 
@@ -555,9 +554,16 @@ function Orders() {
             newTracking = 'En livraison'; 
         } else if (ZrStatus === 'Livrée [ Encaisser ]') {
             newTracking = 'Livrée [ Encaisser ]'; 
+        } else if (ZrStatus === 'Livrée') {
+            newTracking = 'Livrée'; 
+        } else if (ZrStatus === 'Retour de Dispatche') {
+            newTracking = 'Retour de Dispatche'; 
         } else if (ZrStatus === 'Reporté') {
             newTracking = 'Scheduled'; 
+        } else if (ZrStatus === 'En Traitement - Prêt à Expédie') {
+            newTracking = 'Prêt à expédier'; 
         }
+
         if(newTracking === 'Retour Navette' && order.tracking !== 'Retour Navette') {
             
             order.orders.forEach(product => {
