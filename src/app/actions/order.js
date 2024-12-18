@@ -146,7 +146,7 @@ export async function ZrfetchDate() {
     const lastUpdated = new Date(fetchDateDoc.updatedAt);
 
     // Check if 10 minutes have passed
-    const tenMinutesInMs = 0.5 * 60 * 1000;
+    const tenMinutesInMs = 10 * 60 * 1000;
     
     if (now - lastUpdated >= tenMinutesInMs) {
       fetchDateDoc.updatedAt = now;
