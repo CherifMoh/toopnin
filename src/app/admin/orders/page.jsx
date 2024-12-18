@@ -295,10 +295,11 @@ function Orders() {
                 const relevantOrders = ZrOrders.filter(
                     (order) =>
                         order.deliveryAgent === 'ZR' &&
-                        order.state === 'مؤكدة' &&
-                        order.tracking !== 'Retour de Dispatche' &&
-                        order.tracking !== 'Livrée' &&
-                        order.tracking !== 'Livrée [ Recouvert ]'
+                        order.state === 'مؤكدة'
+                        //  &&
+                        // order.tracking !== 'Retour de Dispatche' &&
+                        // order.tracking !== 'Livrée' &&
+                        // order.tracking !== 'Livrée [ Recouvert ]'
                 );
                 
                 
