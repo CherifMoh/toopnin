@@ -833,6 +833,7 @@ function Orders() {
             const newOrder = {
                 ...order,
                 inDelivery: true,
+                tracking: 'Prêt à expédier',
             };
             const response = await axios.put(`/api/orders/${order._id}`, newOrder, { headers: { 'Content-Type': 'application/json' } });
             queryClient.invalidateQueries(`orders,${dateFilter}`);
