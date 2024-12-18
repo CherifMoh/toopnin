@@ -296,10 +296,6 @@ function Orders() {
                     (order) =>
                         order.deliveryAgent === 'ZR' &&
                         order.state === 'مؤكدة'
-                        //  &&
-                        // order.tracking !== 'Retour de Dispatche' &&
-                        // order.tracking !== 'Livrée' &&
-                        // order.tracking !== 'Livrée [ Recouvert ]'
                 );
                 
                 
@@ -315,8 +311,10 @@ function Orders() {
                 // Update orders in the database
                 await Promise.all(
                     relevantOrders.map(async (order,i) => {
-                        
-                        const newTracking = await getOrderStatus(order,trackingData[i]);
+                       
+                        const matchingOrder = trackingData.find((item) => item.Tracking === order.DLVTracking);                        
+
+                        const newTracking = await getOrderStatus(order,matchingOrder);
                         if ( !newTracking) return;
                     
                         const newOrder = { ...order, tracking: newTracking };
@@ -537,15 +535,13 @@ function Orders() {
 
     function newTrackingFromActivity(order, ZrStatus) {
         let newTracking =ZrStatus
+
+        
+
         if (!order.inDelivery && order.state !== 'مؤكدة') {
             newTracking = '';
         } else if (!order.inDelivery && order.state === 'مؤكدة' || ZrStatus === 'En Preparation') {
             newTracking = 'En preparation';
-        }
-         else if (ZrStatus === 'Dispatcher') {
-            newTracking = 'Dispatcher'; 
-        } else if (ZrStatus === 'Au Bureau') {
-            newTracking = 'Au Bureau'; 
         } else if (ZrStatus === 'SD - Appel sans Réponse 3') {
             newTracking = 'SD - Appel sans Réponse 2'; 
         } else if (ZrStatus === 'SD - En Attente du Client') {
@@ -568,7 +564,7 @@ function Orders() {
             
             order.orders.forEach(product => {
     
-                product.qnts.forEach(qnt => {
+                product?.qnts?.forEach(qnt => {
                     editAddProduct(product.productID,qnt)
                 })
             });
