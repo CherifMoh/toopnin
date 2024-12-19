@@ -540,7 +540,7 @@ function Orders() {
 
         if (!order.inDelivery && order.state !== 'مؤكدة') {
             newTracking = '';
-        } else if (!order.inDelivery && order.state === 'مؤكدة' || ZrStatus === 'En Preparation') {
+        } else if (ZrStatus === 'En Preparation') {
             newTracking = 'En preparation';
         } else if (ZrStatus === 'SD - Appel sans Réponse 3') {
             newTracking = 'SD - Appel sans Réponse 2'; 
