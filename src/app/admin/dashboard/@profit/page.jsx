@@ -14,7 +14,7 @@ async function fetchProducts() {
 
 const fetchOrders = async (filters) => {
 
-  const res = await axios.get(`/api/orders?date=${filters.date}&startDate=${filters.startDate}&endDate=${filters.endDate}`);
+  const res = await axios.get(`/api/orders/createdAt?date=${filters.date}&startDate=${filters.startDate}&endDate=${filters.endDate}`);
   return res.data;
 };
 
@@ -61,11 +61,10 @@ function Profit() {
    body={`Error: ${error?.message || ordersError?.message}`}
   />;
   
-
-
+  
   async function calculateProfit() {
     const livredOrders = Orders.filter(order => 
-        order.tracking === 'Livrée [ Encaisser ]' || order.tracking === 'Livrée'
+      order.tracking === 'Livrée [ Encaisser ]' || order.tracking === 'Livrée'
     );
     const returnedOrders = Orders.filter(order => 
         order.tracking === 'Retour Livreur' || 
@@ -78,7 +77,8 @@ function Profit() {
     
     for (const order of livredOrders) {
         let orderProfit = Number(order.totalPrice) - Number(order.shippingPrice);
-
+        
+        
         for (const product of order.orders) {
             if (product.productID === selectedProduct) {
                 if(!product || !product.qnts) continue
@@ -91,6 +91,7 @@ function Profit() {
 
         ordersProfit += orderProfit;
     }
+    
 
     stProfit(ordersProfit - Number(cost) - Number(returnedOrders.length * 150));
 }
