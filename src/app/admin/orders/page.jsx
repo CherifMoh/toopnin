@@ -538,22 +538,12 @@ function Orders() {
 
         
 
-        if (!order.inDelivery && order.state !== 'مؤكدة') {
-            newTracking = '';
-        } else if (!order.inDelivery || ZrStatus === 'En Preparation') {
+        if (!order.inDelivery || ZrStatus === 'En Preparation') {
             newTracking = 'En preparation';
         } else if (ZrStatus === 'SD - Appel sans Réponse 3') {
             newTracking = 'SD - Appel sans Réponse 2'; 
         } else if (ZrStatus === 'SD - En Attente du Client') {
             newTracking = 'En Attente du Client'; 
-        } else if (ZrStatus === 'En livraison') {
-            newTracking = 'En livraison'; 
-        } else if (ZrStatus === 'Livrée [ Encaisser ]') {
-            newTracking = 'Livrée [ Encaisser ]'; 
-        } else if (ZrStatus === 'Livrée') {
-            newTracking = 'Livrée'; 
-        } else if (ZrStatus === 'Retour de Dispatche') {
-            newTracking = 'Retour de Dispatche'; 
         } else if (ZrStatus === 'Reporté') {
             newTracking = 'Scheduled'; 
         } else if (ZrStatus === 'En Traitement - Prêt à Expédie') {
