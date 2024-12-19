@@ -64,7 +64,7 @@ function PieChartC() {
   const livred = Orders.filter(order =>{
     let result = false
 
-    if(selectedProduct &&order.orders.some(obj => obj.productID !== selectedProduct)) return false
+    if(selectedProduct &&order.orders.some(obj => obj.title !== selectedProduct)) return false
 
     if(order.tracking === 'Livrée' || order.tracking === 'Livrée [ Encaisser ]' || order.tracking === 'Livrée [ Recouvert ]'){
       result = true
@@ -75,7 +75,7 @@ function PieChartC() {
   const Retour = Orders.filter(order =>{
     let result = false
 
-    if(selectedProduct &&order.orders.some(obj => obj.productID !== selectedProduct)) return false
+    if(selectedProduct &&order.orders.some(obj => obj.title !== selectedProduct)) return false
 
     if(order.tracking === 'Retour Livreur' || order.tracking === 'Retour Navette' || order.tracking === 'Retour de Dispatche'){
       result = true
@@ -83,13 +83,14 @@ function PieChartC() {
     return result
   });
 
+ 
 
   const livredPercent = Math.floor((livred.length / (livred.length + Retour.length)) * 100);
   const retourPercent = Math.floor((Retour.length / (livred.length + Retour.length)) * 100);
 
   const data = [
-    { name: 'livred %', value: livredPercent, color: '#66FF66' },
-    { name: 'Retour %', value: retourPercent, color: '#FF6666' },
+    { name: 'livred %', value: livred.length, color: '#66FF66' },
+    { name: 'Retour %', value: Retour.length, color: '#FF6666' },
   ];
 
   const renderCustomLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent, index }) => {
@@ -106,7 +107,7 @@ function PieChartC() {
   };
 
   const productsOptionsElement = Products.map(product => {
-    return <option key={product._id} value={product._id}>{product.title}</option>
+    return <option key={product._id} value={product.title}>{product.title}</option>
   })
 
   const productsSelectElement = [

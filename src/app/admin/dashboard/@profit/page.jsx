@@ -63,24 +63,36 @@ function Profit() {
   
   
   async function calculateProfit() {
-    const livredOrders = Orders.filter(order => 
-      order.tracking === 'Livrée [ Encaisser ]' || order.tracking === 'Livrée'
-    );
-    const returnedOrders = Orders.filter(order => 
-        order.tracking === 'Retour Livreur' || 
-        order.tracking === 'Retour de Dispatche' || 
-        order.tracking === 'Retour Navette'
-    );
+    const livredOrders = Orders.filter(order =>{
+      let result = false
+  
+      if(selectedProduct &&order.orders.some(obj => obj.title !== selectedProduct)) return false
+  
+      if(order.tracking === 'Livrée' || order.tracking === 'Livrée [ Encaisser ]' || order.tracking === 'Livrée [ Recouvert ]'){
+        result = true
+      }
+      return result
+    });
+  
+    const returnedOrders = Orders.filter(order =>{
+      let result = false
+  
+      if(selectedProduct &&order.orders.some(obj => obj.title !== selectedProduct)) return false
+  
+      if(order.tracking === 'Retour Livreur' || order.tracking === 'Retour Navette' || order.tracking === 'Retour de Dispatche' || order.tracking === 'Retour Client'){
+        result = true
+      }
+      return result
+    });
     
     let ordersProfit = 0;
+
   
-    
     for (const order of livredOrders) {
         let orderProfit = Number(order.totalPrice) - Number(order.shippingPrice);
         
-        
         for (const product of order.orders) {
-            if (product.productID === selectedProduct) {
+            if (product.title === selectedProduct) {
                 if(!product || !product.qnts) continue
                 for (const qnt of product?.qnts) {
                     const productCost = await getProductCost(product.productID);
@@ -98,7 +110,7 @@ function Profit() {
 
 
   const productsOptionsElement = Products.map(product => {
-    return <option key={product._id} value={product._id}>{product.title}</option>
+    return <option key={product._id} value={product.title}>{product.title}</option>
   })
   
   const productsSelectElement = [
