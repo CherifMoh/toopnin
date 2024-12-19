@@ -538,7 +538,7 @@ function Orders() {
 
         
 
-        if (!order.inDelivery || ZrStatus === 'En Preparation') {
+        if ((!order.inDelivery || ZrStatus === 'En Preparation')&&order.tracking !== 'Prêt à expédier') {
             newTracking = 'En preparation';
         } else if (ZrStatus === 'SD - Appel sans Réponse 3') {
             newTracking = 'SD - Appel sans Réponse 2'; 
