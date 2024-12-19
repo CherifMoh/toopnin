@@ -540,7 +540,7 @@ function Orders() {
 
         if (!order.inDelivery && order.state !== 'مؤكدة') {
             newTracking = '';
-        } else if (ZrStatus === 'En Preparation') {
+        } else if (!order.inDelivery || ZrStatus === 'En Preparation') {
             newTracking = 'En preparation';
         } else if (ZrStatus === 'SD - Appel sans Réponse 3') {
             newTracking = 'SD - Appel sans Réponse 2'; 
@@ -840,6 +840,13 @@ function Orders() {
         })
     }
 
+/*************  ✨ Codeium Command ⭐  *************/
+    /**
+     * Handle confirming an order by updating the stock and setting the order's state to 'confirmed'
+     * @param {Object} order - The order to be confirmed
+     * @returns {Object} An object with a success property indicating whether the operation succeeded and the order if it did
+
+/******  22171918-598b-414e-aa03-0bb3ceec5a33  *******/
     async function handelConfirmOrder(order) {
         let success = true;
         const emailAllowed = await checkEmailAllowance(order._id)
