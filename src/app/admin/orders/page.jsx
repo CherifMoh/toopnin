@@ -298,7 +298,7 @@ function Orders() {
         const fetchAndUpdateOrders = async () => {
             try {
                 const dateFilter = await ZrfetchDate()
-                
+                console.log(dateFilter)
                 if(!dateFilter) return
                 liveUpdateOrders()
                 const relevantOrders = ZrOrders.filter(
@@ -325,8 +325,11 @@ function Orders() {
 
                         const newTracking = await getOrderStatus(order,matchingOrder);
                         if ( !newTracking) return;
-                    
-                        const newOrder = { ...order, tracking: newTracking };
+                        
+                        let newOrder = { ...order, tracking: newTracking };
+
+                        if(newOrder.tracking === 'Prêt à expédier') newOrder.inDelivery = true
+
                         
                         const res = await axios.put(`/api/orders/${order._id}`, newOrder, {
                             headers: { 'Content-Type': 'application/json' },
@@ -346,7 +349,7 @@ function Orders() {
             LivreurOrders.forEach(async(order) => {
                 if(order.state === 'مؤكدة'&& order.inDelivery && order.tracking === 'En preparation'){
                     const newOrder = { ...order, tracking: 'Prêt à expédier L' };
-                    console.log(newOrder)
+                    
                     const res = await axios.put(`/api/orders/${order._id}`, newOrder, {
                         headers: { 'Content-Type': 'application/json' },
                     });
@@ -560,9 +563,7 @@ function Orders() {
 
         
 
-        if ((!order.inDelivery || ZrStatus === 'En Preparation')&&order.tracking !== 'Prêt à expédier') {
-            newTracking = 'En preparation';
-        } else if (ZrStatus === 'SD - Appel sans Réponse 3') {
+        if (ZrStatus === 'SD - Appel sans Réponse 3') {
             newTracking = 'SD - Appel sans Réponse 2'; 
         } else if (ZrStatus === 'SD - En Attente du Client') {
             newTracking = 'En Attente du Client'; 
@@ -570,7 +571,9 @@ function Orders() {
             newTracking = 'Scheduled ZR'; 
         } else if (ZrStatus === 'En Traitement - Prêt à Expédie') {
             newTracking = 'Prêt à expédier'; 
-        }
+        }else if ((!order.inDelivery && ZrStatus === 'En Preparation')&&order.tracking !== 'Prêt à expédier') {
+            newTracking = 'En preparation';
+        } 
 
         if(newTracking === 'Retour Navette' && order.tracking !== 'Retour Navette') {
             
