@@ -54,6 +54,10 @@ async function fetchZrOrders() {
     const res = await axios.get('/api/orders/zrOrders');
     return res.data;
 }
+async function fetchLivreurOrders() {
+    const res = await axios.get('/api/orders/livreurOrders');
+    return res.data;
+}
 
 
 async function fetchProducts() {
@@ -87,6 +91,11 @@ function Orders() {
     const { data: ZrOrders, isLoading : zrOrdersLoding, isError:ZrOrdersIsError, error:ZrOrdersError } = useQuery({
         queryKey: ['zr orders'],
         queryFn: fetchZrOrders,
+        // enabled: !!dateFilter,
+    });
+    const { data: LivreurOrders, isLoading : LivreurOrdersLoding, isError:LivreurOrdersIsError, error:LivreurOrdersError } = useQuery({
+        queryKey: ['Livreur orders'],
+        queryFn: fetchLivreurOrders,
         // enabled: !!dateFilter,
     });
 
@@ -282,16 +291,16 @@ function Orders() {
     useEffect(() => {
         let isMounted = true;
     
-        if (!ZrOrders || ordersUpdted) return;
+        if (!ZrOrders ||!LivreurOrders || ordersUpdted) return;
     
         setOrdersUpdted(true);
        
         const fetchAndUpdateOrders = async () => {
             try {
                 const dateFilter = await ZrfetchDate()
-                console.log(dateFilter)
                 
                 if(!dateFilter) return
+                liveUpdateOrders()
                 const relevantOrders = ZrOrders.filter(
                     (order) =>
                         order.deliveryAgent === 'ZR' &&
@@ -300,7 +309,7 @@ function Orders() {
                 
                 
                 if (relevantOrders.length === 0) return;
-              
+                
                
                 // Fetch tracking statuses for all relevant orders
                 let trackingData = await fetchAllOrderStatuses(relevantOrders);
@@ -332,13 +341,25 @@ function Orders() {
                 console.log(err);
             }
         };
+
+        function liveUpdateOrders() {
+            LivreurOrders.forEach(async(order) => {
+                if(order.state === 'مؤكدة'&& order.inDelivery && order.tracking === 'En preparation'){
+                    const newOrder = { ...order, tracking: 'Prêt à expédier L' };
+                    console.log(newOrder)
+                    const res = await axios.put(`/api/orders/${order._id}`, newOrder, {
+                        headers: { 'Content-Type': 'application/json' },
+                    });
+                }
+            })
+        }
     
         fetchAndUpdateOrders();
     
         return () => {
             isMounted = false;
         };
-    }, [ZrOrders, ordersUpdted, queryClient]);
+    }, [ZrOrders,LivreurOrders, ordersUpdted, queryClient]);
     
 
     useEffect(() => {
@@ -371,11 +392,12 @@ function Orders() {
         handleShopifyOrders()
     }, [wilayat,Products]);
 
-    if (isLoading || wilayatLoding || communesLoding || ProductsLoding || zrOrdersLoding) return <div>Loading...</div>;
-    if (isError || communesIsErr || wilayatErr || ProductsIsError || ZrOrdersIsError) {
+    if (isLoading || wilayatLoding || communesLoding || ProductsLoding || zrOrdersLoding || LivreurOrdersLoding) return <div>Loading...</div>;
+    if (isError || communesIsErr || wilayatErr || ProductsIsError || ZrOrdersIsError|| LivreurOrdersIsError) {
         return <div>Error fetching Data: {
             error?.message ||
             ZrOrdersError?.message ||
+            LivreurOrdersError?.message ||
             ProductsErr?.message ||
             wilayatIsErr?.message ||
             communesErr?.message
@@ -545,7 +567,7 @@ function Orders() {
         } else if (ZrStatus === 'SD - En Attente du Client') {
             newTracking = 'En Attente du Client'; 
         } else if (ZrStatus === 'Reporté') {
-            newTracking = 'Scheduled'; 
+            newTracking = 'Scheduled ZR'; 
         } else if (ZrStatus === 'En Traitement - Prêt à Expédie') {
             newTracking = 'Prêt à expédier'; 
         }
@@ -830,13 +852,6 @@ function Orders() {
         })
     }
 
-/*************  ✨ Codeium Command ⭐  *************/
-    /**
-     * Handle confirming an order by updating the stock and setting the order's state to 'confirmed'
-     * @param {Object} order - The order to be confirmed
-     * @returns {Object} An object with a success property indicating whether the operation succeeded and the order if it did
-
-/******  22171918-598b-414e-aa03-0bb3ceec5a33  *******/
     async function handelConfirmOrder(order) {
         let success = true;
         const emailAllowed = await checkEmailAllowance(order._id)
@@ -1059,10 +1074,11 @@ function Orders() {
         //     isMatchingTraking = order.schedule === currentDate;
 
         // }else 
+        
         if(trackingFilter === 'Abandoned'){
             isMatchingTraking = order.state === 'abandoned'
         }else{
-            isMatchingTraking = order.tracking===trackingFilter
+            isMatchingTraking = order.tracking === trackingFilter
         }
 
         const isMatchingDateFilter = true
@@ -1536,7 +1552,7 @@ function Orders() {
         if(track === 'Livrée' || track === 'Livrée [ Encaisser ]'){
             return greenBg
         }
-        if(track === 'Prêt à expédier' || track === 'Scheduled'){
+        if(track === 'Prêt à expédier' || track === 'Scheduled' || track === 'Scheduled ZR'){
             return orangeBg
         }
         if(track === 'Au Bureau'){
@@ -2478,6 +2494,9 @@ function Orders() {
             name:'Scheduled',
             icon:'Schedule.png'      
         },{
+            name:'Prêt à expédier L',
+            icon:'Prêt à expédier.png'      
+        },{
             name:'En preparation',
             icon:'En preparation.png'  
         },{
@@ -2485,6 +2504,9 @@ function Orders() {
             icon:'Prêt à expédier.png'      
         },{
         
+            name:'Scheduled ZR',
+            icon:'Schedule.png' 
+        },{
             name:'Dispatcher',
             icon:'Dispatcher.png'
         },{
@@ -2553,11 +2575,11 @@ function Orders() {
         //     })
         // }else 
         if(name ==='unconfirmed'){
-            ordersNumber = Orders.filter(order=>(order.state !== 'مؤكدة' && order.state !== 'abandoned')).length
+            ordersNumber = Orders.filter(order=>(order.state !== 'مؤكدة' && order.state !== 'abandoned' && order.tracking !== 'Scheduled')).length
         }else if(name ==='Abandoned'){
             ordersNumber = Orders.filter(order=>order.state === 'abandoned').length
         }else{
-
+            
             if(!filter.dropDown) ordersNumber = Orders.filter(order=>order.tracking===name).length
             filter.dropDown?.forEach(dropDown=>{
                 ordersNumber += Orders.filter(order=>order.tracking===dropDown).length
