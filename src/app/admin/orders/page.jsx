@@ -926,21 +926,18 @@ function Orders() {
                 })
                 return setErrorNotifiction("Not enough items in stock")
             }
-        }
-
-        if(oldOrder.inDelivery !== true && editedOrder.inDelivery  === true&& editedOrder.deliveryAgent !== 'Livreur'){
-            newOrder = {
-                ...newOrder,
-                tracking : 'Prêt à expédier'
-            }
-        }
-        
+        }      
         
        
 
         if(oldOrder.inDelivery !== true && editedOrder.inDelivery  === true && editedOrder.deliveryAgent === 'ZR' && editedOrder.state  === 'مؤكدة'){
             let res= await validateToZR(editedOrder)
+            newOrder = {
+                ...newOrder,
+                tracking : 'Prêt à expédier'
+            }
         }
+
         if(oldOrder.inDelivery !== true && editedOrder.inDelivery  === true && editedOrder.deliveryAgent === 'Livreur' && editedOrder.state  === 'مؤكدة'){
             newOrder = {
                 ...newOrder,
