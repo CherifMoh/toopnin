@@ -928,7 +928,7 @@ function Orders() {
             }
         }
 
-        if(oldOrder.inDelivery !== true && editedOrder.inDelivery  === true){
+        if(oldOrder.inDelivery !== true && editedOrder.inDelivery  === true&& editedOrder.deliveryAgent !== 'Livreur'){
             newOrder = {
                 ...newOrder,
                 tracking : 'Prêt à expédier'
