@@ -324,7 +324,7 @@ function Orders() {
                         const matchingOrder = trackingData.find((item) => item.Tracking === order.DLVTracking);                        
 
                         const newTracking = await getOrderStatus(order,matchingOrder);
-                        if ( !newTracking) return;
+                        if ( !newTracking || newTracking === order.tracking) return;
                         
                         let newOrder = { ...order, tracking: newTracking };
 
