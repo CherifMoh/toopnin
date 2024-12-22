@@ -347,7 +347,7 @@ function Orders() {
 
         function liveUpdateOrders() {
             LivreurOrders.forEach(async(order) => {
-                if(order.state === 'مؤكدة'&& order.inDelivery && order.tracking === 'En preparation'){
+                if(order.state === 'مؤكدة'&& order.inDelivery && order.tracking === 'En Préparation'){
                     const newOrder = { ...order, tracking: 'Prêt à expédier L' };
                     
                     const res = await axios.put(`/api/orders/${order._id}`, newOrder, {
@@ -571,8 +571,8 @@ function Orders() {
             newTracking = 'Scheduled ZR'; 
         } else if (ZrStatus === 'En Traitement - Prêt à Expédie') {
             newTracking = 'Prêt à expédier'; 
-        }else if ((!order.inDelivery && ZrStatus === 'En Preparation')&&order.tracking !== 'Prêt à expédier') {
-            newTracking = 'En preparation';
+        }else if ((!order.inDelivery && ZrStatus === 'En Préparation')&&order.tracking !== 'Prêt à expédier') {
+            newTracking = 'En Préparation';
         } 
 
         if(newTracking === 'Retour Navette' && order.tracking !== 'Retour Navette') {
@@ -914,7 +914,7 @@ function Orders() {
                 await addToZR(editedOrder)
                 newOrder = {
                     ...res.order,
-                    tracking : 'En preparation'
+                    tracking : 'En Préparation'
                 }
             }
             if(!res.success){
@@ -926,7 +926,12 @@ function Orders() {
                 })
                 return setErrorNotifiction("Not enough items in stock")
             }
-        }      
+        }
+
+        if(oldOrder.inDelivery !== true && editedOrder.inDelivery  === true && editedOrder.deliveryAgent !== 'Livreur'){
+            
+        }
+        
         
        
 
@@ -956,7 +961,7 @@ function Orders() {
         if(editedOrder.deliveryAgent === 'Livreur' && oldOrder.state !== 'مؤكدة'){
             newOrder = {
                 ...newOrder,
-                tracking : 'En preparation',
+                tracking : 'En Préparation',
                 inDelivery : true
             }
         }
@@ -1001,7 +1006,7 @@ function Orders() {
             const newOrder = {
                 ...order,
                 state: 'مؤكدة',
-                tracking : 'En preparation',
+                tracking : 'En Préparation',
                 ...(tracking && { DLVTracking: tracking })
 
             };
@@ -1553,7 +1558,7 @@ function Orders() {
         if(track === 'Appel sans Réponse 3' || track === 'Appel sans Réponse 2' || track === 'Appel sans Réponse 1' || track === 'SD - Appel sans Réponse 2' || track === 'SD - Appel sans Réponse 1' || track === 'SD - Annuler par le Client' || track === 'Annuler par le Client'){
             return yellowBg
         }
-        if(track === 'En preparation' || track === 'Dispatcher'){
+        if(track === 'En Préparation' || track === 'Dispatcher'){
             return darkBlueBg
         }
         if(track === 'Livrée' || track === 'Livrée [ Encaisser ]'){
@@ -2504,8 +2509,8 @@ function Orders() {
             name:'Prêt à expédier L',
             icon:'Prêt à expédier.png'      
         },{
-            name:'En preparation',
-            icon:'En preparation.png'  
+            name:'En Préparation',
+            icon:'En Préparation.png'  
         },{
             name:'Prêt à expédier',
             icon:'Prêt à expédier.png'      
