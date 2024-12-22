@@ -927,6 +927,7 @@ function Orders() {
                 return setErrorNotifiction("Not enough items in stock")
             }
         }
+
         if(oldOrder.inDelivery !== true && editedOrder.inDelivery  === true){
             newOrder = {
                 ...newOrder,
@@ -939,6 +940,12 @@ function Orders() {
 
         if(oldOrder.inDelivery !== true && editedOrder.inDelivery  === true && editedOrder.deliveryAgent === 'ZR' && editedOrder.state  === 'مؤكدة'){
             let res= await validateToZR(editedOrder)
+        }
+        if(oldOrder.inDelivery !== true && editedOrder.inDelivery  === true && editedOrder.deliveryAgent === 'Livreur' && editedOrder.state  === 'مؤكدة'){
+            newOrder = {
+                ...newOrder,
+                tracking : 'Prêt à expédier L'
+            }
         }
 
         const emailAllowed = await checkEmailAllowance(oldOrder._id)
