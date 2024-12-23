@@ -949,7 +949,8 @@ function Orders() {
         if(oldOrder.inDelivery !== true && editedOrder.inDelivery  === true && editedOrder.deliveryAgent === 'Livreur' && editedOrder.state  === 'مؤكدة'){
             newOrder = {
                 ...newOrder,
-                tracking : 'Prêt à expédier L'
+                tracking : 'Prêt à expédier L',
+                inDelivery : true
             }
         }
 
@@ -964,8 +965,7 @@ function Orders() {
         if(editedOrder.deliveryAgent === 'Livreur' && oldOrder.state !== 'مؤكدة'){
             newOrder = {
                 ...newOrder,
-                tracking : 'En Préparation',
-                inDelivery : true
+                tracking : 'En Préparation'
             }
         }
 
