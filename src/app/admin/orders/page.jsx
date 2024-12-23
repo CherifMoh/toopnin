@@ -2513,7 +2513,7 @@ function Orders() {
             icon:'Prêt à expédier.png'      
         },{
             name:'En Préparation',
-            icon:'En Préparation.png'  
+            icon:'EnPréparation.png'  
         },{
             name:'Prêt à expédier',
             icon:'Prêt à expédier.png'      
