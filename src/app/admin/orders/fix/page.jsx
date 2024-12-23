@@ -99,6 +99,7 @@ function Fix() {
                     <option value='غير مؤكدة'>غير مؤكدة</option>
                     <option value="En preparation">En préparation</option>
                     <option value="Prêt à expédier">Prêt à expédier</option>
+                    <option value="Prêt à expédier L">Prêt à expédier L</option>
                     <option value="Dispatcher">Dispatcher</option>
                     <option value="Au Bureau">Au Bureau</option>
                     <option value="Annuler par le Client">Annuler par le Client</option>
