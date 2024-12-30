@@ -145,16 +145,18 @@ export async function ZrfetchDate() {
     const now = new Date();
     const lastUpdated = new Date(fetchDateDoc.updatedAt);
 
-    // Check if 10 minutes have passed
-    const tenMinutesInMs = 10 * 60 * 1000;
+    // Check if 5 minutes have passed
+    const tenMinutesInMs = 5 * 60 * 1000;
     
     if (now - lastUpdated >= tenMinutesInMs) {
-      fetchDateDoc.updatedAt = now;
-      await fetchDateDoc.save(); // Update the `updatedAt` field
+      setTimeout(async () => {
+        fetchDateDoc.updatedAt = now;
+        await fetchDateDoc.save(); // Update the `updatedAt` field
+      }, 10000);
       return true;
     }
 
-    return false; // Less than 10 minutes
+    return false; // Less than 5 minutes
   } catch (err) {
     console.log(err.message);
     return null; // Handle error scenario
