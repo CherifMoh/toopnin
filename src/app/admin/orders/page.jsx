@@ -316,6 +316,7 @@ function Orders() {
               
                 trackingData = trackingData.Colis
                 console.log(relevantOrders.length)
+                console.log(trackingData)
                
                 // Update orders in the database
                 await Promise.all(
