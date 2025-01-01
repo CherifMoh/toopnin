@@ -325,7 +325,7 @@ function Orders() {
 
                         const newTracking = await getOrderStatus(order,matchingOrder);
                         if ( !newTracking || newTracking === order.tracking) return;
-                        
+                        console.log(newTracking)
                         let newOrder = { ...order, tracking: newTracking };
 
                         if(newOrder.tracking === 'Prêt à expédier') newOrder.inDelivery = true
