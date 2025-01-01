@@ -315,7 +315,7 @@ function Orders() {
                 let trackingData = await fetchAllOrderStatuses(relevantOrders);
               
                 trackingData = trackingData.Colis
-                
+                console.log(relevantOrders.length)
                
                 // Update orders in the database
                 await Promise.all(
@@ -325,7 +325,7 @@ function Orders() {
 
                         const newTracking = await getOrderStatus(order,matchingOrder);
                         if ( !newTracking || newTracking === order.tracking) return;
-                        console.log(newTracking)
+                        
                         let newOrder = { ...order, tracking: newTracking };
 
                         if(newOrder.tracking === 'Prêt à expédier') newOrder.inDelivery = true
