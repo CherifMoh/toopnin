@@ -346,9 +346,12 @@ function Orders() {
             }
         };
 
-        function liveUpdateOrders() {
+        async function liveUpdateOrders() {
+            const dateFilter = await ZrfetchDate()
+            console.log(dateFilter)
+            if(!dateFilter) return
             LivreurOrders.forEach(async(order) => {
-                if(order.state === 'مؤكدة'&& order.inDelivery && order.tracking === 'En Préparation'){
+                if(order.state === 'مؤكدة'&& order.inDelivery &&( order.tracking === 'En Préparation' || order.tracking === 'Prêt à expédier')){
                     const newOrder = { ...order, tracking: 'Prêt à expédier L' };
                     
                     const res = await axios.put(`/api/orders/${order._id}`, newOrder, {
@@ -359,6 +362,7 @@ function Orders() {
         }
     
         fetchAndUpdateOrders();
+        liveUpdateOrders()
     
         return () => {
             isMounted = false;
