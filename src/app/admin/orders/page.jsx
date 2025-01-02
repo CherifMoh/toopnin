@@ -304,17 +304,30 @@ function Orders() {
                 const relevantOrders = ZrOrders.filter(
                     (order) =>
                         order.deliveryAgent === 'ZR' &&
-                        order.state === 'مؤكدة'
+                        order.state === 'مؤكدة' && 
+                        order.tracking !== 'Livrée [ Recouvert ]'
                 );
                 
+                if(relevantOrders.length === 0) return
                 
-                if (relevantOrders.length === 0) return;
+                let trackingData = [];
+                if (relevantOrders.length > 300) {
+                // Split the orders into chunks of 300
+                const chunks = splitIntoChunks(relevantOrders, 300);
                 
-               
-                // Fetch tracking statuses for all relevant orders
-                let trackingData = await fetchAllOrderStatuses(relevantOrders);
-              
+                // Fetch tracking statuses for each chunk
+                for (const chunk of chunks) {
+                    let chunkData = await fetchAllOrderStatuses(chunk);
+                    chunkData = chunkData.Colis
+                    trackingData = trackingData.concat(chunkData); // Combine results
+                }
+                } else {
+                // Fetch tracking statuses for all relevant orders in a single call
+                trackingData = await fetchAllOrderStatuses(relevantOrders);
                 trackingData = trackingData.Colis
+                }
+              
+                
                 console.log(relevantOrders.length)
                 console.log(trackingData)
                
@@ -812,6 +825,15 @@ function Orders() {
             })
             console.error('Error:', error.response?.data || error.message);
         }
+    }
+
+
+    function splitIntoChunks(array, chunkSize) {
+        let chunks = [];
+        for (let i = 0; i < array.length; i += chunkSize) {
+          chunks.push(array.slice(i, i + chunkSize));
+        }
+        return chunks;
     }
 
     async function validateToZR(order) {
