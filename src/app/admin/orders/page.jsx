@@ -444,7 +444,6 @@ function Orders() {
             
             addOrder(order)
         });
-        console.log(newOrders.length)
 
         if(newOrders.length>0) updateShopifyDate()
     
