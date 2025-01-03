@@ -328,8 +328,8 @@ function Orders() {
                 }
               
                 
-                console.log(relevantOrders.length)
-                console.log(trackingData)
+                // console.log(relevantOrders.length)
+                // console.log(trackingData)
                
                 // Update orders in the database
                 await Promise.all(
@@ -344,7 +344,7 @@ function Orders() {
 
                         if(newOrder.tracking === 'Prêt à expédier') newOrder.inDelivery = true
 
-                        
+                        console.log(newOrder.tracking)
                         const res = await axios.put(`/api/orders/${order._id}`, newOrder, {
                             headers: { 'Content-Type': 'application/json' },
                         });
