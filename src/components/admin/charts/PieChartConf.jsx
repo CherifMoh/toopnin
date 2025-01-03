@@ -15,7 +15,7 @@ async function fetchTrackingOrders() {
 }
 const fetchOrders = async (filters) => {
 
-  const res = await axios.get(`/api/orders?date=${filters.date}&startDate=${filters.startDate}&endDate=${filters.endDate}`);
+  const res = await axios.get(`/api/orders/createdAt?date=${filters.date}&startDate=${filters.startDate}&endDate=${filters.endDate}`);
   return res.data;
 };
 
@@ -104,9 +104,9 @@ function PieChartC() {
   const betweenPercent = Math.floor((between.length / (confirmed.length + inConfirmed.length + between.length)) * 100);
 
   const data = [
-    { name: 'مؤكدة %', value: confirmedPercent, color: '#66FF66' },
-    { name: 'غير مؤكدة %', value: inConfirmedPercent, color: '#FF6666' },
-    { name: 'غيرها %', value: betweenPercent, color: '#808080' },
+    { name: `مؤكدة ${confirmed.length}`, value: confirmedPercent, color: '#66FF66' },
+    { name: `غير مؤكدة ${inConfirmed.length}`, value: inConfirmedPercent, color: '#FF6666' },
+    { name: `غيرها ${between.length}`, value: betweenPercent, color: '#808080' },
   ];
 
   const renderCustomLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent, index }) => {

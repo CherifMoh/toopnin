@@ -15,7 +15,7 @@ async function fetchProducts() {
 }
 const fetchOrders = async (filters) => {
 
-  const res = await axios.get(`/api/orders?date=${filters.date}&startDate=${filters.startDate}&endDate=${filters.endDate}`);
+  const res = await axios.get(`/api/orders/createdAt?date=${filters.date}&startDate=${filters.startDate}&endDate=${filters.endDate}`);
   return res.data;
 };
 
@@ -77,20 +77,24 @@ function PieChartC() {
 
     if(selectedProduct &&order.orders.some(obj => obj.title !== selectedProduct)) return false
 
-    if(order.tracking === 'Retour Livreur' || order.tracking === 'Retour Navette' || order.tracking === 'Retour de Dispatche'){
+    if(order.tracking === 'Retour Livreur' || order.tracking === 'Retour Navette' || order.tracking === 'Retour de Dispatche'|| order.tracking === 'Retour Client'){
       result = true
     }
     return result
   });
-
+  let inProcess = Orders.filter(order =>{
+    return order.state === 'مؤكدة'
+  })
  
 
-  const livredPercent = Math.floor((livred.length / (livred.length + Retour.length)) * 100);
-  const retourPercent = Math.floor((Retour.length / (livred.length + Retour.length)) * 100);
+  const livredPercent = Math.floor((livred.length / (Orders.length)) * 100);
+  const retourPercent = Math.floor((Retour.length / (Orders.length)) * 100);
+  const inProcessPercent = Math.floor(((inProcess.length- (livred.length + Retour.length)) / (Orders.length)) * 100);
 
   const data = [
-    { name: 'livred %', value: livred.length, color: '#66FF66' },
-    { name: 'Retour %', value: Retour.length, color: '#FF6666' },
+    { name: `livred ${livred.length}`, value: livredPercent, color: '#55FF55' },
+    { name: `inProcess ${inProcess.length - (livred.length + Retour.length)}`, value: inProcessPercent, color: '#808080' },
+    { name: `Retour ${Retour.length}`, value: retourPercent, color: '#FF6666' },
   ];
 
   const renderCustomLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent, index }) => {
