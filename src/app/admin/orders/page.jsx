@@ -344,11 +344,26 @@ function Orders() {
 
                         if(newOrder.tracking === 'Prêt à expédier') newOrder.inDelivery = true
 
-                        console.log(newOrder.tracking)
-                        const res = await axios.put(`/api/orders/${order._id}`, newOrder, {
-                            headers: { 'Content-Type': 'application/json' },
-                        });
-                        console.log(res.data)
+                        try {
+                            const response = await fetch(`/api/orders/${order._id}`, {
+                              method: 'PUT',
+                              headers: {
+                                'Content-Type': 'application/json',
+                              },
+                              body: JSON.stringify(newOrder),
+                            });
+                  
+                            if (!response.ok) {
+                              const errorData = await response.json();
+                              throw new Error(errorData.message || 'Failed to update order');
+                            }
+                  
+                            const data = await response.json();
+                            console.log('Update successful:', data);
+                            
+                          } catch (error) {
+                            console.error(`Failed to update order ${order._id}:`, error);
+                          }
                     
                     })
                 );
