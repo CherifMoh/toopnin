@@ -348,6 +348,7 @@ function Orders() {
                         const res = await axios.put(`/api/orders/${order._id}`, newOrder, {
                             headers: { 'Content-Type': 'application/json' },
                         });
+                        console.log(res.data)
                     
                     })
                 );
@@ -816,7 +817,8 @@ function Orders() {
      
 
         try {
-            await addOrderToZR(ZROrder)
+            const res = await addOrderToZR(ZROrder)
+            console.log(res)
         } catch (error) {
             setErrorNotifiction("couldn't set the order in ZR")
             setEditedOrder(pre=>{
