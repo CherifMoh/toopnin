@@ -34,7 +34,7 @@ export async function PUT(req, { params }) {
       tracking: NewOrder.DLVTracking,
       action: "تم تعديل طلب",
     }); 
-    return Response.json({success:true,message:"order updated"})
+    return Response.json({success:true,phone:newDocument.phoneNumber,message:"order updated"})
 
   } catch (err) {
     return new NextResponse("Error :" + err)
