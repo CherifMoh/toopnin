@@ -338,7 +338,10 @@ function Orders() {
                         const matchingOrder = trackingData.find((item) => item.Tracking === order.DLVTracking);                        
 
                         const newTracking = await getOrderStatus(order,matchingOrder);
-                        if ( !newTracking || newTracking === order.tracking) return;
+                        if (!newTracking || newTracking === order.tracking) {
+                            // console.log('Skipping update for order:', order._id);
+                            return Promise.resolve();
+                        }
                         
                         let newOrder = { ...order, tracking: newTracking };
 
